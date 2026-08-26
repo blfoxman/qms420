@@ -426,24 +426,25 @@ const MODULE_DEFS=[
   {id:'batch',label:'Batch Tracker'},
   {id:'formbank',label:'Formulation Bank'},
   {id:'cogs',label:'COGS Calculator'},
+  {id:'planner',label:'Production Planner'},
   {id:'mydocs',label:'My Documents'},
   {id:'sales',label:'Sales & Marketing'},
 ];
 const ROLE_DEFAULT_PERMS={
-  admin:{license:'admin',board:'admin',qms:'admin',compliance:'admin',risks:'admin',logs:'admin',batch:'admin',formbank:'admin',cogs:'admin',mydocs:'admin',sales:'admin'},
-  general_manager:{license:'read',board:null,qms:null,compliance:null,risks:null,logs:null,batch:null,formbank:null,cogs:null,mydocs:'admin',sales:null},
-  assistant_general_manager:{license:'read',board:null,qms:null,compliance:null,risks:null,logs:null,batch:null,formbank:null,cogs:null,mydocs:'admin',sales:null},
-  compliance_officer:{license:'read',board:null,qms:null,compliance:null,risks:null,logs:null,batch:null,formbank:null,cogs:null,mydocs:'admin',sales:null},
-  security_manager:{license:'read',board:null,qms:null,compliance:null,risks:null,logs:null,batch:null,formbank:null,cogs:null,mydocs:'admin',sales:null},
-  security_officer:{license:'read',board:null,qms:null,compliance:null,risks:null,logs:null,batch:null,formbank:null,cogs:null,mydocs:'admin',sales:null},
-  inventory_manager:{license:'read',board:null,qms:null,compliance:null,risks:null,logs:null,batch:null,formbank:null,cogs:null,mydocs:'admin',sales:null},
-  extraction_manager:{license:'read',board:null,qms:null,compliance:null,risks:null,logs:null,batch:null,formbank:null,cogs:null,mydocs:'admin',sales:null},
-  production_manager:{license:'read',board:null,qms:null,compliance:null,risks:null,logs:null,batch:null,formbank:null,cogs:null,mydocs:'admin',sales:null},
-  sales_manager:{license:'read',board:null,qms:null,compliance:null,risks:null,logs:null,batch:null,formbank:null,cogs:null,mydocs:'admin',sales:null},
-  production_lead:{license:'read',board:null,qms:null,compliance:null,risks:null,logs:null,batch:null,formbank:null,cogs:null,mydocs:'admin',sales:null},
-  team_member:{license:'read',board:null,qms:null,compliance:null,risks:null,logs:null,batch:null,formbank:null,cogs:null,mydocs:'admin',sales:null},
-  sanitation:{license:'read',board:null,qms:null,compliance:null,risks:null,logs:null,batch:null,formbank:null,cogs:null,mydocs:'admin',sales:null},
-  employee:{license:'read',board:null,qms:null,compliance:null,risks:null,logs:null,batch:null,formbank:null,cogs:null,mydocs:'admin',sales:null},
+  admin:{license:'admin',board:'admin',qms:'admin',compliance:'admin',risks:'admin',logs:'admin',batch:'admin',formbank:'admin',cogs:'admin',planner:'admin',mydocs:'admin',sales:'admin'},
+  general_manager:{license:'read',board:null,qms:null,compliance:null,risks:null,logs:null,batch:null,formbank:null,cogs:null,planner:null,mydocs:'admin',sales:null},
+  assistant_general_manager:{license:'read',board:null,qms:null,compliance:null,risks:null,logs:null,batch:null,formbank:null,cogs:null,planner:null,mydocs:'admin',sales:null},
+  compliance_officer:{license:'read',board:null,qms:null,compliance:null,risks:null,logs:null,batch:null,formbank:null,cogs:null,planner:null,mydocs:'admin',sales:null},
+  security_manager:{license:'read',board:null,qms:null,compliance:null,risks:null,logs:null,batch:null,formbank:null,cogs:null,planner:null,mydocs:'admin',sales:null},
+  security_officer:{license:'read',board:null,qms:null,compliance:null,risks:null,logs:null,batch:null,formbank:null,cogs:null,planner:null,mydocs:'admin',sales:null},
+  inventory_manager:{license:'read',board:null,qms:null,compliance:null,risks:null,logs:null,batch:null,formbank:null,cogs:null,planner:null,mydocs:'admin',sales:null},
+  extraction_manager:{license:'read',board:null,qms:null,compliance:null,risks:null,logs:null,batch:null,formbank:null,cogs:null,planner:null,mydocs:'admin',sales:null},
+  production_manager:{license:'read',board:null,qms:null,compliance:null,risks:null,logs:null,batch:null,formbank:null,cogs:null,planner:null,mydocs:'admin',sales:null},
+  sales_manager:{license:'read',board:null,qms:null,compliance:null,risks:null,logs:null,batch:null,formbank:null,cogs:null,planner:null,mydocs:'admin',sales:null},
+  production_lead:{license:'read',board:null,qms:null,compliance:null,risks:null,logs:null,batch:null,formbank:null,cogs:null,planner:null,mydocs:'admin',sales:null},
+  team_member:{license:'read',board:null,qms:null,compliance:null,risks:null,logs:null,batch:null,formbank:null,cogs:null,planner:null,mydocs:'admin',sales:null},
+  sanitation:{license:'read',board:null,qms:null,compliance:null,risks:null,logs:null,batch:null,formbank:null,cogs:null,planner:null,mydocs:'admin',sales:null},
+  employee:{license:'read',board:null,qms:null,compliance:null,risks:null,logs:null,batch:null,formbank:null,cogs:null,planner:null,mydocs:'admin',sales:null},
 };
 function modulePerm(u,mod){
   if(!u)return null;
@@ -882,7 +883,7 @@ async function requestPushPermission(userId){
 // \u2500\u2500 AUTH \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 function Auth({onLogin}){
   const[tab,setTab]=useState('login');
-  const[f,setF]=useState({firstName:'',lastName:'',email:'',pw:'',dept:'Production',loc:'Missouri',depts:[],licenses:[]});
+  const[f,setF]=useState({firstName:'',lastName:'',email:'',pw:'',dept:'Production',loc:'Michigan',depts:[],licenses:[]});
   const[msg,setMsg]=useState('');
   const[pend,setPend]=useState(false);
   const[loading,setLoading]=useState(false);
@@ -938,7 +939,7 @@ function Auth({onLogin}){
 
   return el('div',{className:'auth-wrap'},el('div',{className:'auth-box'},
     el(BFMlogo,{size:36,labelSize:24,className:'logo'}),
-    el('div',{className:'auth-sub'},'Quality Management System — Michigan'),
+    el('div',{className:'auth-sub'},'Task Management System'),
     el('div',{className:'auth-tabs'},
       el('button',{className:`atab ${tab==='login'?'on':''}`,onClick:()=>{setTab('login');setMsg('');}}, 'Sign In'),
       el('button',{className:`atab ${tab==='reg'?'on':''}`,onClick:()=>{setTab('reg');setMsg('');}}, 'Register'),
@@ -998,7 +999,7 @@ const SETUP_SQL=`
 CREATE TABLE IF NOT EXISTS pf_users (
   id text primary key, name text, first_name text, last_name text,
   email text unique, pw text, role text default 'team_member',
-  dept text default 'General', loc text default 'Missouri',
+  dept text default 'General', loc text default 'Michigan',
   approved boolean default false, perms jsonb default '[]', managers jsonb default '[]', oversees_depts jsonb default '[]', licenses jsonb default '[]', depts jsonb default '[]'
 );
 ALTER TABLE pf_users DISABLE ROW LEVEL SECURITY;
@@ -1009,7 +1010,7 @@ CREATE TABLE IF NOT EXISTS pf_tasks (
   id text primary key, title text, section text,
   description text default '', assignees jsonb default '[]',
   due_date text, priority text default 'medium',
-  status text default 'not_started', loc text default 'Missouri',
+  status text default 'not_started', loc text default 'Michigan',
   tags jsonb default '[]', notes jsonb default '[]',
   attachments jsonb default '[]', created_by text,
   created_by_id text, created_at text, updated_at text,
@@ -1027,7 +1028,7 @@ CREATE TABLE IF NOT EXISTS pf_events (
   all_day boolean default false, attendees jsonb default '[]',
   location text, meet_link text, color text default '#f5a623',
   created_by text, created_by_id text, created_at text, updated_at text,
-  loc text default 'Missouri', personal boolean default false
+  loc text default 'Michigan', personal boolean default false
 );
 ALTER TABLE pf_events DISABLE ROW LEVEL SECURITY;
 CREATE TABLE IF NOT EXISTS pf_meeting_notes (
@@ -1974,7 +1975,7 @@ function ComplianceSummaryWidget({cu,setPage,SUPA_URL,SUPA_KEY,H}){
         el('div',{style:{fontSize:20}},'\u2705'),
         el('div',null,
           el('div',{style:{fontSize:15,fontWeight:800,color:'var(--text)'}},'Compliance Overview'),
-          el('div',{style:{fontSize:12,color:'var(--text2)',marginTop:1}},'ISO 9001 \u00B7 cGMP \u00B7 Missouri DCR \u00B7 FSMA 21 CFR 117'),
+          el('div',{style:{fontSize:12,color:'var(--text2)',marginTop:1}},'ISO 9001 \u00B7 cGMP \u00B7 Michigan CRA \u00B7 FSMA 21 CFR 117'),
         ),
       ),
       el('div',{style:{display:'flex',alignItems:'center',gap:10}},
@@ -2039,13 +2040,13 @@ function Board({tasks,setTasks,cu,users,locFilter,setLocFilter,canAccessQms,setP
   const[colOrder,setColOrder]=useState(()=>{try{const s=localStorage.getItem('pf_col_order');const saved=s?JSON.parse(s):null;const allIds=COLS.map(c=>c.id);if(saved){const merged=[...saved.filter(id=>allIds.includes(id)),...allIds.filter(id=>!saved.includes(id))];return merged;}return allIds;}catch{return COLS.map(c=>c.id);}});
   const[dragCol,setDragCol]=useState(null);
   const[dragOver,setDragOver]=useState(null);
-  const[f,setF]=useState({title:'',section:'Missouri Production',description:'',assignees:[],due_date:'',priority:'medium',loc:'Missouri',tags:[]});
+  const[f,setF]=useState({title:'',section:'Michigan Production',description:'',assignees:[],due_date:'',priority:'medium',loc:'Michigan',tags:[]});
   const today=new Date().toISOString().slice(0,10);
   const isAdmin=cu.role==='admin';
 
   const filtered=useMemo(()=>{
     let list=tasks;
-    // Single location: Missouri only — no loc filtering needed
+    // Single location: Michigan only — no loc filtering needed
     if(section!=='All') list=list.filter(t=>t.section===section);
     if(restricted==='lead'){
       // Production Lead: strictly tasks assigned to them — not created-by or cc.
@@ -2101,7 +2102,7 @@ function Board({tasks,setTasks,cu,users,locFilter,setLocFilter,canAccessQms,setP
       sendEmail({to:a.email,subject:`\uD83D\uDCCB New task assigned: "${f.title}"`,html:emailBody});
     });
     sendLocalNotification('\uD83D\uDCCB Task Created',`"${f.title}" assigned to ${f.assignees.map(a=>a.name.split(' ')[0]).join(', ')}`).catch(()=>{});
-    setF({title:'',section:'General',description:'',assignees:[],due_date:'',priority:'medium',loc:'Missouri',tags:[]});
+    setF({title:'',section:'General',description:'',assignees:[],due_date:'',priority:'medium',loc:'Michigan',tags:[]});
     setNew(false);setSaving(false);
   }
 
@@ -2164,7 +2165,7 @@ function Board({tasks,setTasks,cu,users,locFilter,setLocFilter,canAccessQms,setP
     canAccessQms&&el(ComplianceSummaryWidget,{cu,setPage,SUPA_URL,SUPA_KEY,H}),
     el('div',{style:{display:'flex',gap:16,marginBottom:16,flexWrap:'wrap',alignItems:'center'}},
       el('div',{style:{display:'flex',gap:6}},
-        el('button',{onClick:()=>setLocFilter('Missouri'),style:{padding:'5px 14px',borderRadius:20,border:'1px solid',fontSize:12,fontWeight:500,cursor:'default',background:'var(--accent)',color:'#fff',borderColor:'var(--accent)'}},"\uD83C\uDFD7 Missouri")
+        el('button',{onClick:()=>setLocFilter('Michigan'),style:{padding:'5px 14px',borderRadius:20,border:'1px solid',fontSize:12,fontWeight:500,cursor:'default',background:'var(--accent)',color:'#fff',borderColor:'var(--accent)'}},"\uD83C\uDFD7 Michigan")
       ),
       el('div',{style:{width:1,height:20,background:'var(--border)'}}),
       el('div',{style:{display:'flex',gap:6,flexWrap:'wrap'}},
@@ -2226,7 +2227,7 @@ function Board({tasks,setTasks,cu,users,locFilter,setLocFilter,canAccessQms,setP
               el('div',{style:{width:3,height:32,borderRadius:4,background:PRI[task.priority]?.color||'#6b7280',flexShrink:0}}),
               el('div',{style:{flex:1,minWidth:0}},
                 el('div',{style:{fontSize:13,fontWeight:600}},task.title),
-                el('div',{style:{fontSize:11,color:'var(--text2)',marginTop:2}},task.section+' \u00B7 Created by '+task.created_by+(task.loc&&task.loc!=='Missouri'?' \u00B7 '+task.loc:'')),
+                el('div',{style:{fontSize:11,color:'var(--text2)',marginTop:2}},task.section+' \u00B7 Created by '+task.created_by+(task.loc&&task.loc!=='Michigan'?' \u00B7 '+task.loc:'')),
                 task.status==='on_hold'&&el('div',{style:{fontSize:11,color:'var(--red)',fontWeight:700,marginTop:2}},'\uD83D\uDEA8 ON HOLD \u2014 '+task.hold_reason?.slice(0,50)),
               ),
               el('div',{style:{display:'flex',gap:6,alignItems:'center',flexShrink:0}},
@@ -2329,7 +2330,7 @@ function Team({users,setUsers,cu}){
   const[newPw,setNewPw]=useState('');
   const[pwMsg,setPwMsg]=useState('');
   const[teamTab,setTeamTab]=useState('members');
-  const[af,setAf]=useState({firstName:'',lastName:'',email:'',pw:'',role:'team_member',roles:['team_member'],dept:'Production',loc:'Missouri'});
+  const[af,setAf]=useState({firstName:'',lastName:'',email:'',pw:'',role:'team_member',roles:['team_member'],dept:'Production',loc:'Michigan'});
   const pending=users.filter(u=>!u.approved);
   const approved=users.filter(u=>u.approved).filter(u=>
     !search||u.name.toLowerCase().includes(search.toLowerCase())||
@@ -2398,7 +2399,7 @@ function Team({users,setUsers,cu}){
       await db.insert('pf_users',nu);
       setUsers(p=>[...p,nu]);
       setAdd(false);
-      setAf({firstName:'',lastName:'',email:'',pw:'',role:'team_member',roles:['team_member'],dept:'Production',loc:'Missouri'});
+      setAf({firstName:'',lastName:'',email:'',pw:'',role:'team_member',roles:['team_member'],dept:'Production',loc:'Michigan'});
     }catch(e){console.error('addUser error:',e);alert('Failed to add user: '+e.message);}
   }
 
@@ -2969,7 +2970,7 @@ function SalesMarketing({salesTasks,setSalesTasks,cu,users,locFilter}){
     type:'Retail Visit',title:'',description:'',
     assigned_to:'',assigned_id:'',
     date:'',time:'',
-    state:'Missouri',brand:'',location:'',
+    state:'Michigan',brand:'',location:'',
     priority:'medium',report:'',
   });
 
@@ -3038,7 +3039,7 @@ function SalesMarketing({salesTasks,setSalesTasks,cu,users,locFilter}){
         </div>`
       });
     }
-    setF({type:'Retail Visit',title:'',description:'',assigned_to:'',assigned_id:'',date:'',time:'',state:'Missouri',brand:'',location:'',priority:'medium',report:''});
+    setF({type:'Retail Visit',title:'',description:'',assigned_to:'',assigned_id:'',date:'',time:'',state:'Michigan',brand:'',location:'',priority:'medium',report:''});
     setNew(false);setSaving(false);
   }
 
@@ -3207,7 +3208,7 @@ function SalesMarketing({salesTasks,setSalesTasks,cu,users,locFilter}){
           el('div',{className:'fg',style:{marginTop:13}},
             el('label',null,'State'),
             el('div',{style:{display:'flex',gap:8,marginTop:4}},
-              ['Missouri'].map(s=>el('button',{key:s,onClick:()=>setF(p=>({...p,state:s,brand:'',location:''})),style:{flex:1,padding:'9px',borderRadius:'var(--rs)',border:'2px solid',borderColor:f.state===s?'var(--accent)':'var(--border)',background:f.state===s?'rgba(30,58,95,.08)':'transparent',color:f.state===s?'var(--accent)':'var(--text2)',fontFamily:'inherit',fontWeight:600,fontSize:13,cursor:'pointer',transition:'all .15s'}},'\uD83D\uDDFA '+s))
+              ['Michigan'].map(s=>el('button',{key:s,onClick:()=>setF(p=>({...p,state:s,brand:'',location:''})),style:{flex:1,padding:'9px',borderRadius:'var(--rs)',border:'2px solid',borderColor:f.state===s?'var(--accent)':'var(--border)',background:f.state===s?'rgba(30,58,95,.08)':'transparent',color:f.state===s?'var(--accent)':'var(--text2)',fontFamily:'inherit',fontWeight:600,fontSize:13,cursor:'pointer',transition:'all .15s'}},'\uD83D\uDDFA '+s))
             ),
           ),
           el('div',{className:'fg'},
@@ -3588,7 +3589,7 @@ const QMS_DEPTS=['Facility','Production','Sanitation','Compliance','Security','W
 const QMS_PRIORITIES={critical:{label:'Critical',color:'#ef4444'},major:{label:'Major',color:'#f59e0b'},minor:{label:'Minor',color:'#3b82f6'}};
 const QMS_STATUSES={open:{label:'Open',color:'#ef4444'},in_progress:{label:'In Progress',color:'#f5a623'},closed:{label:'Closed',color:'#10b981'},cancelled:{label:'Cancelled',color:'#6b7280'}};
 
-// \u2500\u2500 COMPLIANCE MODULE (ISO 9001 + GMP + 21 CFR 117 + Missouri DCR) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+// \u2500\u2500 COMPLIANCE MODULE (ISO 9001 + GMP + 21 CFR 117 + Michigan CRA) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 // \u2500\u2500 RISK REGISTER (ISO 9001:2015 Clause 6.1) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 // \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
 // FACILITY LOGS MODULE \u2014 Sanitation, Waste, Security, Pest, Equipment, Temp, Visitor, Environmental
@@ -3911,7 +3912,7 @@ function previewSafe(v){
 // (used for the Sanitation Log's Daily/Weekly/Monthly area & equipment checklists).
 function checklistFields(prefix,names){return names.map(n=>({key:prefix+'_'+slug(n),label:n,type:'checkbox'}));}
 const LOG_TYPES={
-  sanitation:{id:'sanitation',label:'Sanitation Log',icon:'\uD83E\uDDF9',color:'#065f46',bg:'#f0fdf4',table:'pf_log_sanitation',dcr:'cGMP / 21 CFR 117 / Missouri DCR',freq:'Daily / Weekly / Monthly',fields:[
+  sanitation:{id:'sanitation',label:'Sanitation Log',icon:'\uD83E\uDDF9',color:'#065f46',bg:'#f0fdf4',table:'pf_log_sanitation',dcr:'cGMP / 21 CFR 117 / Michigan CRA',freq:'Daily / Weekly / Monthly',fields:[
     {key:'date',label:'Date *',type:'date'},{key:'time',label:'Time Completed',type:'time'},
     {key:'shift',label:'Shift',type:'select',options:['Day','Evening','Night']},
     {key:'cleaned_by',label:'Cleaned By *',type:'text',placeholder:'Employee name'},
@@ -3935,11 +3936,11 @@ const LOG_TYPES={
     {key:'_s_notes',label:'--- NOTES ---',type:'section'},
     {key:'notes',label:'Additional Notes',type:'textarea',placeholder:'Any observations, issues found, or comments'},
   ]},
-  waste:{id:'waste',label:'Waste Destruction Log',icon:'\uD83D\uDDD1\uFE0F',color:'#7c2d12',bg:'#fff7ed',table:'pf_log_waste',dcr:'Missouri DCR / METRC Required',freq:'Every destruction event',fields:[
+  waste:{id:'waste',label:'Waste Destruction Log',icon:'\uD83D\uDDD1\uFE0F',color:'#7c2d12',bg:'#fff7ed',table:'pf_log_waste',dcr:'Michigan CRA / METRC Required',freq:'Every destruction event',fields:[
     {key:'date',label:'Date of Waste Generation *',type:'date'},
     {key:'time',label:'Time of Waste Generation',type:'time'},
     {key:'personnel_involved',label:'Personnel Involved *',type:'text',placeholder:'Names of all staff involved'},
-    {key:'agent_ids',label:'Agent ID(s) *',type:'text',placeholder:'DCR agent ID numbers'},
+    {key:'agent_ids',label:'Agent ID(s) *',type:'text',placeholder:'CRA agent ID numbers'},
     {key:'category',label:'Category *',type:'select',options:['Concentrate','Flower','Vape Cartridges','Edibles','Infused Pre-Rolls']},
     {key:'strain',label:'Strain / Flavor',type:'text',placeholder:'Strain or flavor name'},
     {key:'waste_metrc_tags',label:'METRC Tag(s) *',type:'text',prefix:'1A40C03000060E100'},
@@ -3962,7 +3963,7 @@ const LOG_TYPES={
     {key:'compliance_verification',label:'Compliance Verification',type:'checkbox'},
     {key:'supervisor_name',label:'Supervisor Name *',type:'text',placeholder:'Verifying supervisor full name'},
   ]},
-  security_inspection:{id:'security_inspection',label:'Security Equipment Inspection',icon:'\uD83D\uDEE1\uFE0F',color:'#1e3a5f',bg:'#eff6ff',table:'pf_log_security_inspection',dcr:'Missouri DCR Security Requirements — Weekly',freq:'Weekly',
+  security_inspection:{id:'security_inspection',label:'Security Equipment Inspection',icon:'\uD83D\uDEE1\uFE0F',color:'#1e3a5f',bg:'#eff6ff',table:'pf_log_security_inspection',dcr:'Michigan CRA Security Requirements — Weekly',freq:'Weekly',
     cameras:["VAULT 1", "VAULT 2", "VAULT FISHEYE", "VAULT 4", "BIOMASS 1", "BIOMASS 2", "WAREHOUSE AIR COMPRESSOR", "WAREHOUSE SHIPPING OFFICE DOOR", "WAREHOUSE DOOR INSIDE", "MAIN ENTRANCE DOOR IN", "MAIN ENTRANCE OUT", "MAIN ENTRANCE OUT 2", "FRONT OFFICE", "TESTING 1", "TESTING 2", "1 ETHANOL EXTRACTION", "2 ETHANOL EXTRACTION", "STORAGE 1", "STORAGE 1B", "STORAGE 2", "STORAGE 3", "EXECUTIVE OFFICE", "EXECUTIVE OFFICE 2", "WASTE 1", "WASTE 2", "WASTE 3", "SECURITY HALLWAY", "SHIP/REC OFFICE", "FREEZER 1", "FREEZER 2", "FREEZER 3", "HWY 47 N", "HWY 47 S", "WAREHOUSE SECURITY OUT", "SHIPPING DOCK", "DUNCAN ST E", "DUNCAN ST W", "SANITATION ROOM DOOR", "EMERGENCY EXIT INSIDE", "EMERGENCY EXIT OUTSIDE", "SECURITY ROOM", "1 BUTANE EXTRACTION", "2 BUTANE EXTRACTION", "3 BUTANE EXTRACTION", "C1D1 A", "C1D1 B", "DATA ROOM", "PRE ROLL FILLING", "PACKAGING / PRE ROLL", "GUMMY PRODUCTION", "CART FILLING", "PRODUCTION CART FILLING", "GUMMY DEMOLDING AREA", "PRODUCTION CENTER WEST", "PRODUCTION PACKAGING AREA", "TESTING / WASTE", "QC", "RESTROOMS"],
     door_locks:["MAIN ENTRANCE", "SECURITY 1 ENTRANCE", "FLOOR MANAGERS OFFICE", "SOUTH EAST PRODUCTION", "WAREHOUSE ENTRANCE", "SECURITY 2 ENTRANCE", "WAREHOUSE", "VAULT", "BUTANE EXTRACTION", "BIOMASS", "ETHANOL EXTRACTION", "DATA ROOM", "EXECUTIVE OFFICE", "DOOR BELL", "MAIN ENTRANCE (2)", "WAREHOUSE ENTRANCE (2)"],
     alarms:["MAIN ENTRANCE CONTACT SENSOR", "SECURITY 2 ENTRANCE CONTACT SENSOR", "WAREHOUSE ENTRANCE CONTACT SENSOR", "DISTRIBUTION CONTACT SENSOR", "EMERGENCY EXIT CONTACT SENSOR", "DATA ROOM CONTACT SENSOR", "MAIN ENTRANCE MOTION DETECTOR", "EMERGENCY EXIT MOTION DETECTOR", "WAREHOUSE MOTION DETECTOR", "EXECUTIVE OFFICE MOTION DETECTOR 1", "SECURITY 2 ENTRANCE MOTION DETECTOR", "BASE STATION", "EXECUTIVE OFFICE MOTION DETECTOR 2", "SECURITY 1 PANIC BUTTON", "SECURITY 2 PANIC BUTTON", "SECURITY 1 KEY PAD", "SECURITY 2 KEY PAD"],
@@ -3973,19 +3974,19 @@ const LOG_TYPES={
       {key:'notes',label:'General Notes / Issues Found',type:'textarea',placeholder:'Any issues, failures, or observations'},
     ],
   },
-  security:{id:'security',label:'Security Malfunction Log',icon:'\uD83D\uDD12',color:'#1e3a5f',bg:'#eff6ff',table:'pf_log_security',dcr:'Missouri DCR Security Requirements',freq:'Every malfunction event',fields:[
+  security:{id:'security',label:'Security Malfunction Log',icon:'\uD83D\uDD12',color:'#1e3a5f',bg:'#eff6ff',table:'pf_log_security',dcr:'Michigan CRA Security Requirements',freq:'Every malfunction event',fields:[
     {key:'date',label:'Date *',type:'date'},{key:'time',label:'Time Discovered',type:'time'},
     {key:'system_type',label:'System Type *',type:'select',options:['CCTV Camera','DVR/NVR Recorder','Motion Sensor','Door Access Control','Alarm System','Perimeter Fence/Gate','Safe/Vault','Other']},
     {key:'location',label:'Location *',type:'text',placeholder:'e.g. Front entrance camera'},
     {key:'description',label:'Description of Malfunction *',type:'textarea',placeholder:'What malfunctioned and how discovered'},
-    {key:'dcr_notified',label:'DCR Notified?',type:'select',options:['Yes \u2014 within 24 hours','Yes \u2014 within 48 hours','Not required \u2014 minor','Pending']},
+    {key:'cra_notified',label:'CRA Notified?',type:'select',options:['Yes \u2014 within 24 hours','Yes \u2014 within 48 hours','Not required \u2014 minor','Pending']},
     {key:'temp_measure',label:'Temporary Security Measure',type:'textarea',placeholder:'Interim measures while system is down'},
     {key:'repair_date',label:'Repair Completed Date',type:'date'},
     {key:'resolution',label:'Resolution / Repair',type:'textarea',placeholder:'How was it resolved?'},
     {key:'verified_by',label:'Verified Operational By',type:'text',placeholder:'Name of verifying person'},
     {key:'notes',label:'Notes',type:'textarea',placeholder:''},
   ]},
-  pest:{id:'pest',label:'Pest Control Log',icon:'\uD83D\uDC1B',color:'#4c1d95',bg:'#f5f3ff',table:'pf_log_pest',dcr:'cGMP / 21 CFR 117 / Missouri DCR',freq:'Each inspection / treatment',fields:[
+  pest:{id:'pest',label:'Pest Control Log',icon:'\uD83D\uDC1B',color:'#4c1d95',bg:'#f5f3ff',table:'pf_log_pest',dcr:'cGMP / 21 CFR 117 / Michigan CRA',freq:'Each inspection / treatment',fields:[
     {key:'date',label:'Date *',type:'date'},
     {key:'type',label:'Type *',type:'select',options:['Routine inspection','Pest sighting report','Treatment / Extermination','Follow-up inspection','Bait station check','Glue trap check']},
     {key:'performed_by',label:'Performed By *',type:'text',placeholder:'Name or licensed vendor'},
@@ -4022,12 +4023,12 @@ const LOG_TYPES={
     {key:'corrective_action',label:'Corrective Action (if out of range)',type:'textarea',placeholder:'Action taken to correct'},
     {key:'notes',label:'Notes',type:'textarea',placeholder:''},
   ]},
-  visitor:{id:'visitor',label:'Visitor Log',icon:'\uD83D\uDC64',color:'#475569',bg:'#f8fafc',table:'pf_log_visitor',dcr:'Missouri DCR Security Requirements',freq:'Every visitor entry',fields:[
+  visitor:{id:'visitor',label:'Visitor Log',icon:'\uD83D\uDC64',color:'#475569',bg:'#f8fafc',table:'pf_log_visitor',dcr:'Michigan CRA Security Requirements',freq:'Every visitor entry',fields:[
     {key:'date',label:'Date *',type:'date'},{key:'time_in',label:'Time In *',type:'time'},{key:'time_out',label:'Time Out',type:'time'},
     {key:'visitor_name',label:'Visitor Full Name *',type:'text',placeholder:''},
     {key:'visitor_company',label:'Company / Organization',type:'text',placeholder:''},
     {key:'visitor_id',label:'ID Type & Number',type:'text',placeholder:'e.g. MO DL A123456789'},
-    {key:'purpose',label:'Purpose of Visit *',type:'select',options:['Regulatory inspection (DCR)','Regulatory inspection (other)','Vendor / delivery','Testing','Maintenance / repair','Audit','Business meeting','Other']},
+    {key:'purpose',label:'Purpose of Visit *',type:'select',options:['Regulatory inspection (CRA)','Regulatory inspection (other)','Vendor / delivery','Testing','Maintenance / repair','Audit','Business meeting','Other']},
     {key:'areas_accessed',label:'Areas Accessed *',type:'textarea',placeholder:'List all areas visitor entered'},
     {key:'escorted_by',label:'Escorted By *',type:'text',placeholder:'Employee who supervised visitor'},
     {key:'notes',label:'Notes',type:'textarea',placeholder:''},
@@ -4045,7 +4046,7 @@ const LOG_TYPES={
     {key:'notes',label:'Notes',type:'textarea',placeholder:''},
   ]},
   // \u2500\u2500 BATCH TRACKER (category:'batch' \u2014 shown on its own sidebar tab, not Facility Logs) \u2500\u2500
-  ethanol_extraction:{id:'ethanol_extraction',category:'batch',label:'Ethanol Extraction',icon:'\uD83E\uDDEA',color:'#7c3aed',bg:'#f5f3ff',table:'pf_batch_tracker',dcr:'Missouri DCR / METRC \u2014 Batch Production Record',freq:'Per batch',fields:[
+  ethanol_extraction:{id:'ethanol_extraction',category:'batch',label:'Ethanol Extraction',icon:'\uD83E\uDDEA',color:'#7c3aed',bg:'#f5f3ff',table:'pf_batch_tracker',dcr:'Michigan CRA / METRC \u2014 Batch Production Record',freq:'Per batch',fields:[
     {key:'batch_number',label:'Batch / Lot Number',type:'text',placeholder:'e.g. ETH-2026-014'},
     {key:'date',label:'Date',type:'date'},
     {key:'operator',label:'Operator / Personnel',type:'text',placeholder:'Who performed the extraction'},
@@ -4071,7 +4072,7 @@ const LOG_TYPES={
     {key:'status',label:'Status',type:'select',options:['In Progress','Winterization','Filtration','QC Hold','Passed','Failed','Completed']},
     {key:'notes',label:'Notes',type:'textarea',placeholder:'Any observations or issues'},
   ]},
-  butane_extraction:{id:'butane_extraction',category:'batch',label:'BHO Extraction',icon:'\uD83D\uDD25',color:'#ea580c',bg:'#fff7ed',table:'pf_batch_tracker',dcr:'Missouri DCR / METRC \u2014 Batch Production Record',freq:'Per batch',fields:[
+  butane_extraction:{id:'butane_extraction',category:'batch',label:'BHO Extraction',icon:'\uD83D\uDD25',color:'#ea580c',bg:'#fff7ed',table:'pf_batch_tracker',dcr:'Michigan CRA / METRC \u2014 Batch Production Record',freq:'Per batch',fields:[
     {key:'batch_number',label:'Batch / Lot Number',type:'text',placeholder:'e.g. BHO-2026-014'},
     {key:'date',label:'Date',type:'date'},
     {key:'operator',label:'Operator / Personnel',type:'text',placeholder:'Who performed the extraction'},
@@ -4123,7 +4124,7 @@ const LOG_TYPES={
     {key:'status',label:'Status',type:'select',options:['In Progress','Purging','QC Hold','Passed','Failed','Completed']},
     {key:'notes',label:'Notes',type:'textarea',placeholder:'Any observations or issues'},
   ]},
-  pre_rolls:{id:'pre_rolls',category:'batch',label:'Pre-Rolls',icon:'\uD83C\uDF3F',color:'#0891b2',bg:'#ecfeff',table:'pf_batch_tracker',dcr:'Missouri DCR / METRC \u2014 Batch Production Record',freq:'Per batch',fields:[
+  pre_rolls:{id:'pre_rolls',category:'batch',label:'Pre-Rolls',icon:'\uD83C\uDF3F',color:'#0891b2',bg:'#ecfeff',table:'pf_batch_tracker',dcr:'Michigan CRA / METRC \u2014 Batch Production Record',freq:'Per batch',fields:[
     {key:'batch_number',label:'Batch / Lot Number',type:'text',placeholder:'e.g. PR-2026-014'},
     {key:'date',label:'Date',type:'date'},
     {key:'operator',label:'Operator / Personnel',type:'text',placeholder:'Who ran this batch'},
@@ -4180,7 +4181,7 @@ const LOG_TYPES={
     {key:'status',label:'Status',type:'select',options:['In Progress','QC Hold','Passed','Failed','Completed']},
     {key:'notes',label:'Notes',type:'textarea',placeholder:'Any observations or issues'},
   ]},
-  cartridges:{id:'cartridges',category:'batch',label:'Cartridges',icon:'\uD83D\uDCA8',color:'#be185d',bg:'#fdf2f8',table:'pf_batch_tracker',dcr:'Missouri DCR / METRC \u2014 Batch Production Record',freq:'Per batch',fields:[
+  cartridges:{id:'cartridges',category:'batch',label:'Cartridges',icon:'\uD83D\uDCA8',color:'#be185d',bg:'#fdf2f8',table:'pf_batch_tracker',dcr:'Michigan CRA / METRC \u2014 Batch Production Record',freq:'Per batch',fields:[
     {key:'batch_number',label:'Batch / Lot Number',type:'text',placeholder:'e.g. CART-2026-014'},
     {key:'date',label:'Date',type:'date'},
     {key:'operator',label:'Operator / Personnel',type:'text',placeholder:'Who ran this batch'},
@@ -4208,7 +4209,7 @@ const LOG_TYPES={
     {key:'status',label:'Status',type:'select',options:['In Progress','QC Hold','Passed','Failed','Completed']},
     {key:'notes',label:'Notes',type:'textarea',placeholder:'Any observations or issues'},
   ]},
-  gummies:{id:'gummies',category:'batch',label:'Gummies',icon:'\uD83C\uDF6C',color:'#d97706',bg:'#fffbeb',table:'pf_batch_tracker',dcr:'Missouri DCR / METRC \u2014 Batch Production Record',freq:'Per batch',fields:[
+  gummies:{id:'gummies',category:'batch',label:'Gummies',icon:'\uD83C\uDF6C',color:'#d97706',bg:'#fffbeb',table:'pf_batch_tracker',dcr:'Michigan CRA / METRC \u2014 Batch Production Record',freq:'Per batch',fields:[
     {key:'batch_number',label:'Batch / Lot Number',type:'text',placeholder:'e.g. GUM-2026-014'},
     {key:'date',label:'Date',type:'date'},
     {key:'operator',label:'Operator / Personnel',type:'text',placeholder:'Who ran this batch'},
@@ -4249,7 +4250,7 @@ const LOG_TYPES={
     {key:'status',label:'Status',type:'select',options:['In Progress','QC Hold','Passed','Failed','Completed']},
     {key:'notes',label:'Notes',type:'textarea',placeholder:'Any observations or issues'},
   ]},
-  infused_flower:{id:'infused_flower',category:'batch',label:'Infused Flower',icon:'\uD83C\uDF3F',color:'#7c3aed',bg:'#f5f3ff',table:'pf_batch_tracker',dcr:'Missouri DCR / METRC \u2014 Batch Production Record',freq:'Per batch',fields:[
+  infused_flower:{id:'infused_flower',category:'batch',label:'Infused Flower',icon:'\uD83C\uDF3F',color:'#7c3aed',bg:'#f5f3ff',table:'pf_batch_tracker',dcr:'Michigan CRA / METRC \u2014 Batch Production Record',freq:'Per batch',fields:[
     {key:'batch_number',label:'Batch / Lot Number',type:'text',placeholder:'e.g. IF-2026-014'},
     {key:'date',label:'Date',type:'date'},
     {key:'operator',label:'Operator / Personnel',type:'text',placeholder:'Who ran this batch'},
@@ -4281,7 +4282,7 @@ const LOG_TYPES={
     {key:'status',label:'Status',type:'select',options:['In Progress','QC Hold','Passed','Failed','Completed']},
     {key:'notes',label:'Notes',type:'textarea',placeholder:'Any observations or issues'},
   ]},
-  moon_rocks:{id:'moon_rocks',category:'batch',label:'Moon Rocks',icon:'\uD83C\uDF11',color:'#4338ca',bg:'#eef2ff',table:'pf_batch_tracker',dcr:'Missouri DCR / METRC \u2014 Batch Production Record',freq:'Per batch',fields:[
+  moon_rocks:{id:'moon_rocks',category:'batch',label:'Moon Rocks',icon:'\uD83C\uDF11',color:'#4338ca',bg:'#eef2ff',table:'pf_batch_tracker',dcr:'Michigan CRA / METRC \u2014 Batch Production Record',freq:'Per batch',fields:[
     {key:'batch_number',label:'Batch / Lot Number',type:'text',placeholder:'e.g. MR-2026-014'},
     {key:'date',label:'Date',type:'date'},
     {key:'operator',label:'Operator / Personnel',type:'text',placeholder:'Who ran this batch'},
@@ -4298,7 +4299,7 @@ const LOG_TYPES={
     {key:'status',label:'Status',type:'select',options:['In Progress','QC Hold','Passed','Failed','Completed']},
     {key:'notes',label:'Notes',type:'textarea',placeholder:'Any observations or issues'},
   ]},
-  snow_caps:{id:'snow_caps',category:'batch',label:'Snow Caps',icon:'\u2744\uFE0F',color:'#0891b2',bg:'#ecfeff',table:'pf_batch_tracker',dcr:'Missouri DCR / METRC \u2014 Batch Production Record',freq:'Per batch',fields:[
+  snow_caps:{id:'snow_caps',category:'batch',label:'Snow Caps',icon:'\u2744\uFE0F',color:'#0891b2',bg:'#ecfeff',table:'pf_batch_tracker',dcr:'Michigan CRA / METRC \u2014 Batch Production Record',freq:'Per batch',fields:[
     {key:'batch_number',label:'Batch / Lot Number',type:'text',placeholder:'e.g. SC-2026-014'},
     {key:'date',label:'Date',type:'date'},
     {key:'operator',label:'Operator / Personnel',type:'text',placeholder:'Who ran this batch'},
@@ -4366,7 +4367,7 @@ function exportLogPdf(logType,entries,dateFrom,dateTo){
   doc.setFont('helvetica','normal');doc.setFontSize(11);doc.setTextColor(...SUBTEXT);
   doc.text('Regulatory Basis: '+lt.dcr,margin,y);y+=18;
   doc.text('Period: '+(dateFrom||'All dates')+' to '+(dateTo||'All dates')+' \u00B7 Entries: '+entries.length,margin,y);y+=18;
-  doc.text('Black Fox Manufacturing \u2014 HMBF Management Inc. \u2014 MAN000109',margin,y);y+=10;
+  doc.text('Black Fox Manufacturing \u2014 HMBF Management Inc. \u2014 TBD-PENDING',margin,y);y+=10;
   doc.setDrawColor(...BORDER);doc.setLineWidth(0.5);doc.line(margin,y,W-margin,y);y+=20;
   function sectionTable(title,items,keyPrefix,statusOpts){
     checkPage(30);
@@ -4523,7 +4524,7 @@ function exportLogPdf(logType,entries,dateFrom,dateTo){
     });
   });
   doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(22,163,74);
-  doc.text('Official record \u2014 Black Fox QMS \u00B7 MAN000109 \u00B7 HMBF Management Inc. \u00B7 Retain 5+ years per Missouri DCR',margin,H-20);
+  doc.text('Official record \u2014 Black Fox QMS \u00B7 TBD-PENDING \u00B7 HMBF Management Inc. \u00B7 Retain 4+ years per Michigan CRA',margin,H-20);
   doc.save('BlackFox_'+lt.label.replace(/[^a-z0-9]/gi,'_')+'_'+new Date().toISOString().slice(0,10)+'.pdf');
 }
 
@@ -4786,21 +4787,18 @@ function LogEntryForm({logType,cu,onSave,onClose,SUPA_URL,SUPA_KEY,H,editData,lo
     // Waste log: unlimited METRC tags with prefix + weight per tag
     if(logType==='waste'&&f.key==='waste_metrc_tags'){
       const tags=Array.isArray(form.waste_metrc_tags)?form.waste_metrc_tags:[];
-      const PREFIX='1A40C03000060E100';
       return el('div',{key:f.key,className:'fg'},
         el('label',null,f.label+' \u2014 add as many as needed'),
         el('div',{style:{display:'flex',flexDirection:'column',gap:8}},
           tags.map((row,i)=>el('div',{key:i,style:{display:'flex',gap:6,alignItems:'center'}},
-            el('input',{type:'text',value:(row&&row.weight)||'',placeholder:'Weight',onChange:ev=>{
+            el('input',{type:'text',value:(row&&row.weight)||'',placeholder:'Wt / Qty',onChange:ev=>{
               const next=tags.map((r,idx)=>idx===i?{...r,weight:ev.target.value}:r);
               setF('waste_metrc_tags',next);
             },style:{width:90,background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:'8px 10px',color:'var(--text)',fontFamily:'inherit',fontSize:13,boxSizing:'border-box'}}),
-            el('span',{style:{background:'var(--surface2)',border:'1px solid var(--border)',borderRight:'none',borderRadius:'var(--rs) 0 0 var(--rs)',padding:'8px 8px',color:'var(--text3)',fontFamily:'monospace',fontSize:11,whiteSpace:'nowrap',flexShrink:0}},PREFIX),
-            el('input',{type:'text',value:(row&&row.tag)||'',placeholder:'Last 7 digits',onChange:ev=>{
+            el('input',{type:'text',value:(row&&row.tag)||'',placeholder:'Full METRC Tag #',onChange:ev=>{
               const next=tags.map((r,idx)=>idx===i?{...r,tag:ev.target.value}:r);
               setF('waste_metrc_tags',next);
-            },style:{flex:1,background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'0 var(--rs) var(--rs) 0',padding:'8px 10px',color:'var(--text)',fontFamily:'inherit',fontSize:13,boxSizing:'border-box'}}),
-            el('div',{style:{fontSize:10,color:'var(--text3)',whiteSpace:'nowrap',minWidth:100,fontFamily:'monospace'}},PREFIX+(row&&row.tag||'')),
+            },style:{flex:1,background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:'8px 10px',color:'var(--text)',fontFamily:'monospace',fontSize:13,boxSizing:'border-box'}}),
             el('button',{type:'button',onClick:()=>setF('waste_metrc_tags',tags.filter((_,idx)=>idx!==i)),
               style:{background:'#fee2e2',color:'#dc2626',border:'none',borderRadius:6,padding:'8px 12px',fontFamily:'inherit',fontSize:13,fontWeight:700,cursor:'pointer',flexShrink:0}},'\u2715'),
           )),
@@ -4923,7 +4921,7 @@ function LogEntryForm({logType,cu,onSave,onClose,SUPA_URL,SUPA_KEY,H,editData,lo
         el('button',{className:'mc',onClick:onClose},'\u00D7'),
       ),
       el('div',{className:'mbd'},
-        el('div',{style:{background:'rgba(30,58,95,.04)',border:'1px solid rgba(30,58,95,.1)',borderRadius:8,padding:'10px 14px',marginBottom:16,fontSize:12,color:'var(--text2)'}},'\uD83D\uDCCB Fields marked * are required. This record is timestamped and signed \u2014 legally valid for DCR inspections.'),
+        el('div',{style:{background:'rgba(30,58,95,.04)',border:'1px solid rgba(30,58,95,.1)',borderRadius:8,padding:'10px 14px',marginBottom:16,fontSize:12,color:'var(--text2)'}},'\uD83D\uDCCB Fields marked * are required. This record is timestamped and signed \u2014 legally valid for CRA inspections.'),
         lt.fields.filter(f=>
           !(logType==='pre_rolls'&&PRE_ROLL_NO_KIEF_SKUS.includes(form.sku)&&PRE_ROLL_KIEF_SECTION_KEYS.includes(f.key))
           &&!(logType==='butane_extraction'&&form.sku===BHO_DUAL_SKU&&BHO_SINGLE_PRODUCT_KEYS.includes(f.key))
@@ -5041,7 +5039,7 @@ function SecurityInspectionForm({cu,onSave,onClose,editData,SUPA_URL,SUPA_KEY,H}
       el('div',{className:'mh'},
         el('div',null,
           el('div',{style:{fontSize:17,fontWeight:800}},'\uD83D\uDEE1\uFE0F Weekly Security Equipment Inspection'),
-          el('div',{style:{fontSize:11,color:'var(--text2)',marginTop:2}},'Missouri DCR \u2014 '+(editData?'Edit Record':'New Inspection')),
+          el('div',{style:{fontSize:11,color:'var(--text2)',marginTop:2}},'Michigan CRA \u2014 '+(editData?'Edit Record':'New Inspection')),
         ),
         el('button',{className:'mc',onClick:onClose},'\u00D7'),
       ),
@@ -5195,7 +5193,7 @@ function FacilityLogs({cu,isElevated,isAdmin,SUPA_URL,SUPA_KEY,H}){
   if(!activeLog) return el('div',{style:{padding:'0 0 48px'}},
     el('div',{style:{background:'linear-gradient(135deg,#1e3a5f,#2d5282)',borderRadius:14,padding:'24px 28px',marginBottom:24,color:'#fff'}},
       el('div',{style:{fontSize:22,fontWeight:800,marginBottom:4}},'\uD83D\uDCCB Facility Logs'),
-      el('div',{style:{fontSize:13,opacity:.85,lineHeight:1.6}},'All logs are timestamped, signed, and exportable as PDF for DCR inspections and ISO 9001 audits. Retain all records for minimum 5 years per Missouri DCR.'),
+      el('div',{style:{fontSize:13,opacity:.85,lineHeight:1.6}},'All logs are timestamped, signed, and exportable as PDF for CRA inspections and ISO 9001 audits. Retain all records for minimum 4 years per Michigan CRA.'),
     ),
     el('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(260px,1fr))',gap:14}},
       Object.values(LOG_TYPES).filter(log=>log.category!=='batch').map(log=>el('div',{key:log.id,onClick:()=>setActiveLog(log.id),
@@ -5530,6 +5528,273 @@ const REPORTER_TABLE_MAP={
 };
 const ALL_REPORTER_TABLES=['pf_batch_tracker','pf_sops','pf_qms_capas','pf_qms_corrective','pf_qms_deviations','pf_qms_audits','pf_qms_suppliers','pf_qms_complaints','pf_qms_changes','pf_compliance_checks','pf_tasks','pf_log_sanitation','pf_log_visitor','pf_log_waste','pf_log_pest','pf_log_equipment','pf_log_temperature','pf_log_security','pf_risk_register','pf_users_safe'];
 
+// ── PRODUCTION PLANNER ───────────────────────────────────────────────────────
+// AI-powered ingredient calculator. User picks product type, SKU, flavors,
+// and units per flavor. The system pulls saved recipes from pf_cogs_formulations,
+// sends everything to Claude, and gets back a per-flavor ingredient breakdown.
+function ProductionPlanner({cu,SUPA_URL,SUPA_KEY,H}){
+  const[productType,setProductType]=useState(BATCH_TYPE_IDS[0]);
+  const[sku,setSku]=useState('');
+  const[selectedFlavors,setSelectedFlavors]=useState([]);
+  const[unitsPerFlavor,setUnitsPerFlavor]=useState('');
+  const[customInstructions,setCustomInstructions]=useState('');
+  const[results,setResults]=useState(null); // {[flavor]: [{name,qty,unit},...]}
+  const[loading,setLoading]=useState(false);
+  const[error,setError]=useState('');
+  const[recipes,setRecipes]=useState([]);
+  // Production tracking fields per flavor
+  const[tracking,setTracking]=useState({});
+
+  React.useEffect(()=>{
+    fetch(`${SUPA_URL}/rest/v1/pf_cogs_formulations?select=*`,{headers:H.headers})
+      .then(r=>r.ok?r.json():[]).then(d=>setRecipes(Array.isArray(d)?d:[])).catch(()=>[]);
+  },[]);
+
+  const skuOptions=cogsSkuOptions(productType);
+  const flavorOptions=cogsFlavorOptions(productType,sku);
+  const allFlavorsSelected=flavorOptions.length>0&&selectedFlavors.length===flavorOptions.length;
+
+  function changeProductType(pt){setProductType(pt);setSku(cogsSkuOptions(pt)[0]||'');setSelectedFlavors([]);setResults(null);}
+  function changeSku(s){setSku(s);setSelectedFlavors([]);setResults(null);}
+  function toggleFlavor(f){setSelectedFlavors(p=>p.includes(f)?p.filter(x=>x!==f):[...p,f]);}
+  function selectAllFlavors(){setSelectedFlavors(allFlavorsSelected?[]:flavorOptions.slice());}
+  function setTrack(flavor,key,val){setTracking(p=>({...p,[flavor]:{...(p[flavor]||{}),[key]:val}}));}
+
+  const TRACK_FIELDS=[
+    {key:'infused_flower_wt',label:'Infused Flower Wt'},
+    {key:'infused_flower_waste',label:'Infused Flower Waste'},
+    {key:'infused_preroll_produced',label:'Infused Pre Roll Produced'},
+    {key:'kief_used',label:'Kief Used'},
+    {key:'infused_preroll_waste',label:'Infused Pre Roll Waste'},
+    {key:'infused_kiefed_produced',label:'Infused Kiefed Pre Roll Produced'},
+    {key:'infused_kiefed_waste',label:'Infused Kiefed Pre Roll Waste'},
+  ];
+
+  async function calculate(){
+    if(!sku){setError('Select a SKU.');return;}
+    const flavors=flavorOptions.length>0?selectedFlavors:['Standard'];
+    if(flavors.length===0){setError('Select at least one flavor.');return;}
+    if(!unitsPerFlavor||isNaN(parseInt(unitsPerFlavor))){setError('Enter units per flavor.');return;}
+    setError('');setLoading(true);setResults(null);
+
+    const matchingRecipes=recipes.filter(r=>r.product_type===productType&&(r.sku===sku||!r.sku));
+    const recipeData=matchingRecipes.length>0?JSON.stringify(matchingRecipes.map(r=>({
+      name:r.name,sku:r.sku,flavor:r.flavor,batch_size:r.batch_size,
+      raw_materials:(r.raw_materials||[]).map(m=>({name:m.name,qty:m.qty,unit:m.unit})),
+    }))):'No saved recipes.';
+
+    const lt=LOG_TYPES[productType];
+    const prompt=`You are a cannabis production ingredient calculator for Black Fox Manufacturing.
+
+PRODUCT: ${lt?lt.label:productType}
+SKU: ${sku}
+FLAVORS: ${flavors.join(', ')}
+UNITS PER FLAVOR: ${unitsPerFlavor}
+
+SAVED RECIPES:
+${recipeData}
+
+${customInstructions?'NOTES: '+customInstructions:''}
+
+RESPOND WITH ONLY a JSON object (no markdown, no backticks, no explanation). Format:
+{"flavors":{"FlavorName":[{"name":"Ingredient","qty":"amount","unit":"g"}],...},"grand_total":[{"name":"Ingredient","qty":"total","unit":"g"}]}
+
+Rules:
+- ONLY ingredients and quantities. No labor, no packaging, no costs.
+- Use saved recipe ratios scaled to ${unitsPerFlavor} units. If no recipe for a flavor, use the closest matching recipe and note the flavor-specific ingredient (like terpene name).
+- The terpene/flavor ingredient should be named specifically (e.g. "Terpene - Berry Blast" not just "Terpene").
+- Include ALL raw materials: flower, trim, THCA, kief, terpene, distillate, etc.
+- Grand total sums ALL flavors.`;
+
+    try{
+      const res=await fetch(`${SUPA_URL}/functions/v1/claude-proxy`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPA_KEY},
+        body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:4000,messages:[{role:'user',content:prompt}]}),
+      });
+      let data;try{data=await res.json();}catch{throw new Error('Proxy error');}
+      if(!res.ok||data.error)throw new Error((data.error&&(data.error.message||JSON.stringify(data.error)))||'AI failed');
+      const text=(data.content||[]).map(b=>b.type==='text'?b.text:'').join('').replace(/```json|```/g,'').trim();
+      const parsed=JSON.parse(text);
+      setResults(parsed);
+      // Initialize tracking for each flavor
+      const tr={};
+      Object.keys(parsed.flavors||{}).forEach(f=>{tr[f]={};});
+      setTracking(tr);
+    }catch(e){
+      setError('Calculation failed: '+e.message);
+    }
+    setLoading(false);
+  }
+
+  function generatePdf(flavor){
+    const{jsPDF}=window.jspdf;
+    const doc=pdfSafeDoc(new jsPDF('p','mm','letter'));
+    const W=215.9,margin=14;
+    let y=14;
+    const lt=LOG_TYPES[productType];
+
+    // Header
+    doc.setFontSize(18);doc.setFont('helvetica','bold');
+    doc.text('Production Worksheet',margin,y);y+=7;
+    doc.setFontSize(10);doc.setFont('helvetica','normal');
+    doc.text('Black Fox Manufacturing | '+new Date().toLocaleDateString(),margin,y);y+=5;
+    doc.text((lt?lt.label:productType)+' | '+sku+' | '+flavor,margin,y);y+=5;
+    doc.text('Target: '+unitsPerFlavor+' units',margin,y);y+=8;
+    doc.setDrawColor(200);doc.line(margin,y,W-margin,y);y+=6;
+
+    // Ingredients table
+    doc.setFontSize(12);doc.setFont('helvetica','bold');
+    doc.text('Required Ingredients',margin,y);y+=6;
+    doc.setFontSize(9);doc.setFont('helvetica','bold');
+    doc.text('Ingredient',margin,y);
+    doc.text('Quantity',W-margin-10,y,{align:'right'});y+=4;
+    doc.setDrawColor(180);doc.line(margin,y,W-margin,y);y+=4;
+    doc.setFont('helvetica','normal');
+    const ingredients=(results.flavors||{})[flavor]||[];
+    ingredients.forEach(ing=>{
+      doc.text(ing.name||'',margin,y);
+      doc.text((ing.qty||'')+(ing.unit?' '+ing.unit:''),W-margin-10,y,{align:'right'});
+      y+=5;
+    });
+    y+=4;doc.line(margin,y,W-margin,y);y+=8;
+
+    // Production tracking fields
+    doc.setFontSize(12);doc.setFont('helvetica','bold');
+    doc.text('Production Tracking',margin,y);y+=7;
+    doc.setFontSize(9);
+    const trk=tracking[flavor]||{};
+    TRACK_FIELDS.forEach(tf=>{
+      doc.setFont('helvetica','bold');
+      doc.text(tf.label+':',margin,y);
+      doc.setFont('helvetica','normal');
+      const val=trk[tf.key]||'';
+      doc.text(val||'____________________',margin+55,y);
+      y+=7;
+    });
+    y+=4;
+
+    // Signature line
+    y+=10;
+    doc.line(margin,y,margin+60,y);y+=4;
+    doc.setFontSize(8);doc.text('Operator Signature / Date',margin,y);
+    doc.line(W-margin-60,y-4,W-margin,y-4);
+    doc.text('Manager Signature / Date',W-margin-60,y);
+
+    doc.save(slug(sku)+'_'+slug(flavor)+'_production.pdf');
+  }
+
+  function generateAllPdfs(){
+    const flavors=Object.keys(results.flavors||{});
+    flavors.forEach((f,i)=>setTimeout(()=>generatePdf(f),i*300));
+  }
+
+  const lt=LOG_TYPES[productType];
+
+  return el('div',{style:{display:'flex',flexDirection:'column',height:'calc(100vh - 80px)',overflow:'hidden'}},
+    el('div',{className:'ph',style:{flexShrink:0}},
+      el('div',null,
+        el('div',{className:'pt'},'\uD83C\uDFED Production Planner'),
+        el('div',{className:'ps'},'Calculate ingredients per flavor and generate production worksheets'),
+      ),
+    ),
+    el('div',{style:{flex:1,overflowY:'auto',padding:'16px 20px'}},
+      // Input form
+      el('div',{style:{background:'#fff',border:'1px solid var(--border)',borderRadius:12,padding:20,marginBottom:16}},
+        el('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:12,marginBottom:16}},
+          el('div',null,
+            el('label',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',textTransform:'uppercase',display:'block',marginBottom:5}},'Product Type'),
+            el('select',{value:productType,onChange:ev=>changeProductType(ev.target.value),style:{width:'100%',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:8,padding:'9px 12px',fontFamily:'inherit',fontSize:13,color:'var(--text)'}},
+              BATCH_TYPE_IDS.map(id=>el('option',{key:id,value:id},LOG_TYPES[id].label))
+            ),
+          ),
+          el('div',null,
+            el('label',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',textTransform:'uppercase',display:'block',marginBottom:5}},'SKU'),
+            skuOptions.length>0?el('select',{value:sku,onChange:ev=>changeSku(ev.target.value),style:{width:'100%',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:8,padding:'9px 12px',fontFamily:'inherit',fontSize:13,color:'var(--text)'}},
+              el('option',{value:''},'Select SKU\u2026'),
+              skuOptions.map(s=>el('option',{key:s,value:s},s))
+            ):el('input',{value:sku,onChange:ev=>setSku(ev.target.value),placeholder:'SKU name',style:{width:'100%',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:8,padding:'9px 12px',fontFamily:'inherit',fontSize:13,color:'var(--text)',boxSizing:'border-box'}}),
+          ),
+          el('div',null,
+            el('label',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',textTransform:'uppercase',display:'block',marginBottom:5}},'Units Per Flavor'),
+            el('input',{value:unitsPerFlavor,onChange:ev=>setUnitsPerFlavor(ev.target.value),placeholder:'e.g. 2000',style:{width:'100%',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:8,padding:'9px 12px',fontFamily:'inherit',fontSize:13,color:'var(--text)',boxSizing:'border-box'}}),
+          ),
+        ),
+        flavorOptions.length>0&&el('div',{style:{marginBottom:16}},
+          el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}},
+            el('label',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',textTransform:'uppercase'}},'Flavors ('+selectedFlavors.length+'/'+flavorOptions.length+')'),
+            el('button',{onClick:selectAllFlavors,style:{fontSize:11,color:'var(--accent)',background:'none',border:'none',cursor:'pointer',fontFamily:'inherit',fontWeight:700}},allFlavorsSelected?'Deselect All':'Select All'),
+          ),
+          el('div',{style:{display:'flex',flexWrap:'wrap',gap:6}},
+            flavorOptions.map(f=>{
+              const on=selectedFlavors.includes(f);
+              return el('button',{key:f,onClick:()=>toggleFlavor(f),
+                style:{padding:'5px 12px',borderRadius:14,border:'1px solid',borderColor:on?'var(--accent)':'var(--border)',background:on?'var(--accent)':'transparent',color:on?'#fff':'var(--text2)',fontFamily:'inherit',fontSize:11,fontWeight:600,cursor:'pointer',transition:'all .12s'}
+              },f);
+            })
+          ),
+        ),
+        el('div',{style:{marginBottom:12}},
+          el('label',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',textTransform:'uppercase',display:'block',marginBottom:5}},'Additional Instructions (optional)'),
+          el('textarea',{value:customInstructions,onChange:ev=>setCustomInstructions(ev.target.value),rows:2,placeholder:'e.g. "5% waste buffer" or "use 1.5g flower per joint"',
+            style:{width:'100%',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:8,padding:'9px 12px',fontFamily:'inherit',fontSize:13,color:'var(--text)',boxSizing:'border-box',resize:'vertical'}}),
+        ),
+        el('div',{style:{display:'flex',gap:12,alignItems:'center'}},
+          el('button',{onClick:calculate,disabled:loading,
+            style:{background:'var(--accent)',color:'#fff',border:'none',borderRadius:8,padding:'11px 28px',fontFamily:'inherit',fontSize:14,fontWeight:700,cursor:loading?'wait':'pointer',opacity:loading?.6:1}
+          },loading?'\u23F3 Calculating\u2026':'\uD83C\uDFED Calculate Ingredients'),
+          recipes.filter(r=>r.product_type===productType).length>0
+            ?el('span',{style:{fontSize:11,color:'#059669',fontWeight:600}},'\u2705 '+recipes.filter(r=>r.product_type===productType).length+' recipe(s) found')
+            :el('span',{style:{fontSize:11,color:'#d97706'}},'\u26A0\uFE0F No saved recipes \u2014 AI will estimate'),
+        ),
+        error&&el('div',{style:{background:'rgba(239,68,68,.1)',border:'1px solid rgba(239,68,68,.3)',borderRadius:8,padding:'10px 14px',fontSize:12,color:'var(--red)',marginTop:12}},error),
+      ),
+
+      // Results
+      results&&el('div',null,
+        el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}},
+          el('div',{style:{fontSize:16,fontWeight:800,color:'var(--text)'}},(lt?lt.icon+' ':'')+sku+' \u2014 '+(Object.keys(results.flavors||{}).length)+' flavors \u00D7 '+unitsPerFlavor+' units'),
+          el('button',{onClick:generateAllPdfs,style:{background:'#dc2626',color:'#fff',border:'none',borderRadius:8,padding:'9px 20px',fontFamily:'inherit',fontSize:13,fontWeight:700,cursor:'pointer'}},'\uD83D\uDCC4 Download All PDFs ('+Object.keys(results.flavors||{}).length+')'),
+        ),
+        // Grand total card
+        results.grand_total&&el('div',{style:{background:'#1e3a5f',borderRadius:12,padding:'16px 20px',marginBottom:16,color:'#fff'}},
+          el('div',{style:{fontSize:13,fontWeight:800,marginBottom:8,opacity:.85,textTransform:'uppercase',letterSpacing:'.5px'}},'Grand Total \u2014 All Flavors Combined'),
+          el('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(140px,1fr))',gap:8}},
+            (results.grand_total||[]).map((ing,i)=>el('div',{key:i,style:{background:'rgba(255,255,255,.1)',borderRadius:8,padding:'8px 12px'}},
+              el('div',{style:{fontSize:11,opacity:.7}},ing.name),
+              el('div',{style:{fontSize:16,fontWeight:800}},ing.qty+(ing.unit?' '+ing.unit:'')),
+            ))
+          ),
+        ),
+        // Per-flavor cards
+        el('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(360px,1fr))',gap:12}},
+          Object.entries(results.flavors||{}).map(([flavor,ingredients])=>{
+            const trk=tracking[flavor]||{};
+            return el('div',{key:flavor,style:{background:'#fff',border:'1px solid var(--border)',borderRadius:12,padding:16}},
+              el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}},
+                el('div',{style:{fontSize:14,fontWeight:800,color:'var(--text)'}},'\uD83C\uDF3F '+flavor),
+                el('button',{onClick:()=>generatePdf(flavor),style:{background:'var(--surface2)',border:'1px solid var(--border)',borderRadius:6,padding:'4px 12px',fontSize:11,cursor:'pointer',fontFamily:'inherit',fontWeight:600,color:'var(--text2)'}},'\uD83D\uDCC4 PDF'),
+              ),
+              el('div',{style:{fontSize:11,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',marginBottom:6}},'Ingredients'),
+              (ingredients||[]).map((ing,i)=>el('div',{key:i,style:{display:'flex',justifyContent:'space-between',fontSize:12,padding:'3px 0',borderBottom:'1px solid var(--border)'}},
+                el('span',{style:{color:'var(--text2)'}},ing.name),
+                el('span',{style:{fontWeight:700,color:'var(--text)'}},ing.qty+(ing.unit?' '+ing.unit:'')),
+              )),
+              el('div',{style:{fontSize:11,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',marginTop:12,marginBottom:6}},'Production Tracking'),
+              TRACK_FIELDS.map(tf=>el('div',{key:tf.key,style:{display:'flex',gap:8,alignItems:'center',marginBottom:4}},
+                el('label',{style:{fontSize:11,color:'var(--text2)',width:180,flexShrink:0}},tf.label),
+                el('input',{value:trk[tf.key]||'',onChange:ev=>setTrack(flavor,tf.key,ev.target.value),
+                  style:{flex:1,background:'var(--bg)',border:'1px solid var(--border)',borderRadius:6,padding:'5px 8px',fontSize:12,fontFamily:'inherit',color:'var(--text)'}}),
+              )),
+            );
+          })
+        ),
+      ),
+    ),
+  );
+}
+
+
 function AIReporter({cu,SUPA_URL,SUPA_KEY,H}){
   const[messages,setMessages]=useState([]);
   const[input,setInput]=useState('');
@@ -5582,7 +5847,7 @@ function AIReporter({cu,SUPA_URL,SUPA_KEY,H}){
       return `## ${t} (${rows.length} records)\n${str}`;
     }).join('\n\n');
     const capped=dataStr.length>25000?dataStr.slice(0,25000)+'\u2026':dataStr;
-    return `AI Reporter for Black Fox QMS (Black Fox Manufacturing / HMBF Management Inc, MAN000109). Today: ${now}. User: ${cu.name} (${cu.role}).\n\nAnswer using ONLY the data below. Be specific with record IDs, batch numbers, dates, names. Lead with a direct answer, then details. Flag any compliance gaps.\n\n${capped}`;
+    return `AI Reporter for Black Fox QMS (Black Fox Manufacturing / HMBF Management Inc, TBD-PENDING). Today: ${now}. User: ${cu.name} (${cu.role}).\n\nAnswer using ONLY the data below. Be specific with record IDs, batch numbers, dates, names. Lead with a direct answer, then details. Flag any compliance gaps.\n\n${capped}`;
   }
 
   async function send(){
@@ -5870,6 +6135,7 @@ function FormulationBank({cu,SUPA_URL,SUPA_KEY,H}){
                   ),
                   el('div',{style:{display:'flex',gap:4}},
                     canEditForm&&el('button',{onClick:()=>setEditing(f),style:{background:'var(--surface2)',border:'1px solid var(--border)',borderRadius:6,padding:'4px 10px',fontSize:11,cursor:'pointer',fontFamily:'inherit',fontWeight:600,color:'var(--text2)'}},'Edit'),
+                    canEditForm&&el('button',{onClick:()=>setEditing({...f,id:undefined,name:f.name+' (copy)',flavor:''}),style:{background:'rgba(124,58,237,.06)',border:'1px solid rgba(124,58,237,.2)',borderRadius:6,padding:'4px 10px',fontSize:11,cursor:'pointer',fontFamily:'inherit',fontWeight:600,color:'#7c3aed'}},'Duplicate'),
                     canDeleteForm&&el('button',{onClick:()=>deleteFormulation(f.id),style:{background:'#fee2e2',border:'1px solid #fecaca',borderRadius:6,padding:'4px 8px',fontSize:11,cursor:'pointer',fontFamily:'inherit',fontWeight:600,color:'#dc2626'}},'\u2715'),
                   ),
                 ),
@@ -6347,6 +6613,10 @@ function CogsFormulationManager({formulations,library,onSave,onDelete}){
             ),
           ),
           el('div',{style:{display:'flex',gap:6}},
+            el('button',{onClick:()=>{
+              // Duplicate: copy everything except id/name/flavor, open in editor as new
+              setEditing({...f,id:undefined,name:f.name+' (copy)',flavor:''});
+            },className:'btn b-ghost btn-sm'},'Duplicate'),
             el('button',{onClick:()=>setEditing(f),className:'btn b-ghost btn-sm'},'Edit'),
             el('button',{onClick:()=>onDelete(f.id),className:'btn b-ghost btn-sm',style:{color:'#dc2626'}},'Delete'),
           ),
@@ -6737,7 +7007,7 @@ const COMPLIANCE_FRAMEWORKS={
     {id:'GMP-5',title:'Records & Reports',req:'Maintain complete, accurate and retrievable production records.',actions:['Retain all batch records for minimum 3 years','Document all deviations, corrections and rework activities','Maintain METRC compliance records and reconciliations']},
     {id:'GMP-6',title:'Returned & Salvaged Products',req:'Control all returned and salvaged cannabis product.',actions:['Document all returns in METRC within 24 hours','Quarantine all returned product pending QA review and disposition','Complete disposition assessment and document outcome']},
   ]},
-  dcr:{label:'Michigan CRA / MRTMA',color:'#7c2d12',icon:'\uD83C\uDFDB\uFE0F',clauses:[
+  cra:{label:'Michigan CRA / MRTMA',color:'#7c2d12',icon:'\uD83C\uDFDB\uFE0F',clauses:[
     {id:'CRA-1',title:'License Compliance',req:'Maintain active processor license with the Cannabis Regulatory Agency.',actions:['Track license renewal dates and renew before expiration','Display license prominently in facility','Notify CRA of any material changes within 10 business days']},
     {id:'CRA-2',title:'METRC Track & Trace',req:'All cannabis must be tracked in METRC from receipt through sale or disposal.',actions:['Tag all packages in METRC upon creation','Reconcile METRC inventory daily against physical count','Report any discrepancies to CRA within 24 hours']},
     {id:'CRA-3',title:'Security Requirements',req:'Maintain security plan including cameras, access control and visitor logs per R 420.206.',actions:['Maintain 24/7 video surveillance with 90-day retention','Restrict access to limited-access areas to authorized personnel only','Log all visitors with ID, purpose, and escort information']},
@@ -6752,7 +7022,7 @@ const COMPLIANCE_FRAMEWORKS={
     {id:'117.2',title:'Supply Chain Program',req:'Implement a risk-based supply chain program for raw material hazards.',actions:['Qualify all raw material and ingredient suppliers before use','Obtain supplier verification documentation annually','Document all supply chain program activities and approvals']},
     {id:'117.3',title:'Sanitation Controls',req:'Implement sanitation controls to prevent contamination of food-grade cannabis.',actions:['Complete and retain daily sanitation logs for all production areas','Conduct environmental monitoring for pathogens monthly','Document all sanitation verification and corrective activities']},
     {id:'117.4',title:'Allergen Controls',req:'Implement controls to prevent allergen cross-contact.',actions:['Clearly label all allergen-containing materials in storage','Conduct allergen cleaning verification before allergen changeovers','Train all production and QC staff on allergen control procedures']},
-    {id:'117.5',title:'Recall Program',req:'Establish and maintain a written recall plan.',actions:['Maintain current recall contact list including DCR and lab contacts','Conduct mock recall exercise at least annually and document results','Review and update recall SOP annually or after any regulatory change']},
+    {id:'117.5',title:'Recall Program',req:'Establish and maintain a written recall plan.',actions:['Maintain current recall contact list including CRA and lab contacts','Conduct mock recall exercise at least annually and document results','Review and update recall SOP annually or after any regulatory change']},
   ]},
 };
 
@@ -6828,7 +7098,7 @@ function ComplianceModule({cu,isElevated,isAdmin,LICENSES,SUPA_URL,SUPA_KEY,H,db
       el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:12}},
         el('div',null,
           el('div',{style:{fontSize:22,fontWeight:800,marginBottom:3}},'\u2705 Compliance Center'),
-          el('div',{style:{fontSize:13,opacity:.8,lineHeight:1.5}},'Track ISO 9001:2015 \u00B7 cGMP \u00B7 Missouri DCR \u00B7 FSMA 21 CFR 117'),
+          el('div',{style:{fontSize:13,opacity:.8,lineHeight:1.5}},'Track ISO 9001:2015 \u00B7 cGMP \u00B7 Michigan CRA \u00B7 FSMA 21 CFR 117'),
         ),
         el('div',{style:{display:'flex',gap:8,alignItems:'center'}},
           saved&&el('div',{style:{background:'rgba(22,163,74,.25)',border:'1px solid rgba(22,163,74,.5)',borderRadius:8,padding:'6px 14px',fontSize:12,fontWeight:700,color:'#6ee7b7'}},saved),
@@ -7530,7 +7800,7 @@ ${caAttachments.length>0?'SUPPORTING EVIDENCE: '+caAttachments.length+' file(s) 
 Write a formal, professional Corrective Action notice. Be factual, specific, and fair \u2014 this is a real HR document that the employee will read and sign. Respond with ONLY this JSON (no markdown):
 {
   "title": "CA \u2014 [Violation Type] \u2014 [Employee Name]",
-  "ca_number": "${license.state==='Missouri'?'MO':'MI'}-[3 digits]",
+  "ca_number": "${license.state==='Michigan'?'MO':'MI'}-[3 digits]",
   "date_issued": "${new Date().toISOString().slice(0,10)}",
   "incident_summary": "2-3 sentences on what happened",
   "policy_reference": "Policy or SOP violated",
@@ -7565,7 +7835,7 @@ Write a formal, professional Corrective Action notice. Be factual, specific, and
         const extractArr=(key)=>{const m=clean.match(new RegExp('"'+key+'"\s*:\s*\[([^\]]*?)\]?'));if(!m)return[];return m[1].split('","').map(s=>s.replace(/^["\s]+|["\s]+$/g,'').trim()).filter(Boolean);};
         parsed={
           title:extract('title')||'Corrective Action \u2014 '+violationType,
-          ca_number:extract('ca_number')||(license?.state==='Missouri'?'MO':'MI')+'-'+Date.now().toString().slice(-3),
+          ca_number:extract('ca_number')||(license?.state==='Michigan'?'MO':'MI')+'-'+Date.now().toString().slice(-3),
           date_issued:new Date().toISOString().slice(0,10),
           incident_summary:extract('incident_summary')||violationDesc,
           policy_reference:extract('policy_reference')||'Company SOP',
@@ -8181,7 +8451,7 @@ function QMS({cu,users,tasks,sops,setSops,deviations,setDeviations,capas,setCapa
         if(u.role==='admin'){
           const adminLics=u.licenses||[];
           if(adminLics.length>0&&!sopLicIds.some(id=>adminLics.includes(id))) return false;
-        } else if(u.loc==='Missouri'){
+        } else if(u.loc==='Michigan'){
           // Nationwide users work across all states \u2014 they bypass the license check
           // entirely and are scoped only by department below.
           // e.g. Cart Cleaning Supervisor Nationwide sees Cart SOPs in both MI and MO.
@@ -8249,7 +8519,7 @@ function QMS({cu,users,tasks,sops,setSops,deviations,setDeviations,capas,setCapa
     el('div',{className:'ph'},
       el('div',null,
         el('div',{className:'pt'},'Quality Management System'),
-        el('div',{className:'ps'},'DCR Compliance \u2014 Missouri QMS Requirements'),
+        el('div',{className:'ps'},'CRA Compliance \u2014 Michigan QMS Requirements'),
       ),
     ),
 
@@ -8306,9 +8576,9 @@ function QMS({cu,users,tasks,sops,setSops,deviations,setDeviations,capas,setCapa
           ),
           untrainedUsers.length===0&&el('div',{style:{color:'var(--green)',fontWeight:600,fontSize:13}},'\u2705 All staff current on SOPs'),
         ),
-        // DCR Readiness
+        // CRA Readiness
         el('div',{className:'card'},
-          el('div',{style:{fontWeight:700,fontSize:14,marginBottom:12}},'\uD83D\uDEE1\uFE0F DCR Inspection Readiness'),
+          el('div',{style:{fontWeight:700,fontSize:14,marginBottom:12}},'\uD83D\uDEE1\uFE0F CRA Inspection Readiness'),
           [
             {l:'SOP Library',v:sops.filter(s=>s.status==='published').length+' published',ok:sops.filter(s=>s.status==='published').length>0},
             {l:'Training Records',v:avgAckRate+'% compliance',ok:avgAckRate>=80},
@@ -9202,7 +9472,7 @@ function Scoreboard({tasks,cu,users}){
 // \u2500\u2500 SOPs \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 // \u2500\u2500 LICENSE & REGULATORY CONSTANTS \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 const LICENSES=[
-  {id:'bfm_mi',name:'Black Fox Michigan',state:'Michigan',license_type:'Processor License',license_number:'TBD-PENDING'},
+  {id:'bfm',name:'Black Fox Manufacturing',state:'Michigan',license_type:'Processor License',license_number:'TBD-PENDING'},
 ];
 
 const STATE_REGS={
@@ -9222,23 +9492,6 @@ const STATE_REGS={
       'Packaging must be child-resistant and opaque',
     ],
     sop_header_fields:['SOP Number','Revision Number','Effective Date','Approved By','Department','License Number','METRC Relevant','Review Frequency'],
-  },
-  Missouri:{
-    agency:'Missouri Division of Cannabis Regulation (DCR)',
-    code:'19 CSR 100-1 et seq.',
-    key_rules:[
-      '19 CSR 100-1.030 \u2014 Comprehensive Facility License requirements',
-      'METRC tracking required for all cannabis and cannabis-infused products',
-      'Testing required: potency, pesticides, heavy metals, microbials, residual solvents',
-      'Labels must include: license number, net weight, THC content (total), warning: "Keep out of reach of children", batch/lot number, test date and lab name',
-      'QMS required within 1 year of receiving approval \u2014 must follow recognized standard (ISO/ASTM/CSQ/FOCUS)',
-      'Employee background check required \u2014 no disqualifying felony offenses',
-      'Seed-to-sale tracking \u2014 no untracked transfers permitted',
-      'Waste disposal: 50% rendered unusable by mixing with non-consumable material',
-      'Facility must maintain cleaning and sanitation logs',
-      'All SOPs must be signed/acknowledged by employees performing the tasks',
-    ],
-    sop_header_fields:['SOP Number','Revision Number','Effective Date','Approved By','Department','License Number','DCR Regulation Reference','Review Frequency','Training Required'],
   },
 };
 
@@ -9669,7 +9922,7 @@ function SOPEditModal({sop,cu,onClose,onSave,users}){
   const initLic=LICENSES.find(l=>l.id===sop.license_id)||LICENSES.find(l=>l.name===sop.license_name)||null;
   const[ef,setEf]=useState({
     title:sop.title||'',
-    state:sop.state||initLic?.state||'Missouri',
+    state:sop.state||initLic?.state||'Michigan',
     license_ids:sop.license_id?[sop.license_id]:(initLic?[initLic.id]:[]),
     folder:getSopFolder(sop)==='Archived'?(sop.previous_folder||'General'):getSopFolder(sop),
     target_user_ids:sop.target_user_ids||[],
@@ -9743,7 +9996,7 @@ function SOPEditModal({sop,cu,onClose,onSave,users}){
         el('div',{className:'fg'},
           el('label',null,'State *'),
           el('div',{style:{display:'flex',gap:8}},
-            ['Missouri'].map(s=>el('button',{key:s,
+            ['Michigan'].map(s=>el('button',{key:s,
               onClick:()=>setEf(p=>({...p,state:s,license_ids:[]})),
               style:{flex:1,padding:'9px',borderRadius:'var(--rs)',border:'2px solid',borderColor:ef.state===s?'var(--accent)':'var(--border)',background:ef.state===s?'rgba(30,58,95,.08)':'transparent',color:ef.state===s?'var(--accent)':'var(--text2)',fontFamily:'inherit',fontWeight:600,fontSize:13,cursor:'pointer',transition:'all .15s'}
             },s))
@@ -9843,8 +10096,8 @@ function exportCorrectiveActionPdf(ca){
   const NAVY=[30,58,95],RED=[185,28,28],TEXT=[15,15,15],TEXT2=[75,85,99],LIGHT=[248,250,252],BORDER=[203,213,225];
   const gen=ca.generated_content?JSON.parse(ca.generated_content):{};
   const lic=LICENSES.find(l=>l.id===ca.license_id)||LICENSES.find(l=>l.name===ca.license_name);
-  const isMissouri=(lic?.state||ca.state)==='Missouri';
-  const companyName=isMissouri?'HMBF MANAGEMENT INC':'BLACK FOX MANUFACTURING';
+  const isMichigan=(lic?.state||ca.state)==='Michigan';
+  const companyName=isMichigan?'HMBF MANAGEMENT INC':'BLACK FOX MANUFACTURING';
 
   function header(){
     // Header background
@@ -9887,7 +10140,7 @@ function exportCorrectiveActionPdf(ca){
     doc.setTextColor(...TEXT2);
     doc.setFont('helvetica','normal');
     doc.setFontSize(8);
-    doc.text('CONFIDENTIAL \u2014 MAN000109 \u2014 '+(ca.license_name||companyName)+' \u2014 Internal HR Record',margin,H-32);
+    doc.text('CONFIDENTIAL \u2014 TBD-PENDING \u2014 '+(ca.license_name||companyName)+' \u2014 Internal HR Record',margin,H-32);
     doc.text('Page '+pageNum,W-margin,H-32,{align:'right'});
   }
 
@@ -10400,96 +10653,75 @@ function EmployeeProfileModal({employee,cu,users,publishedSOPs,corrective,showCo
 // License & Designated Responsible Parties chart. Visible to every approved
 // user regardless of role/tier (unlike the Compliance Center itself, which is
 // manager+ only) — this is a simple reference page, not an editable module.
-// Grounded in actual Missouri DCR requirements: 19 CSR 100-1.090(7)-(8)
-// requires a designated Security Manager; 19 CSR 100-1.130(1)(A) requires a
-// designated facility agent responsible for inventory control. Reviewed and
-// approved by Sam before being added here.
-const LICENSE_CHART_TIERS=[
-  {label:'Facility leadership',color:'#7c3aed',bg:'#f5f3ff',roles:[
-    {title:'General Manager',name:'Saman Salari'},
-    {title:'Assistant General Manager',name:'Liisa Pembroke'},
-  ]},
-  {label:'DCR-designated compliance roles',color:'#0891b2',bg:'#ecfeff',roles:[
-    {title:'Compliance Officer',name:'Micah Heppermann',note:'ISO 9001 / QMS oversight'},
-    {title:'Security Manager',name:'Micah Heppermann',note:'19 CSR 100-1.090(7)\u2013(8) \u2014 security audits, training, contractor credential review'},
-    {title:'Inventory Control',name:'Saman Salari',note:'19 CSR 100-1.130(1)(A) \u2014 designated agent for inventory control systems/procedures'},
-  ]},
-  {label:'Production & operations',color:'#be185d',bg:'#fdf2f8',roles:[
-    {title:'Production Manager',name:'Zak Knowles'},
-    {title:'Extraction Manager',name:'Amir Yrigoyen'},
-  ]},
-];
+// Michigan build: all positions TBD, filled as roles are hired.
 function LicenseChart(){
-  const cardStyle=(color,highlight)=>({
+  const cardStyle=(color,highlight,dim)=>({
     background:'#fff',border:'2px solid',borderColor:highlight?color:'var(--border)',
-    borderRadius:12,padding:'14px 18px',textAlign:'center',transition:'all .2s',
+    borderRadius:10,padding:'10px 14px',textAlign:'center',transition:'all .2s',
     boxShadow:highlight?'0 0 0 4px '+color+'15':'0 1px 3px rgba(15,23,42,.04)',
-    maxWidth:240,width:'100%',
+    width:'100%',opacity:dim?.7:1,
   });
-  const titleStyle={fontSize:11,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:4};
-  const nameStyle=(color)=>({fontSize:15,fontWeight:800,color});
-  const noteStyle={fontSize:11,color:'var(--text3)',marginTop:6,lineHeight:1.4};
+  const titleStyle={fontSize:10,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',letterSpacing:'.4px',marginBottom:3};
+  const nameStyle={fontSize:13,fontWeight:800,color:'var(--text3)',fontStyle:'italic'};
   const connectorV=(h)=>el('div',{style:{width:2,height:h,background:'var(--border)',margin:'0 auto'}});
-  const sectionLabel=(label,color)=>el('div',{style:{fontSize:10,fontWeight:800,textTransform:'uppercase',letterSpacing:'1px',color,marginBottom:8,textAlign:'center'}},label);
+  const branchLabel=(label,color)=>el('div',{style:{fontSize:10,fontWeight:800,textTransform:'uppercase',letterSpacing:'.8px',color,marginBottom:10,textAlign:'center',paddingBottom:6,borderBottom:'2px solid '+color+'30'}},label);
+
+  const roleCard=(title,color,indent)=>el('div',{key:title,style:{marginLeft:(indent||0)*16,marginBottom:8}},
+    el('div',{style:cardStyle(color,false,true)},
+      el('div',{style:titleStyle},title),
+      el('div',{style:nameStyle},'TBD'),
+    ),
+  );
+
+  const BRANCHES=[
+    {branch:'Production',color:'#be185d',roles:[
+      {title:'Director of Production',indent:0},
+      {title:'Production Manager',indent:1},
+      {title:'Assistant Production Manager',indent:2},
+      {title:'Cartridge Department Supervisor',indent:2},
+      {title:'Pre-Roll Department Supervisor',indent:2},
+      {title:'Inventory Manager',indent:1},
+      {title:'Warehouse Manager',indent:1},
+    ]},
+    {branch:'Sales',color:'#0891b2',roles:[
+      {title:'Director of Sales',indent:0},
+      {title:'Distribution Coordinator',indent:1},
+    ]},
+    {branch:'HR',color:'#d97706',roles:[
+      {title:'Director of HR',indent:0},
+      {title:'HRBP',indent:1},
+    ]},
+    {branch:'Compliance',color:'#059669',roles:[
+      {title:'Compliance Officer',indent:0},
+      {title:'Metrc Specialist',indent:1},
+    ]},
+  ];
 
   return el('div',{style:{padding:'0 0 48px'}},
     el('div',{style:{background:'#1e3a5f',borderRadius:14,padding:'20px 24px',marginBottom:24,color:'#fff'}},
-      el('div',{style:{fontSize:20,fontWeight:800,marginBottom:4}},'\uD83C\uDFDB\uFE0F Michigan Facility — Org Chart & License'),
-      el('div',{style:{fontSize:12,opacity:.85}},'Black Fox Michigan · Processor License · TBD-PENDING'),
-      el('div',{style:{fontSize:11,opacity:.65,marginTop:4}},'Michigan CRA / MRTMA · R 420.301\u2013420.807'),
+      el('div',{style:{fontSize:20,fontWeight:800,marginBottom:4}},'\uD83C\uDFDB\uFE0F Michigan Facility \u2014 Org Chart & License'),
+      el('div',{style:{fontSize:12,opacity:.85}},'Black Fox Michigan \u00B7 Processor License \u00B7 TBD-PENDING'),
+      el('div',{style:{fontSize:11,opacity:.65,marginTop:4}},'Michigan CRA / MRTMA \u00B7 R 420.301\u2013420.807'),
     ),
 
-    // Top: GM
     el('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',marginBottom:8}},
       el('div',{style:{...cardStyle('#1e3a5f',true),maxWidth:280}},
         el('div',{style:titleStyle},'General Manager'),
-        el('div',{style:nameStyle('#1e3a5f')},'TBD'),
-        el('div',{style:noteStyle},'Overall facility operations'),
+        el('div',{style:{fontSize:15,fontWeight:800,color:'var(--text3)',fontStyle:'italic'}},'TBD'),
+        el('div',{style:{fontSize:11,color:'var(--text3)',marginTop:6,lineHeight:1.4}},'Overall facility operations'),
       ),
       connectorV(20),
     ),
 
-    // Branches
-    el('div',{style:{display:'flex',justifyContent:'center',gap:24,flexWrap:'wrap',alignItems:'flex-start'}},
-      // Compliance
-      el('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',flex:'1 1 200px',maxWidth:240}},
+    el('div',{style:{display:'flex',justifyContent:'center',gap:20,flexWrap:'wrap',alignItems:'flex-start'}},
+      BRANCHES.map(b=>el('div',{key:b.branch,style:{flex:'1 1 220px',maxWidth:260}},
         connectorV(16),
-        sectionLabel('Compliance','#0891b2'),
-        el('div',{style:{...cardStyle('#0891b2',false),borderStyle:'dashed',opacity:.75}},
-          el('div',{style:titleStyle},'Compliance Officer'),
-          el('div',{style:{...nameStyle('#0891b2'),color:'var(--text3)',fontStyle:'italic'}},'TBD'),
-        ),
-      ),
-      // Production
-      el('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',flex:'1 1 200px',maxWidth:240}},
-        connectorV(16),
-        sectionLabel('Production','#be185d'),
-        el('div',{style:{...cardStyle('#be185d',false),borderStyle:'dashed',opacity:.75}},
-          el('div',{style:titleStyle},'Production Manager'),
-          el('div',{style:{...nameStyle('#be185d'),color:'var(--text3)',fontStyle:'italic'}},'TBD'),
-        ),
-      ),
-      // Extraction
-      el('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',flex:'1 1 200px',maxWidth:240}},
-        connectorV(16),
-        sectionLabel('Extraction','#ea580c'),
-        el('div',{style:{...cardStyle('#ea580c',false),borderStyle:'dashed',opacity:.75}},
-          el('div',{style:titleStyle},'Extraction Manager'),
-          el('div',{style:{...nameStyle('#ea580c'),color:'var(--text3)',fontStyle:'italic'}},'TBD'),
-        ),
-      ),
-      // Security
-      el('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',flex:'1 1 200px',maxWidth:240}},
-        connectorV(16),
-        sectionLabel('Security','#059669'),
-        el('div',{style:{...cardStyle('#059669',false),borderStyle:'dashed',opacity:.75}},
-          el('div',{style:titleStyle},'Security Manager'),
-          el('div',{style:{...nameStyle('#059669'),color:'var(--text3)',fontStyle:'italic'}},'TBD'),
-        ),
-      ),
+        branchLabel(b.branch,b.color),
+        b.roles.map(r=>roleCard(r.title,b.color,r.indent)),
+      )),
     ),
 
-    el('div',{style:{textAlign:'center',marginTop:32,fontSize:12,color:'var(--text3)',fontStyle:'italic'}},'All positions TBD — update as roles are filled.'),
+    el('div',{style:{textAlign:'center',marginTop:24,fontSize:12,color:'var(--text3)',fontStyle:'italic'}},'All positions TBD \u2014 update as roles are filled.'),
   );
 }
 
@@ -10586,7 +10818,7 @@ function SOPs({sops,setSops,cu,users}){
         if(u.role==='admin'){
           const adminLics=u.licenses||[];
           if(adminLics.length>0&&!sopLicIds.some(id=>adminLics.includes(id))) return false;
-        } else if(u.loc==='Missouri'){
+        } else if(u.loc==='Michigan'){
           // Nationwide users work across all states \u2014 they bypass the license check
           // entirely and are scoped only by department below.
           // e.g. Cart Cleaning Supervisor Nationwide sees Cart SOPs in both MI and MO.
@@ -11152,7 +11384,7 @@ function Calendar({events,setEvents,tasks,cu,users,locFilter,meetingNotes,setMee
   const[showNew,setNew]=useState(false);
   const[sel,setSel]=useState(null);
   const[saving,setSaving]=useState(false);
-  const[f,setF]=useState({title:'',type:'event',date:'',start_time:'09:00',end_time:'10:00',all_day:false,description:'',location:'',attendees:[],color:'#f5a623',personal:false,loc:'Missouri',meet_link:''});
+  const[f,setF]=useState({title:'',type:'event',date:'',start_time:'09:00',end_time:'10:00',all_day:false,description:'',location:'',attendees:[],color:'#f5a623',personal:false,loc:'Michigan',meet_link:''});
   const today=new Date().toISOString().slice(0,10);
 
   const allEvents=useMemo(()=>{
@@ -11173,7 +11405,7 @@ function Calendar({events,setEvents,tasks,cu,users,locFilter,meetingNotes,setMee
       return false;
     }).filter(e=>{
       if(e._task) return true;
-      // Single location Missouri — no loc filtering needed
+      // Single location Michigan — no loc filtering needed
       return true;
     });
   },[events,tasks,cu,locFilter]);
@@ -11227,7 +11459,7 @@ function Calendar({events,setEvents,tasks,cu,users,locFilter,meetingNotes,setMee
     if(meetLink){
       setTimeout(()=>{if(window.confirm('Meeting created!\n\nLink:\n'+meetLink+'\n\nCopy to clipboard?')){navigator.clipboard.writeText(meetLink).catch(()=>{}); }},300);
     }
-    setF({title:'',type:'event',date:'',start_time:'09:00',end_time:'10:00',all_day:false,description:'',location:'',attendees:[],color:'#f5a623',personal:false,loc:'Missouri',meet_link:''});
+    setF({title:'',type:'event',date:'',start_time:'09:00',end_time:'10:00',all_day:false,description:'',location:'',attendees:[],color:'#f5a623',personal:false,loc:'Michigan',meet_link:''});
     setNew(false);setSaving(false);
   }
 
@@ -11389,7 +11621,7 @@ function Calendar({events,setEvents,tasks,cu,users,locFilter,meetingNotes,setMee
               ))
             ),
           ),
-          el('div',{className:'fg'},el('label',null,'Location Filter'),el('select',{value:f.loc,onChange:ev=>setF(p=>({...p,loc:ev.target.value}))},['Missouri'].map(l=>el('option',{key:l,value:l},l)))),
+          el('div',{className:'fg'},el('label',null,'Location Filter'),el('select',{value:f.loc,onChange:ev=>setF(p=>({...p,loc:ev.target.value}))},['Michigan'].map(l=>el('option',{key:l,value:l},l)))),
         ),
         el('div',{className:'mf'},
           el('button',{className:'btn b-ghost',onClick:()=>setNew(false)},'Cancel'),
@@ -11585,7 +11817,7 @@ function SanitationKiosk(){
         el('div',{style:{fontSize:28}},'\uD83E\uDDF9'),
         el('div',null,
           el('div',{style:{fontSize:18,fontWeight:800}},'Sanitation Log'),
-          el('div',{style:{fontSize:12,opacity:.8}},'Black Fox Manufacturing \u2014 Missouri'),
+          el('div',{style:{fontSize:12,opacity:.8}},'Black Fox Manufacturing \u2014 Michigan'),
         ),
         el('div',{style:{marginLeft:'auto',fontSize:12,opacity:.7}},new Date().toLocaleDateString()),
       ),
@@ -11604,13 +11836,13 @@ function SanitationKiosk(){
               el('button',{onClick:()=>setSig(null),style:{background:'none',border:'1px solid #cbd5e1',borderRadius:6,padding:'5px 14px',fontSize:12,cursor:'pointer',fontFamily:'inherit'}},'Clear & Re-sign'),
             )
           :el(SignaturePad,{label:'Sign to certify this sanitation record is accurate and complete',onSave:d=>setSig(d),onClear:()=>setSig(null)}),
-        el('div',{style:{fontSize:11,color:'#94a3b8',marginTop:6}},'By signing, you confirm this record is accurate. This log is legally valid for DCR inspections.'),
+        el('div',{style:{fontSize:11,color:'#94a3b8',marginTop:6}},'By signing, you confirm this record is accurate. This log is legally valid for CRA inspections.'),
       ),
       error&&el('div',{style:{background:'#fef2f2',border:'1px solid #fecaca',borderRadius:10,padding:'12px 14px',fontSize:13,color:'#dc2626',marginBottom:12}},error),
       el('button',{onClick:submit,disabled:saving,style:{width:'100%',background:saving?'#94a3b8':'#065f46',color:'#fff',border:'none',borderRadius:14,padding:'16px',fontFamily:'inherit',fontSize:16,fontWeight:800,cursor:saving?'not-allowed':'pointer',boxShadow:'0 4px 16px rgba(6,95,70,.3)'}},
         saving?'Saving...':'\u2705 Submit Sanitation Log'
       ),
-      el('div',{style:{textAlign:'center',fontSize:11,color:'#94a3b8',marginTop:12}},'Black Fox QMS \u2014 MAN000109 \u2014 HMBF Management Inc.'),
+      el('div',{style:{textAlign:'center',fontSize:11,color:'#94a3b8',marginTop:12}},'Black Fox QMS \u2014 TBD-PENDING \u2014 HMBF Management Inc.'),
     ),
   );
 }
@@ -11697,7 +11929,7 @@ function LogKiosk({logKey}){
         el('div',{style:{fontSize:28}},lt.icon),
         el('div',null,
           el('div',{style:{fontSize:18,fontWeight:800}},lt.label),
-          el('div',{style:{fontSize:11,opacity:.8}},'Black Fox Manufacturing \u2014 Missouri'),
+          el('div',{style:{fontSize:11,opacity:.8}},'Black Fox Manufacturing \u2014 Michigan'),
         ),
         el('div',{style:{marginLeft:'auto',fontSize:12,opacity:.75}},new Date().toLocaleDateString()),
       ),
@@ -11715,13 +11947,13 @@ function LogKiosk({logKey}){
               el('button',{onClick:()=>setSig(null),style:{background:'none',border:'1px solid #cbd5e1',borderRadius:6,padding:'5px 14px',fontSize:12,cursor:'pointer',fontFamily:'inherit'}},'Clear & Re-sign'),
             )
           :el(SignaturePad,{label:'Sign to certify this record is accurate',onSave:d=>setSig(d),onClear:()=>setSig(null)}),
-        el('div',{style:{fontSize:11,color:'#94a3b8',marginTop:6}},'This record is legally valid for DCR inspections and ISO 9001 audits.'),
+        el('div',{style:{fontSize:11,color:'#94a3b8',marginTop:6}},'This record is legally valid for CRA inspections and ISO 9001 audits.'),
       ),
       error&&el('div',{style:{background:'#fef2f2',border:'1px solid #fecaca',borderRadius:10,padding:'12px 14px',fontSize:13,color:'#dc2626',marginBottom:12}},error),
       el('button',{onClick:submit,disabled:saving,style:{width:'100%',background:saving?'#94a3b8':lt.color,color:'#fff',border:'none',borderRadius:14,padding:'16px',fontFamily:'inherit',fontSize:16,fontWeight:800,cursor:saving?'not-allowed':'pointer',boxShadow:'0 4px 16px rgba(0,0,0,.2)'}},
         saving?'Saving...':'\u2705 Submit '+lt.label
       ),
-      el('div',{style:{textAlign:'center',fontSize:11,color:'#94a3b8',marginTop:12}},'Black Fox QMS \u2014 MAN000109 \u2014 HMBF Management Inc.'),
+      el('div',{style:{textAlign:'center',fontSize:11,color:'#94a3b8',marginTop:12}},'Black Fox QMS \u2014 TBD-PENDING \u2014 HMBF Management Inc.'),
     ),
   );
 }
@@ -11799,7 +12031,7 @@ function SecurityKiosk(){
         el('div',{style:{fontSize:28}},lt.icon),
         el('div',null,
           el('div',{style:{fontSize:18,fontWeight:800}},'Weekly Security Equipment Inspection'),
-          el('div',{style:{fontSize:11,opacity:.8}},'Black Fox Manufacturing \u2014 Missouri \u00B7 DCR'),
+          el('div',{style:{fontSize:11,opacity:.8}},'Black Fox Manufacturing \u2014 Michigan \u00B7 CRA'),
         ),
         el('div',{style:{marginLeft:'auto',fontSize:12,opacity:.75}},new Date().toLocaleDateString()),
       ),
@@ -11883,14 +12115,14 @@ function SecurityKiosk(){
         sig
           ?el('div',null,el('img',{src:sig,style:{border:'2px solid #1e3a5f',borderRadius:8,maxWidth:'100%',height:80,display:'block',marginBottom:8}}),el('button',{onClick:()=>setSig(null),style:{background:'none',border:'1px solid #cbd5e1',borderRadius:6,padding:'5px 14px',fontSize:12,cursor:'pointer',fontFamily:'inherit'}},'Clear & Re-sign'))
           :el(SignaturePad,{label:'Sign to certify this inspection was completed accurately',onSave:d=>setSig(d),onClear:()=>setSig(null)}),
-        el('div',{style:{fontSize:11,color:'#94a3b8',marginTop:6}},'This record is legally valid for DCR inspections and ISO 9001 audits.'),
+        el('div',{style:{fontSize:11,color:'#94a3b8',marginTop:6}},'This record is legally valid for CRA inspections and ISO 9001 audits.'),
       ),
 
       error&&el('div',{style:{background:'#fef2f2',border:'1px solid #fecaca',borderRadius:10,padding:'12px 14px',fontSize:13,color:'#dc2626',marginBottom:12}},error),
       el('button',{onClick:submit,disabled:saving,style:{width:'100%',background:saving?'#94a3b8':lt.color,color:'#fff',border:'none',borderRadius:14,padding:'16px',fontFamily:'inherit',fontSize:16,fontWeight:800,cursor:saving?'not-allowed':'pointer',boxShadow:'0 4px 16px rgba(0,0,0,.2)'}},
         saving?'Saving...':'\u2705 Submit Inspection'
       ),
-      el('div',{style:{textAlign:'center',fontSize:11,color:'#94a3b8',marginTop:12}},'Black Fox QMS \u2014 MAN000109 \u2014 HMBF Management Inc.'),
+      el('div',{style:{textAlign:'center',fontSize:11,color:'#94a3b8',marginTop:12}},'Black Fox QMS \u2014 TBD-PENDING \u2014 HMBF Management Inc.'),
     ),
   );
 }
@@ -11911,7 +12143,7 @@ function VisitorKiosk(){
   const[cameraActive,setCameraActive]=React.useState(false);
   const setF=(k,v)=>setForm(p=>({...p,[k]:v}));
 
-  const PURPOSES=['Vendor / delivery','Testing','Maintenance / repair','Regulatory inspection (DCR)','Regulatory inspection (other)','Audit','Business meeting','Prospective employee','Other'];
+  const PURPOSES=['Vendor / delivery','Testing','Maintenance / repair','Regulatory inspection (CRA)','Regulatory inspection (other)','Audit','Business meeting','Prospective employee','Other'];
 
   // Camera for selfie
   async function startCamera(){
@@ -12168,7 +12400,7 @@ function App(){
       setTimeout(()=>setShowInstallBanner(true),3000);
     }
   },[cu]);
-  const[locFilter,setLocFilter]=useState('Missouri');
+  const[locFilter,setLocFilter]=useState('Michigan');
 
   // FIX 2: doRefresh with correct destructuring
   const doRefresh=useCallback(()=>{
@@ -12278,7 +12510,7 @@ function App(){
 
   if(dbReady===null) return el('div',{className:'loading'},el('div',{className:'spinner'}),el('div',null,'Connecting...'));
   if(dbReady===false) return el(SetupScreen,{onDone:()=>setDbReady(true)});
-  if(!cu) return el(Auth,{onLogin:u=>{setCu(u);setLocFilter(u.loc||'Missouri');}});
+  if(!cu) return el(Auth,{onLogin:u=>{setCu(u);setLocFilter(u.loc||'Michigan');}});
   if(loading) return el('div',{className:'loading'},el('div',{className:'spinner'}),el('div',null,'Loading...'));
 
   const pending=users.filter(u=>!u.approved).length;
@@ -12291,6 +12523,7 @@ function App(){
   const canAccessLogs=isAdmin||isElevated||canRead(cu,'logs');
   const canAccessBatch=isAdmin||isElevated||canRead(cu,'batch');
   const canAccessCogs=isAdmin||canRead(cu,'cogs');
+  const canAccessPlanner=isAdmin||canRead(cu,'planner');
   const canAccessFormBank=isAdmin||canRead(cu,'formbank');
   const canAccessRisks=isAdmin||isElevated||canRead(cu,'risks');
   const canAccessCompliance=isAdmin||isElevated||canRead(cu,'compliance');
@@ -12313,6 +12546,7 @@ function App(){
     {id:'calendar',ico:'\uD83D\uDCC5',label:'Calendar'},
     canAccessQms&&{id:'qms',ico:'\uD83D\uDEE1\uFE0F',label:'QMS'},
     canAccessQms&&{id:'reporter',ico:'\uD83E\uDDE0',label:'AI Reporter'},
+    canAccessPlanner&&{id:'planner',ico:'\uD83C\uDFED',label:'Production Planner'},
     canAccessCompliance&&{id:'compliance',ico:'\u2705',label:'Compliance'},
     canAccessRisks&&{id:'risks',ico:'\u26A0\uFE0F',label:'Risk Register'},
     canAccessLogs&&{id:'logs',ico:'\uD83D\uDCCB',label:'Facility Logs'},
@@ -12534,6 +12768,7 @@ function App(){
       page==='formbank'&&canAccessFormBank&&el(FormulationBank,{cu,SUPA_URL,SUPA_KEY,H}),
       page==='cogs'&&canAccessCogs&&el(CogsCalculator,{cu,SUPA_URL,SUPA_KEY,H}),
       page==='reporter'&&canAccessQms&&el(AIReporter,{cu,SUPA_URL,SUPA_KEY,H}),
+      page==='planner'&&canAccessPlanner&&el(ProductionPlanner,{cu,SUPA_URL,SUPA_KEY,H}),
       page==='qms'&&!restricted&&canAccessQms&&el(QMS,{cu,users,tasks,sops,setSops,
         deviations:qmsDeviations,setDeviations:setQmsDeviations,
         capas:qmsCAPAs,setCapas:setQmsCAPAs,
