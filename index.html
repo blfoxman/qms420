@@ -3602,46 +3602,34 @@ const QMS_STATUSES={open:{label:'Open',color:'#ef4444'},in_progress:{label:'In P
 // Tracker's Cartridges form). SKUs with no flavor list yet fall back to a
 // free-text flavor field so new batches aren't blocked while Sam fills those in.
 const CARTRIDGE_SKUS=[
-  'Muha Meds 2G AIO',
-  'Muha Meds 1G Reserve AIO',
-  'Muha Meds 1G Melted Diamond AIO',
-  'Muha Meds 1G 510 Cartridges',
-  'Bodega Boyz 2G AIO',
-  '1G Pusha Pods',
+  'MI 2G Gen3.1 Disposable',
+  'MI 1G Gen3 510 Cart',
+  'MI 2G Gen3 510 Cart',
+  'MI 1G Melted Diamond Disposable',
+  'MI 1G Live Resin Disposable',
+  'MI 1G Hash Rosin Disposable',
+  'MI 2G Dual Disposable',
 ];
 const CARTRIDGE_FLAVORS={
-  'Muha Meds 2G AIO':['Moroccan Peaches','Honey Melon','Strawberry Lava','Frozen Pomegranate','Pineapple Paradise','Gelato #33','Lemon Tart','Purple Punch','Blue Dream','Do-Si OG'],
-  'Muha Meds 1G Reserve AIO':['Golden Papaya','Grape Dosi','Lemon Kushmintz','Wedding Cake','OG Kush'],
-  'Muha Meds 1G Melted Diamond AIO':['Durban Delight','Grape Gas','Lemon Cherry Gelato','Mango Mirage','Orange Tangie'],
-  'Muha Meds 1G 510 Cartridges':[],
-  'Bodega Boyz 2G AIO':[],
-  '1G Pusha Pods':[],
+  'MI 2G Gen3.1 Disposable':['Frozen Pomegranate','Aloha Passion Fruit','Lemon Cherry Fizz','Watermelon Bubblegum','Frosted Mint Cookies','Blue Slushie','Arctic Blueberry','Galactic Diesel','Guava Mango Z','Horchata'],
+  'MI 1G Gen3 510 Cart':['Strawberry Kiwi Kush','Bubblegum Burst','Cherry Grapefruit','Banana Cream Cake','Pinapple Paradise','Godfather OG','Bahama Berry','Green Crack','Blue Slushie','Purple Passion Punch'],
+  'MI 2G Gen3 510 Cart':['Gelato 33','Purple Punch','Lemon Drop','Skywalker OG','Frozen Bluez','Mellow Dew','Strawberry Lava','Toxic Apple','Georgia Peaches','Do-si Cake'],
+  'MI 1G Melted Diamond Disposable':['Durban Delight','Lemon Cherry Gelato','Grape Gas','Mango Madness','Orange Tangie'],
+  'MI 1G Live Resin Disposable':['Juice Man','Golden Papaya','Grape Dosi','Lemon Kush Mintz','OG Kush'],
+  'MI 1G Hash Rosin Disposable':['Garlic Jelly','Mimosa','Fatso','Tropicanna Cherry','Donnie Burger'],
+  'MI 2G Dual Disposable':['Blue Slushie','Pomegranate Runts','Cherry Slushie','Limoncello','Grape Ape','Skywalker OG','Key Lime Jack','Train Wreck','Mango Peach','Orange Creamsicle','Blue Aloha Burst','Pineapple Kush','Juicy Melon','Sunset Sherbet','Prickly Pear Drip','Azure Wild Berry','Blackberry Kush','Orange Dream','Kiwi Mojito','Pina Colada'],
 };
-// Pre-Rolls SKU dropdown (Batch Tracker \u2014 New Batch)
+
 const PRE_ROLL_SKUS=[
-  'Muha Meds - Mates - THCA Infused 5 x 0.6g',
-  'Muha Meds - Mates Reserve - 5 x 0.6g',
-  'Bodega Boyz - Shorties',
-  'Muha Meds 2G Infused Pre Roll',
-  'Muha Meds 1G Plain Pre Roll',
+  'MI Reg Mates Gen3 (3g jar, 5 x 0.6g)',
 ];
-// Flavors cascade off the SKU chosen above. SKUs with no flavor list yet fall
-// back to a free-text flavor field so new batches aren't blocked. 1G Plain
-// Pre Roll has no flavor concept at all \u2014 the field is hidden entirely for
-// it (see PRE_ROLL_NO_FLAVOR_SKUS), not just given an empty list.
 const PRE_ROLL_FLAVORS={
-  'Muha Meds - Mates - THCA Infused 5 x 0.6g':['Berry Blast','Honey Melon','Agave Sunrise','Mango Peach Fusion','Frosty Mint Blueberry','Strawberry Ice Cream','Caramel Apple Gelato','Winter Cookie Crumble','Purple Punch','Biscotti Bomb'],
-  'Muha Meds - Mates Reserve - 5 x 0.6g':['Presidential OG','Muha OG','STL Gas','Kush Widow','Super Lemon'],
-  'Bodega Boyz - Shorties':[],
-  'Muha Meds 2G Infused Pre Roll':['Banana Pie','Blue Slushie','Cinnamon Cream OG','Desert Gold Chocolate','Grape Stomper','Honey Melon','Lemon Cheesecake','Matcha Gold','Midnight Espresso','PB Jelly','Peaches & Cream','Pineapple Poison','Pumpkin Bliss','Strawberry Lava','Watermelon Punch'],
-  'Muha Meds 1G Plain Pre Roll':[],
+  'MI Reg Mates Gen3 (3g jar, 5 x 0.6g)':['Berry Blaze','Honey Melon','Caramel Apple Gelato','Snowberry Truffle','Honey Jack','Strawberry Ice Cream','Purple Punch','Agave Sunrise','Frosty Mint Blueberry','Biscotti Bomb'],
 };
-const PRE_ROLL_NO_FLAVOR_SKUS=['Muha Meds 1G Plain Pre Roll'];
-// Gummies SKU/Flavor dropdown (Batch Tracker \u2014 New Batch)
-const GUMMY_SKUS=['Muha Meds Distillate Gummies'];
-const GUMMY_FLAVORS={
-  'Muha Meds Distillate Gummies':['Mango Mirage','Strawberry Lemon','Green Apple','Very Berry','Watermelon'],
-};
+const PRE_ROLL_NO_FLAVOR_SKUS=[];
+
+const GUMMY_SKUS=[];
+const GUMMY_FLAVORS={};
 // Gummies auto-calculation chain:
 //   Gummy Mixture Used        = Gummy Mixture Batch Weight \u2212 Gummy Mixture Waste
 //   Total Sugar Coated Gummies = Total Gummies Produced \u2212 Total Gummies Waste (Before Sugaring)
@@ -3795,8 +3783,7 @@ const PRE_ROLL_TOLERANCE=0.10; // \u00B110%
 const PRE_ROLL_JOINT_WEIGHT_1=0.55; // fallback default, grams/joint, Infused Joints stage
 const PRE_ROLL_JOINT_WEIGHT_2=0.60; // fallback default, grams/joint, Kiefed Preroll stage
 const PRE_ROLL_JOINT_WEIGHTS={
-  'Muha Meds 2G Infused Pre Roll':{filled:1.9,kief:2.0},
-  'Muha Meds 1G Plain Pre Roll':{filled:1.0,kief:null},
+  'MI Reg Mates Gen3 (3g jar, 5 x 0.6g)':{filled:0.6,kief:0.6},
 };
 function preRollJointWeight(sku){
   return PRE_ROLL_JOINT_WEIGHTS[sku]||{filled:PRE_ROLL_JOINT_WEIGHT_1,kief:PRE_ROLL_JOINT_WEIGHT_2};
@@ -3848,8 +3835,7 @@ function recalcPreRoll(logType,f){
 // SKUs Sam has given a ratio for; others get no packaging check (not enough
 // info yet, e.g. the 5x0.6g Mates SKUs likely package multiple joints together).
 const PRE_ROLL_UNITS_PER_PACKAGE={
-  'Muha Meds 1G Plain Pre Roll':1,
-  'Muha Meds 2G Infused Pre Roll':1,
+  'MI Reg Mates Gen3 (3g jar, 5 x 0.6g)':5,
 };
 // Generalized SKU\u2192Flavor cascading dropdown config, keyed by batch log type.
 // Any batch type listed here gets the SKU/Flavor special-case rendering in
@@ -3862,22 +3848,18 @@ const SKU_FLAVOR_CONFIG={
 };
 // Which ingredient fields (in the Pre-Rolls "Infused Flower" section) apply
 // to each SKU. THCA Infused uses Flower+Terp+THCA; Mates Reserve uses those
-// same three PLUS Live Resin, Decarbed Cured Resin, and Distillate; Shorties
-// isn't an infused product so none of these apply. 2G Infused Pre Roll uses
-// the same ingredients/process as THCA Infused. 1G Plain Pre Roll uses ONLY
-// flower \u2014 no THCA, no Terpene, nothing else. Flower and the infused-flower
-// totals stay visible for every SKU (not listed here, unconditional).
+// MI Reg Mates Gen3 formulation includes Flower, Trim, THCA Isolate, Live
+// Resin/HTE, Distillate, and Kief (per the MI ERP formulation sheet) — so all
+// of those conditional fields are shown; Decarbed Cured Resin isn't part of
+// this formulation and stays hidden. Flower and the infused-flower totals
+// stay visible unconditionally (not listed here).
 const PRE_ROLL_SKU_INGREDIENTS={
-  'Muha Meds - Mates - THCA Infused 5 x 0.6g':['thca_metrc','thca_qty','terp_qty'],
-  'Muha Meds - Mates Reserve - 5 x 0.6g':['thca_metrc','thca_qty','terp_qty','live_resin_metrc','live_resin_qty','decarbed_resin_metrc','decarbed_resin_qty','distillate_metrc','distillate_qty'],
-  'Bodega Boyz - Shorties':[],
-  'Muha Meds 2G Infused Pre Roll':['thca_metrc','thca_qty','terp_qty'],
-  'Muha Meds 1G Plain Pre Roll':[],
+  'MI Reg Mates Gen3 (3g jar, 5 x 0.6g)':['thca_metrc','thca_qty','terp_qty','live_resin_metrc','live_resin_qty','distillate_metrc','distillate_qty'],
 };
 const PRE_ROLL_CONDITIONAL_INGREDIENT_KEYS=['thca_metrc','thca_qty','terp_qty','live_resin_metrc','live_resin_qty','decarbed_resin_metrc','decarbed_resin_qty','distillate_metrc','distillate_qty'];
-// 1G Plain Pre Roll has no kiefing step at all \u2014 the entire Kiefed Preroll
-// section (and its System Check) is hidden for it, not just individual fields.
-const PRE_ROLL_NO_KIEF_SKUS=['Muha Meds 1G Plain Pre Roll'];
+// MI Reg Mates Gen3 includes a kiefing step (4% Kief per the formulation), so
+// the Kiefed Preroll section stays visible for it \u2014 nothing excluded here.
+const PRE_ROLL_NO_KIEF_SKUS=[];
 const PRE_ROLL_KIEF_SECTION_KEYS=['_s_kiefed','total_infused_preroll_used','total_infused_preroll_waste','preroll_waste_metrc_confirmed','kief_metrc','kief_qty_used','total_kiefed_infused_joints','kiefed_infused_preroll_metrc','kiefed_metrc_confirmed','_s_kiefed_system_check','kiefed_check_result','kiefed_infused_joints_used','kief_infused_joints_waste','kief_waste_metrc_confirmed'];
 // R&D test checkpoints, keyed by batch logType. Each pair is [rd1_key,rd2_key];
 // rd2 only appears once rd1 has been marked Failed. A batch type can have more
