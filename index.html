@@ -4325,7 +4325,7 @@ function exportLogPdf(logType,entries,dateFrom,dateTo){
   doc.setFont('helvetica','normal');doc.setFontSize(11);doc.setTextColor(...SUBTEXT);
   doc.text('Regulatory Basis: '+lt.dcr,margin,y);y+=18;
   doc.text('Period: '+(dateFrom||'All dates')+' to '+(dateTo||'All dates')+' \u00B7 Entries: '+entries.length,margin,y);y+=18;
-  doc.text('Black Fox Manufacturing \u2014 HMBF Management Inc. \u2014 TBD-PENDING',margin,y);y+=10;
+  doc.text('Summit Solutions \u2014 TBD-PENDING',margin,y);y+=10;
   doc.setDrawColor(...BORDER);doc.setLineWidth(0.5);doc.line(margin,y,W-margin,y);y+=20;
   function sectionTable(title,items,keyPrefix,statusOpts){
     checkPage(30);
@@ -4482,7 +4482,7 @@ function exportLogPdf(logType,entries,dateFrom,dateTo){
     });
   });
   doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(22,163,74);
-  doc.text('Official record \u2014 QMS420 \u00B7 TBD-PENDING \u00B7 HMBF Management Inc. \u00B7 Retain 4+ years per Michigan CRA',margin,H-20);
+  doc.text('Official record \u2014 QMS420 \u00B7 TBD-PENDING \u00B7 Summit Solutions \u00B7 Retain 4+ years per Michigan CRA',margin,H-20);
   doc.save('BlackFox_'+lt.label.replace(/[^a-z0-9]/gi,'_')+'_'+new Date().toISOString().slice(0,10)+'.pdf');
 }
 
@@ -5557,7 +5557,7 @@ function ProductionPlanner({cu,SUPA_URL,SUPA_KEY,H}){
     }))):'No saved recipes.';
 
     const lt=LOG_TYPES[productType];
-    const prompt=`You are a cannabis production ingredient calculator for Black Fox Manufacturing.
+    const prompt=`You are a cannabis production ingredient calculator for Summit Solutions.
 
 PRODUCT: ${lt?lt.label:productType}
 SKU: ${sku}
@@ -5611,7 +5611,7 @@ Rules:
     doc.setFontSize(18);doc.setFont('helvetica','bold');
     doc.text('Production Worksheet',margin,y);y+=7;
     doc.setFontSize(10);doc.setFont('helvetica','normal');
-    doc.text('Black Fox Manufacturing | '+new Date().toLocaleDateString(),margin,y);y+=5;
+    doc.text('Summit Solutions | '+new Date().toLocaleDateString(),margin,y);y+=5;
     doc.text((lt?lt.label:productType)+' | '+sku+' | '+flavor,margin,y);y+=5;
     doc.text('Target: '+unitsPerFlavor+' units',margin,y);y+=8;
     doc.setDrawColor(200);doc.line(margin,y,W-margin,y);y+=6;
@@ -5820,7 +5820,7 @@ function AIReporter({cu,SUPA_URL,SUPA_KEY,H}){
       return `## ${t} (${rows.length} records)\n${str}`;
     }).join('\n\n');
     const capped=dataStr.length>25000?dataStr.slice(0,25000)+'\u2026':dataStr;
-    return `AI Reporter for QMS420 (Black Fox Manufacturing / HMBF Management Inc, TBD-PENDING). Today: ${now}. User: ${cu.name} (${cu.role}).\n\nAnswer using ONLY the data below. Be specific with record IDs, batch numbers, dates, names. Lead with a direct answer, then details. Flag any compliance gaps.\n\n${capped}`;
+    return `AI Reporter for QMS420 (Summit Solutions, TBD-PENDING). Today: ${now}. User: ${cu.name} (${cu.role}).\n\nAnswer using ONLY the data below. Be specific with record IDs, batch numbers, dates, names. Lead with a direct answer, then details. Flag any compliance gaps.\n\n${capped}`;
   }
 
   async function send(){
@@ -9445,7 +9445,7 @@ function Scoreboard({tasks,cu,users}){
 // \u2500\u2500 SOPs \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 // \u2500\u2500 LICENSE & REGULATORY CONSTANTS \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 const LICENSES=[
-  {id:'bfm',name:'Black Fox Manufacturing',state:'Michigan',license_type:'Processor License',license_number:'TBD-PENDING'},
+  {id:'bfm',name:'Summit Solutions',state:'Michigan',license_type:'Processor License',license_number:'TBD-PENDING'},
 ];
 
 const STATE_REGS={
@@ -10070,7 +10070,7 @@ function exportCorrectiveActionPdf(ca){
   const gen=ca.generated_content?JSON.parse(ca.generated_content):{};
   const lic=LICENSES.find(l=>l.id===ca.license_id)||LICENSES.find(l=>l.name===ca.license_name);
   const isMichigan=(lic?.state||ca.state)==='Michigan';
-  const companyName=isMichigan?'HMBF MANAGEMENT INC':'BLACK FOX MANUFACTURING';
+  const companyName='SUMMIT SOLUTIONS';
 
   function header(){
     // Header background
@@ -10673,7 +10673,7 @@ function LicenseChart(){
   return el('div',{style:{padding:'0 0 48px'}},
     el('div',{style:{background:'#6ba022',borderRadius:14,padding:'20px 24px',marginBottom:24,color:'#fff'}},
       el('div',{style:{fontSize:20,fontWeight:800,marginBottom:4}},'\uD83C\uDFDB\uFE0F Michigan Facility \u2014 Org Chart & License'),
-      el('div',{style:{fontSize:12,opacity:.85}},'Black Fox Michigan \u00B7 Processor License \u00B7 TBD-PENDING'),
+      el('div',{style:{fontSize:12,opacity:.85}},'Summit Solutions \u00B7 Processor License \u00B7 TBD-PENDING'),
       el('div',{style:{fontSize:11,opacity:.65,marginTop:4}},'Michigan CRA / MRTMA \u00B7 R 420.301\u2013420.807'),
     ),
 
@@ -10886,7 +10886,7 @@ function exportComplianceSnapshotPdf(license,publishedSOPs,scopeUsers,targetUser
     doc.setTextColor(...GOLD);
     doc.setFont('helvetica','bold');
     doc.setFontSize(16);
-    doc.text('Black Fox QMS',margin,32);
+    doc.text('QMS420',margin,32);
     doc.setTextColor(230,230,230);
     doc.setFont('helvetica','normal');
     doc.setFontSize(9);
@@ -11278,7 +11278,7 @@ function SOPGenerator({cu,onClose,onSave}){
     }
   }
 
-  // Accepts the JSON exported by the standalone Black Fox SOP Generator tool
+  // Accepts the JSON exported by the standalone QMS420 SOP Generator tool
   // (same field shape as generateSOP() below produces) and jumps straight to
   // the review/save screen \u2014 so an imported SOP is saved through the exact
   // same saveSOP() path as one generated inside QMS itself.
@@ -11289,7 +11289,7 @@ function SOPGenerator({cu,onClose,onSave}){
     try{
       const text=await file.text();
       const parsed=JSON.parse(text);
-      if(!parsed||!parsed.title){throw new Error('This file doesn\u2019t look like a Black Fox SOP export.');}
+      if(!parsed||!parsed.title){throw new Error('This file doesn\u2019t look like a QMS420 SOP export.');}
       if(parsed.title) setTitle(parsed.title);
       setGeneratedSOP(parsed);
       setEditedSOP(parsed);
@@ -11562,7 +11562,7 @@ Respond with ONLY this JSON (no markdown, be concise, this must NOT be truncated
 
           // Import from the standalone SOP Generator tool
           el('div',{className:'fg'},
-            el('label',null,'Or Import a Generated SOP (from the Black Fox SOP Generator tool)'),
+            el('label',null,'Or Import a Generated SOP (from the QMS420 SOP Generator tool)'),
             el('div',{style:{fontSize:11,color:'var(--text3)',marginBottom:6}},'Already ran a draft through the standalone SOP Generator? Upload the JSON it downloaded \u2014 this skips AI generation and takes you straight to review, saved exactly like any SOP created here.'),
             el('label',{style:{display:'flex',alignItems:'center',gap:8,padding:'10px 14px',background:'var(--surface2)',border:'1px dashed var(--border)',borderRadius:'var(--rs)',cursor:'pointer',transition:'all .15s'},
               onMouseEnter:ev=>{ev.currentTarget.style.borderColor='var(--accent)';},
@@ -12831,7 +12831,7 @@ function SanitationKiosk(){
         el('div',{style:{fontSize:28}},'\uD83E\uDDF9'),
         el('div',null,
           el('div',{style:{fontSize:18,fontWeight:800}},'Sanitation Log'),
-          el('div',{style:{fontSize:12,opacity:.8}},'Black Fox Manufacturing \u2014 Michigan'),
+          el('div',{style:{fontSize:12,opacity:.8}},'Summit Solutions \u2014 Michigan'),
         ),
         el('div',{style:{marginLeft:'auto',fontSize:12,opacity:.7}},new Date().toLocaleDateString()),
       ),
@@ -12856,7 +12856,7 @@ function SanitationKiosk(){
       el('button',{onClick:submit,disabled:saving,style:{width:'100%',background:saving?'#94a3b8':'#065f46',color:'#fff',border:'none',borderRadius:14,padding:'16px',fontFamily:'inherit',fontSize:16,fontWeight:800,cursor:saving?'not-allowed':'pointer',boxShadow:'0 4px 16px rgba(6,95,70,.3)'}},
         saving?'Saving...':'\u2705 Submit Sanitation Log'
       ),
-      el('div',{style:{textAlign:'center',fontSize:11,color:'#94a3b8',marginTop:12}},'QMS420 \u2014 TBD-PENDING \u2014 HMBF Management Inc.'),
+      el('div',{style:{textAlign:'center',fontSize:11,color:'#94a3b8',marginTop:12}},'QMS420 \u2014 TBD-PENDING \u2014 Summit Solutions'),
     ),
   );
 }
@@ -12943,7 +12943,7 @@ function LogKiosk({logKey}){
         el('div',{style:{fontSize:28}},lt.icon),
         el('div',null,
           el('div',{style:{fontSize:18,fontWeight:800}},lt.label),
-          el('div',{style:{fontSize:11,opacity:.8}},'Black Fox Manufacturing \u2014 Michigan'),
+          el('div',{style:{fontSize:11,opacity:.8}},'Summit Solutions \u2014 Michigan'),
         ),
         el('div',{style:{marginLeft:'auto',fontSize:12,opacity:.75}},new Date().toLocaleDateString()),
       ),
@@ -12967,7 +12967,7 @@ function LogKiosk({logKey}){
       el('button',{onClick:submit,disabled:saving,style:{width:'100%',background:saving?'#94a3b8':lt.color,color:'#fff',border:'none',borderRadius:14,padding:'16px',fontFamily:'inherit',fontSize:16,fontWeight:800,cursor:saving?'not-allowed':'pointer',boxShadow:'0 4px 16px rgba(0,0,0,.2)'}},
         saving?'Saving...':'\u2705 Submit '+lt.label
       ),
-      el('div',{style:{textAlign:'center',fontSize:11,color:'#94a3b8',marginTop:12}},'QMS420 \u2014 TBD-PENDING \u2014 HMBF Management Inc.'),
+      el('div',{style:{textAlign:'center',fontSize:11,color:'#94a3b8',marginTop:12}},'QMS420 \u2014 TBD-PENDING \u2014 Summit Solutions'),
     ),
   );
 }
@@ -13045,7 +13045,7 @@ function SecurityKiosk(){
         el('div',{style:{fontSize:28}},lt.icon),
         el('div',null,
           el('div',{style:{fontSize:18,fontWeight:800}},'Weekly Security Equipment Inspection'),
-          el('div',{style:{fontSize:11,opacity:.8}},'Black Fox Manufacturing \u2014 Michigan \u00B7 CRA'),
+          el('div',{style:{fontSize:11,opacity:.8}},'Summit Solutions \u2014 Michigan \u00B7 CRA'),
         ),
         el('div',{style:{marginLeft:'auto',fontSize:12,opacity:.75}},new Date().toLocaleDateString()),
       ),
@@ -13136,7 +13136,7 @@ function SecurityKiosk(){
       el('button',{onClick:submit,disabled:saving,style:{width:'100%',background:saving?'#94a3b8':lt.color,color:'#fff',border:'none',borderRadius:14,padding:'16px',fontFamily:'inherit',fontSize:16,fontWeight:800,cursor:saving?'not-allowed':'pointer',boxShadow:'0 4px 16px rgba(0,0,0,.2)'}},
         saving?'Saving...':'\u2705 Submit Inspection'
       ),
-      el('div',{style:{textAlign:'center',fontSize:11,color:'#94a3b8',marginTop:12}},'QMS420 \u2014 TBD-PENDING \u2014 HMBF Management Inc.'),
+      el('div',{style:{textAlign:'center',fontSize:11,color:'#94a3b8',marginTop:12}},'QMS420 \u2014 TBD-PENDING \u2014 Summit Solutions'),
     ),
   );
 }
@@ -13241,7 +13241,7 @@ function VisitorKiosk(){
     el('div',{style:{textAlign:'center',marginBottom:28,color:'#fff'}},
       el('div',{style:{fontSize:36,marginBottom:4}},'\uD83E\uDD8A'),
       el('div',{style:{fontSize:22,fontWeight:800,letterSpacing:'-0.5px'}},['QMS420'].join('')),
-      el('div',{style:{fontSize:13,opacity:.75,marginTop:2}},'Visitor Management \u00B7 Black Fox Manufacturing'),
+      el('div',{style:{fontSize:13,opacity:.75,marginTop:2}},'Visitor Management \u00B7 Summit Solutions'),
     ),
 
     // CHOICE SCREEN
