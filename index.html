@@ -5517,15 +5517,29 @@ function ProductionPlanner({cu,SUPA_URL,SUPA_KEY,H}){
   function selectAllFlavors(){setSelectedFlavors(allFlavorsSelected?[]:flavorOptions.slice());}
   function setTrack(flavor,key,val){setTracking(p=>({...p,[flavor]:{...(p[flavor]||{}),[key]:val}}));}
 
-  const TRACK_FIELDS=[
-    {key:'infused_flower_wt',label:'Infused Flower Wt'},
-    {key:'infused_flower_waste',label:'Infused Flower Waste'},
-    {key:'infused_preroll_produced',label:'Infused Pre Roll Produced'},
-    {key:'kief_used',label:'Kief Used'},
-    {key:'infused_preroll_waste',label:'Infused Pre Roll Waste'},
-    {key:'infused_kiefed_produced',label:'Infused Kiefed Pre Roll Produced'},
-    {key:'infused_kiefed_waste',label:'Infused Kiefed Pre Roll Waste'},
-  ];
+  // Production tracking fields differ by product type: Pre-Rolls track flower/
+  // kief through infused and kiefed stages; Cartridges track primed distillate
+  // through fill and packaging instead \u2014 these are physically different
+  // processes so they get different fields, not one generic set.
+  const TRACK_FIELDS_BY_TYPE={
+    pre_rolls:[
+      {key:'infused_flower_wt',label:'Infused Flower Wt'},
+      {key:'infused_flower_waste',label:'Infused Flower Waste'},
+      {key:'infused_preroll_produced',label:'Infused Pre Roll Produced'},
+      {key:'kief_used',label:'Kief Used'},
+      {key:'infused_preroll_waste',label:'Infused Pre Roll Waste'},
+      {key:'infused_kiefed_produced',label:'Infused Kiefed Pre Roll Produced'},
+      {key:'infused_kiefed_waste',label:'Infused Kiefed Pre Roll Waste'},
+    ],
+    cartridges:[
+      {key:'primed_distillate_wt',label:'Primed Distillate Weight'},
+      {key:'remaining_oil',label:'Remaining Oil'},
+      {key:'oil_waste',label:'Oil Waste'},
+      {key:'total_cart_filled',label:'Total Cart Filled'},
+      {key:'total_cart_waste',label:'Total Cart Waste'},
+    ],
+  };
+  const TRACK_FIELDS=TRACK_FIELDS_BY_TYPE[productType]||TRACK_FIELDS_BY_TYPE.pre_rolls;
 
   async function calculate(){
     if(!sku){setError('Select a SKU.');return;}
