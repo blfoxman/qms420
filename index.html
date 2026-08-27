@@ -3,43 +3,44 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
-<meta name="theme-color" content="#1e3a5f"/>
+<meta name="theme-color" content="#6ba022"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
-<meta name="apple-mobile-web-app-title" content="Black Fox QMS"/>
+<meta name="apple-mobile-web-app-title" content="QMS420"/>
 <link rel="manifest" href="/qms420/manifest.json"/>
 <link rel="apple-touch-icon" sizes="180x180" href="/qms420/icon-192.png"/>
 <link rel="apple-touch-icon" sizes="152x152" href="/qms420/icon-192.png"/>
 <link rel="apple-touch-icon" sizes="120x120" href="/qms420/icon-192.png"/>
 <link rel="icon" type="image/png" sizes="192x192" href="/qms420/icon-192.png"/>
-<title>Black Fox QMS</title>
+<title>QMS420</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 :root{
-  --bg:#f0f6ff;
-  --surface:#f0f4f8;
-  --surface2:#e2e8f0;
-  --surface3:#cbd5e1;
-  --border:#cbd5e1;
-  --border2:#94a3b8;
-  --accent:#1e3a5f;
-  --accent2:#2d5282;
-  --accent-dim:rgba(30,58,95,.1);
-  --green:#10b981;
+  --bg:#0b0c0d;
+  --surface:#151618;
+  --surface2:#1e2022;
+  --surface3:#2a2d30;
+  --border:#2f3234;
+  --border2:#454a4e;
+  --accent:#6ba022;
+  --accent2:#8bc93f;
+  --accent-dim:rgba(139,201,63,.12);
+  --silver:#c4c9cd;
+  --green:#22c55e;
   --red:#ef4444;
   --blue:#3b82f6;
-  --purple:#8b5cf6;
-  --text:#0f172a;
-  --text2:#475569;
-  --text3:#94a3b8;
+  --purple:#a78bfa;
+  --text:#f2f4f5;
+  --text2:#aab0b6;
+  --text3:#6f767c;
   --r:14px;--rs:10px;
-  --glow:0 0 40px rgba(30,58,95,.1);
+  --glow:0 0 40px rgba(139,201,63,.10);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
-body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(30,58,95,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(30,58,95,.04) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(255,255,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.035) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
 .auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;}
 .auth-box{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:44px 40px;width:440px;max-width:95vw;box-shadow:var(--glow),0 1px 3px rgba(15,23,42,.08);}
 .logo{display:flex;align-items:center;}
@@ -60,7 +61,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .auth-note{font-size:11px;color:var(--text3);text-align:center;margin-top:12px;}
 .pending-box{background:rgba(30,58,95,.05);border:1px solid rgba(30,58,95,.2);border-radius:var(--rs);padding:28px;text-align:center;}
 .app{display:flex;min-height:100vh;position:relative;z-index:1;}
-.sb{width:248px;background:#1e3a5f;border-right:1px solid #2d5282;display:flex;flex-direction:column;padding:20px 14px;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto;}
+.sb{width:248px;background:#101112;border-right:1px solid #2a2d30;display:flex;flex-direction:column;padding:20px 14px;position:fixed;top:0;left:0;bottom:0;z-index:100;overflow-y:auto;}
 .sb::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);}
 .sb-logo{display:flex;align-items:center;padding:4px 8px;margin-bottom:28px;}
 .sb-logo span{color:rgba(255,255,255,.6);font-weight:300;font-size:16px;}
@@ -300,7 +301,7 @@ async function sendEmail({to,subject,html}){
       await fetch(`${SUPA_URL}/functions/v1/send-email`,{
         method:'POST',
         headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPA_KEY},
-        body:JSON.stringify({to:recipient,subject,html,from_name:'Black Fox QMS',from_email:'noreply@bfmops.com'}),
+        body:JSON.stringify({to:recipient,subject,html,from_name:'QMS420',from_email:'noreply@bfmops.com'}),
       });
     }
   }catch(e){console.error('Email error:',e);}
@@ -324,7 +325,7 @@ function notifyTask({task, actor, subject, body, skipId=null}){
     if(r.email){
       sendEmail({to:r.email,subject,
         html:`<div style="font-family:sans-serif;background:#000000;color:#e8edf8;padding:24px;border-radius:12px;max-width:500px;border:1px solid #1a2d4f">
-          <div style="color:#f5a623;font-size:18px;font-weight:800;margin-bottom:12px">\uD83D\uDCCB Black Fox QMS</div>
+          <div style="color:#f5a623;font-size:18px;font-weight:800;margin-bottom:12px">\uD83D\uDCCB QMS420</div>
           <div style="font-size:15px;font-weight:700;margin-bottom:8px">${task.title}</div>
           <div style="background:rgba(30,58,95,.06);border:1px solid rgba(30,58,95,.15);border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px;line-height:1.6">${bodyText}</div>
           ${actor?`<div style="font-size:12px;color:#7b8db8">By ${actor}</div>`:''}
@@ -771,42 +772,16 @@ function getWorkflowStepObj(task){
 
 function avatarColor(name){return`hsl(${(name.charCodeAt(0)*47)%360},50%,35%)`;}
 
-// \u2500\u2500 Black Fox QMS LOGO MARK \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+// \u2500\u2500 QMS420 LOGO MARK \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 // Hexagonal badge with double-ring border and a bold geometric H monogram \u2014
 // black field, gold ink. Used on login, sidebar, and PWA install prompts.
+const LOGO_EMBLEM_B64='iVBORw0KGgoAAAANSUhEUgAAAIAAAACACAIAAABMXPacAABPCElEQVR4nH19d6AlRZX3OVXdfe99OUwOMMwMYZgBJKogIBIGXQyf6+oq6ror6iqimDCQcUBxFcWECIwRBQMIhs8FVFBB/AiSkcwMTHzz8o3dVed8f1Ts+0Yvw3v33dtdXXXC7/zOqepqHF2wFAEYAKH7xQDADAgAiHM/Ny8MvxCAoy/RncgQLjDnKggIwMy2QQRgQPyn1zXHxI2xad9e11wcgf35HLWCgAzsPkfEUo85PjS6tOuP6RjG4+i6hP8T3YfuRA49QjsShMR2n4HR9i0MLOqMb9B950bBwFgaJnt5MwCyvQ4CmCt095at0uzQ2Ddh5d01Wt9HP0CnOtcoR13FrtHYDvuf4Wz2fUInnfB5LNPSK3TGCjdWITuNeg2zEZtTPwAwJEYzRj6+V+bM2GoRfAN2rF4fuBurwfjoaOxdf9nWrHkFxQRVQdCzO8BI33WOY+N1fsjMVjaIXZIuD4iDnfo/u1wcvE7dG9M6MESyxHCA+SMIKu52PA4zCGFaYQaPAl46Xe7PwQCw/GU0hNJf0bX9GOIDnCmaLxC9f2KpFS79gdaYmJmtyLxb26MjnzHHBDuP+zO3s2UMDZ95twdANrDKvBu7261A2I1udzAPAry2wJkJQxiDd0cOR/krlFwTrVH60WOQcPll++Iv4D+M+1jWPlt7m+MJULog2z/QmIgz57mycoCAuxEKR42bgaEdWDxqQAes8fi8RIyO3fHBTcwr+kyUx1DqhLu8k0uA8JJNohtkVzTyY+jWvZcclo6PHY9jYzUmyNFIrfk5K3QuEbdmmowEDRjJIopFu7HjEtqj64szNAd5yHNti7vflcNX9wsBhHOw2Gm7z0EARi+S3SN+/Ef4hxEPMWpjbx72al6pbMZlf2HkmHaoUXizqrP9Ye8Z0eiZbeOxvZWkhHM+2d144lcXpJcj55ymgpa7NBVjn3DMY+7lGZ3UIr3ObWhu/7tai4Zjr2zFaQyYgzIAPCpYpA8Ks5f3JxmVReDe5Z0lxyr3MqJFpSMZukUZXN3rMA6UvlnejTN04WQYg/3SRpKki8SV6YeP7BxBehdjKV+w23xKVoYex7F8LDMb4h6PIzgJB3zyfXMmyEzOFG3/LZ1Fi1zlbpUu7C/gA9huBO6ujYjs4QgNrkXBhR1UGq9GtsKMTRZLOjHfJCHMhqAVON5uQW13go7DD5dYiPO3GM1KPMditO9b6KZDvODlofMh3XBUkMI1uNRth9xGw2B4pLctNJ8gBmswrfCcyBgLoBv14v4hd30dLCgSirliEgMJOxDGuDlzgotjscpjwjP3FUuubHF+ICVVRv5VRgameBjdqgAI4gueYbRINhEINCAeAcSprx+j/dMZYZcp+bQkdNZf1pMVtk7oaBB610dExylsP5JIHK5XkQSjgTuJofFHYAhuG8mF52gjElHAu7J9cCQMJoY4DYxat5azO/Pz2kNAds5gL4kma8fYIqy4Q38CXNiPMXzuu2bPLAW2gB4+/KCTkWkgABVGb+2pwjVjiXNkd37Y0Tid/znX9W7humx67QYSS8jTnN06DANTkAe5oYbgZgyHwQRelkIkUgIAEQGDkEJIaa7N7Cgb25PYXj/E+6hHVoKlUTrqH8nCGyqW4WS3g7HSmFs08g17bpEECdi2oqys3K8oCFjjwQDO3pxMCcD0GKPT5o4lhrrofRBaHBgCqgohGGBqeppVp6d/sFartVvtmakJAOwfGkqTRGsdwzgHD2Rilz7F4g54EMDQARaWu+/6URatbcHHlbLQQ/+NV6KllsYek3LbcTe6rxw+t6QDuzsOXrheezinDX8GRodCWVEeJoKJGlImhaw3GsB8/HHH/p83vP7www8bGhyamZ35+9+fuOXW227+1W8mJieHh4aYgZjQRUPwRTMED27e4nwkCgGo3MuQ0Vrz9zooxRPTS4wDSewnwcCMnVvPxJF5i7uF/I+rsqYtn8EixPF8d6loWaIwR7nlUmYJ2Dl8xsAgE6mUmp0aP/iQwy7ecNH6k04UUhZ5rrWWMkmzFAAefviRDRsu+dkNNyRp1t/Xp5Q24dDFEkRXm4vEFEE6+y9i3UWS6Xrv4ZTD/wZnoprJPyBTXiBeAcGWSzFn7tn4z6Xc3dFAAbq4EPv+lYo8vhWH3IgohJyamuzv7/vIh88488wP9/X2zszMBDEiIgAx9/X1ZVl20803n3/+RQ8+8ODA0FCSJEopI1B0prcbicR2G7Nk5ojDdFfGu0YfPAu7xxw1GAowNlTHHuA0GCTsO+FlH6ugyy4iMC+H2oCyMaiYb3wk9IWF0qBkkrRarXZj5uSTX/O5z214yUteMjkxWRR5kiRCCDfpYwtWTIwCBwYGGvX6ZV++/Etfvnx6ZmZ4aIiI/ISPqwQGY8B4ZHGVN0aCKMQ5gGIPOHNHFcJXyejQfcVeKzgybxF744hywkgIDjzBzx+5ilnZQQOCBCsAi97oJoRK/hqLvvuNkAIApifGly1ffsH557791FOVVvXZ2SRJXd/Rix6jFxFlaVqt1R588KHPnH3Ob379m2pPX09PTSnlJYsuLnczlfiI8ssrEKOu/mM46BLibr9FYMDheYucPiI1RtIrnTOnoXLM8e84XMD+4Q291Moc6Vs/llLOzs6SVu98x9svOP+85cuX7RwbAwAppRe0Q3NARBTCf2h+a637+/tRiO997/uf3XDJM08/PTA0jEKQ1oFkov9lu1tKxqLRBalAGZ/nyKQbt0sJdnS0d6nh0UVd4kN/mp0sK5GzuU7SRe3nAomTLzs+4llGVMd0MxxCStJ6dnrqJQcf9NmLLjr55JNmZ2bb7XaSJN4GhZE6IDMBohDCfmJE694zkRCyp7dn586dF1204aqrNyqiwYEBrTWH2oPjhtHgw3icuZeOASebuR9aEI4h2ysA5lS7rAIWB4GxO3sOynP5RxkrvfuUsCUuVZVOjo70cGRsTwgxNTXV21P76EfPPPPDH6pWquMT44mUUkp3LQyYwZBlaZKmWum8yIUQ3j8gAiWtdKVaybLsT3/609nnnP+nP95R6+uvZBWtFDhFlvwhGlQ30wzm7HDcYTF0SbbkWyU6GqDXzKsPjy5yXlNKITyoYzS7XsZ8BJtAW1yJg1YkXp7zVRl2EIA5kbKT5836zAknnLDhsxcddNCBY2NjxJylKTOgiEEelVJpmg4ODkxOTk1OTtaq1aVLl3byvNVqpUmCKMC7PgKCMBfq6+8r8vzyr379c5+/dGJ8YmBoCADIFUkcvHsROAFyBCNQopheCF2mtRuF/eOXiK4Wrmy0xugny30ZAa1tAYKL3d7oSymgy/9Nb7ukz66AzsACUUgxOTHR19vz1a9efsMNP1+1atWWLVuYWaDQRMxMRIbJkKaiKIaGhoQQn7vk80ceedThL335y15+5Bkf+tD27dtHR0cRsVCFRTRmJjYcQEpRr9eV1h//+Efv/sudbzv1rTPTU41mM5ESbHeYif0rNuuogIMlr2Z/xO6F6+ftfFO7UZLxAIxsNiYGDoLKLM6JMiZwUa8CqnuV+mUKTiXWf6WUjXpdFcVb3/bvn/zEx5ctW7Jr17gQIktTez2H9wxAWldrtf7+/t///vfnn3/+fffdBwCACbAG4OGRkQ+8//1nnnnm6Ojo1OSkENL4DQAIazMIAETU29uLiDfccOO5553/2KOP9g0MSym01p6kegzzodMYX0D2f8R85n7r2WAUM+IQikOjixyuGLF59NqdXEOSsvsuICD7jCSqILofLtQymDHXZ6b2W7P/+eee85rXnLxr165Gs1mpVBBACJEkCSAYfmOsc2hoaMeOHZdeeunGjRsBIMlqRLaCJ4RQeQ5A+69de+nnP3/KKae0Wq12q5WkiccWMygUwth4X1/f7OzsF77wxcu+8pVmozU0PGyKSC6OOxn48BAT1rKUS8ynK3uAksnG/NJy6YgFBaninGygdLE4WERlYx8hQoEh1HnQQQ8jopByemqqp6f6oQ9+8L3vOS1Nk4mJCZ9bIQCikFIIKQWi1rqvv79SqVz34+s2XLzhxRdfFEkFEYl0wAlEgUJIoTotAHj7299+0UUX7bXXXtNT08SUSGl6KYTwHElrnWVZlmX33Xf/Oeee99v/+5tKra9Wqymt/Xjc7EikiWheJJ5W6pJVl/TMSa4gF6sHcMgoIGYv7mu/TC4mXCWWycDoagmxluP4G5/ALJOk0263m/VXHnfcpz911oEHHLBz506lVKVSsRHTYYUUgpjTNB0dHX3s0UcuueRzv/7NbwAgzWqatO8vYqnILlAAsC46Cxcu/PSnP/2e97w3S5Op6ek0SQxHCskzIANrrfr7B5h548aNF332ks2bnh8YGkEUmpSrPVgzjrAoVokTz+5U8I+MuCTkodFFpXmSUsiPlBLzH1cZKU+JezN3TXkFIDCzFIIBZqfGFy1e8qmzznrD/3nd9NR0vV6v1mqG2iMKowAhBABoooGBAa3Ud7/3vS9/5Sv12VmZVm1NX6C7LBKxiJIQa+kyUZ02AB39iqM/97lLjnrFK5qNRp7nSZoG03WElYgQsbe3d9u2bRd9dsM1G7+riQf6+21ZO2KogSVFuFRGfPDmZ63jnysDAYdGFnqVuSAcR5tQx41fkVlzrAFXhuZ4ugOBZZLUZ2eZ6dS3vuWMMz44OjK8bdt2REzTNOaXBvKZuVqpDgz0/+Uvd2+4+OIHHngARJokidbaQbEJbYjItR7RbJBXeTw2IYTqtGSSfvD0D3zqU59atGjR5OSkQBRSWo4qhJerUqpWq6Vpevvtt3/602ffffddtb6hLMu0KWD4qIBzNeAMzn7g6v3gAwmjXwI8h5l6BUT8yisaHaC7bgZSFCQfa8D/GciOkEIp1apPveTgwz911kcPO+ywXeO72q1WllWC4I39ow2Pw8NDjUbj61//xjUbv0Okk0qNtHYG4/oHoDUMDMs3njr03a/tkGnixMBxZ4SQmohVZ8WKvS688IJTTz1Va1WvNxKZoGPUnvQYvtvf399ut7/+9W98/gv/Mz42PjA0zExmdsFpIdhn+BGZbqjNxZKEGE6CGnBoZGEJ1qMwbit/XV8Fsloq5rNXl6P6KFCgmJma7Ovv++DpH3jH299eFPnYrrEszQQiCBQmYxIohQQEIurp6a1Wq7fcesuXvvil559/HpOKQCQiD7yhpIygOnrVmsoF31r23n/Z1G6xlKWEPnJQlIks2k0AeP3rX7dhw8Xr1q2bmZ7RWiVpWq4a2OCcSFnr6XnyySfPO/+C66//qUyzvt5ebYzA5EAl8e/mDz/JU4L0rhcCAro5YQxRxOEQdEnfgluZ4LDzNzBpjNO/TJJOpzMzNb5+/Uk3/vyn73jH2zdv3rR92zYpJGmtSTMxETETEGultNKDA4NbXnzhwx/+8BkfPOP55zclWQ2YDUDbVBhCwUdKBBCr96+uXpssXVFhDSgA0PyzPMpljqCVkmk1yWo33XTzy488csOGDShwaGhIK2XyO9tzZmYWQjDD7Mzs6lWrrvvxj376k+v2XrVienKMAYSUYLI7M+6QhLlx+/E7iNoNdActAQMLd3CJAoXYEYO/Twvjazvxe5ZvRDUzObZ44YJvfetbX/vqV4QQTz7xhKnVaKU0EZFJbjURFUpVa9UsS7/7ve/++1vf9tvf/lamVZlWiLQv1YAzT2crdoHmS14+VOtJVq2RACwERuhg0dhn78SkSSeVWr3ROvfcc4899thbb711aHg4SZKiKKzdMbPRB7BMZKPZnJ2ZfdOb/vUvd9159tnnAtHM1JRMJAamH2wwMs3wZm62FNEF+9vCLnBJBexO9U04qQd8g+gc7/KJlI1Go9Vo/Nd/nfaLG35+2GGHPvjQQ7P12TTLiqJQWhu5m1dRFAw4MDjw8MOPvPe/3/+FL/zPzGwzyWrE5CqnAgARhMNWUwIBBCCNaUb7rauoHA9+6QD4UBWqcB7jLW4gIGktpEwqPX/729/Wn3zyae9+966xsZGRESJSShu2DQzGOozFzM7MVqvVDRsuuuP220466fjpiV15nkspqWuZBUJJC7EOmBm6VRG8ZHB4Af+zeUsbd9lFdk83HD7Z/6UQSqvm7NTBhxx27jmf2Xv16qeeerJQulargStamLqCEMK0NjQ0PNuo//AHP/zxddepokiyHiId6FpEPErMGwARig4uX5VcedPyvoHKU48W73vtE4Ay5E2+c1FKiCFLISEEEZPqLFmy9Pzzz3vXu94lhKjP1qWUEcW3zIyYlFL9/f0IcM13vnPRRRtefOGF/qFhBCSiEjn1UmTnu/EtID6x8yNhEMxhEW6kOe8BCCXt+WMs3Js6spRyZmpSCnHOOed+d+M1w0NDDz/8sNYkhSiKgjSxoRnERDrPcylFb2/f7Xfc/p7T3vuDH/xAM8qspkm7UQtEgeDokSsYB+aAIFDve0DP8GhPq0HzFunRhSlpVykJ+GuprWnK+QEAIBEzcJLVtm7d+r73ve+UU0556KGHhoaHAFgVRRTNmUgzs5SyXp9tNJrvOe20u/9y53ve+95mvV6v14WUzFSSWlwFCGjhPvLg7SEIENj8Y4CwCt0I2ifOLqgzsOPc5jMpkyLPZybHTlp/0i9u+NnrXnvKQw89uHXb1kols8ROK02aNJt6JiAODg6Oje3acPHFn/nM2Zs3b06ymjElYWIs+Fjq/lmGEHxUCEGkVu/TnyaZVjgwks5fnJA2YcBrydNyFw9cS14RWmuRpDKr3nrrrUcd9Ypzzj6biIaGhwulbXB2MRqYDVWbnJgcGRn59pVX/PpXNx14wP4zkxNSJk7qHEEOgF8g1fViiO+EctQhzC8DA5YKy04ZdmLbzgozAyVS1uuzw0MDV1xxxf9c+rnp6ckHH3xACCGFLJQm0jYHIdK6KFRRrVaq1dovbrrp9DPOuPXWW0VaFWlFE4Fjd85grfcHbl3iiqA0rD10eK+9ZdEuhBBS1NYd2rtidY9WjCKKYGBRwTN905ZBAQH2EqS1zKrtvLj4kkuOPuaYX/7ylyMjw2mW5XlOUSWZmJlYJjLP88nJyfXr199155//+/3/PTM5gUKw11TwA/Jm7/lRyE7dLxwcWVCOGJbsQ1TjCUUd8MDKUiaN2Zk1++377W9f2WzUn332mSzLpJCIiEKYRFQKiQJNv/sHBp54/PGrr9n44IMPAiYyTYnIE2UvIe9sRnocEWkTmVFA0S6uvGm//Q/K2k0CgVqLWp+8+dodX/r0C5WeitYc2byLWtEwfIXKigcAmBFBSGlreaeeesGFF65atWpqaoqIkiQBF0WsPQihlJJC9A8MvPvdp23cuHFgeJ6ZYivNrsUstGQT4WsRSd98iZEDBb2EQ9gWHzvt9tKlS7/3ve9u3fLiY48/VqlUEZGIiZk0kTYWQ6Spf6BfKf3tK7/9kY994sEHH5RpVUjppe+QWhiGExePuTQEtHFEUd9AMjgokFEIgYACKE1p0ZJMyNQuK3VxLsqNonG72BDyCkR26YJIqz+89tqXv/zIyy67LE3TwcFBpZRLxa0UTHZSKDUzM/O1r3314EMOa9ZnzTIOg84YODo44Ct1yHMMAXNfJSVCeZ7LKgERO+3GRReePzU9uWXLlr7eXqWUnbzS2swtKaWyLOvp7f3Tn/780Y9+7Gc/+5kmlmmViNibvLuOFww4uumhw17Z2YXW2KyTFERsT2ZGrTRpTTpawtQtfvDyhjiuh6CDiMLkhklWGxsb+9jHPnbS+vV33XnnyPBwkiSqKCxJdZMaiZRFUfT09Jx7zme01pb0OL7oHc2EVX+LTJTxlhWA1rrZKc2Dv/3l/gQUolGfOeqoow855OBHHnq4p1Yr8oL8tCGzJsqyNEmSe+6599xzz7vkkku2bNki0yqAqSt4KfhEKzbPiAKa70LXWRe8YLF85av7du7gLEuZGIgBQWAyMaFeelwNgUqUOhCfAAs+rgcXQASB/mCttUgyWanddeedxx73qtPe855t27ePzpvnRe9FlSTJzMzsSSedeMCBBzWaDVNccSryogtRKRqhVYHw9hWnbRyyB/R27xINRkRS+cnrT9qxYzsDEZOPMCZWZ1m2fcfOK7515ec+f+kDD/wNk0wkmSYNNjy4MNtF7x11DCIDAEC20ZhRIGk9f7HccNXqvfauNhsFABMzIs9M58e8euTMDcstw4Qy/whqRp8eu6AP0RvPmhCASWmRVgHlNddcc+yxr9z4ne9WsoqfODbQgIhFUfT29h5x+ME6b8Uu69wwkj16f/AslZOIP/k9FAKChdgRhQEiEjLbZ5/V47vGs7RiXI6IGTUQ1Kq1u+6669of/3hqchJEImTCLnr6tNS2HjIt5DLYuy6EznvyXOmpEmFW0VrbVIeYmKhSlUKIWl91ZrJwJ0fOYBt0sS/klCbWu1VpCMAY3ctEAJxktW3bd7z7v/7z2WeePu/c82ZmZxJpb+3yfdx7732csUdL4COBuh5FcY0BEIRbLIQBsrykS0E4cH+lVF//wMjIaKvVQgQiTUxEWistpRzbNfad735vanJSJFVAJFtU8AKOw6BjPiHuIqBRBnJY/V4qtrzwTL0xWwAKZiRiIhv2UMDY1sbUzpaUGNQVIYah2/5C7ENCHJutqSII4UpOqLWWaSZketllX3nmmWd6eno4YIsFpcHBQXOZcL1YdJERlH0EhK8te2G7Rhz2B0u0KQkRZVkqENudttaaXEVUKTU4MPDQQ480m40krRCpKBcFH/FCOPQ4FNwfkM28vjN9I3tkRFA5zV+UvvFto9ufz7MUo1UkAIACZX0a33LafMTCRflYFhBFE6OCCI9CHuJjAlhTQAAArZVIklarcettt/b09Jik3colwgZf/+D4wuzGZi0ismsOQThUNLz7ILgyLVDUqn1nimpgKsUCzY0rWaW6bds2AzLOrAMh3828HEe4EF8dojt1HCtg4qyKbzt93qI9sN3Spo82gUdu1PPDjhl8/TvnMfkMtKsKFocFP+44IJf6gZFQfPx+ftNmL4Sul5Op9454mJEZcDxfxSL6PIw+1qAZIDjh+zallEIIYarA7BRGpLUymO8GByXv7hKzv3RZTqV+QCh4a83TE7kQSOzmH9x99MisdT411mCWBqDNqRhfJRJ715uobxB11cdkQEBmRstznDyAXSkTnYAcIPgfpk1EhzPuB4LxADe4Ej8NGkQXQrxFmmaN3aMfIoJ3M3PBkO64DSnmDHqOSKwivRegq6MCA4hUbH+hM7kLkiwhQvaYaLkvVqvpM48XKi9kgj5sBFAIGoju/OJyb5z1IwAAS+ECqs9wDT/nwLmZmZnsvbTsvCBIlW0I875eYskgIpeJyWqZwnoHCFEGTKLL7kZOQ3JcWHPNIOiCdU5SmhA4pwf+yHDpKOJ6qTEzsxD8xv9YsGN7TsRkWW+owCBCo6EI4ZhXD6mORhEG4QURYmMkLHvh+BtmEIhSFB1NxHE5qiQJpwXtbgCxoufooqGa5HoZWwKD8KWfUs8g+h3pxjoYM7MPYj4qMDCLOKgisObVa3tX7lcp2jkgoMRSeuKV7fsYYVycmhgHVTm/+i2DhxxZbczY1Z8mDyMGIgCE+mz+unfOP/zYIdIaQ3QLw4mwzuecHK5l4wnIBFVbq7Y+8lUDQyOSdXyrNzvJkyaXfRL5kZTyj0ioZZmGnojS17EwLOr5j11648Vt0SnogBnMikw3cgSA2an8wq+veNNp83QOqs1SluTs03Y2oT5oIhqwawxB73whR5QMbNI/ZiBri6w1Syl1oca2N41FOxhmF/ickfrrewhzkQ4lA3Pe1MtXZV/84dIT3jg4O6VkEszWmn5k9cCsicjzIieMclSLoyg7Nsxg5oQB56KCezk44kgFVvoW8e17tFEq3AtHDDIVO7a0brx24rxvrbr46mXLV2LeKoQQQoKwnNDH12AvNi3xVsIMzIjAzH+9Y1Ym4OaQmMyKEfL9EJ1WcffvpsGaTtiDjgO8eXAOWvDUv2gBsv739wx+8+bVaw7pv/zCF5WyGZJPrexyAlt3DGu2nXYjM4693Hgxhl4YuSchXY4iqJFCwHKHn87DwsCITKXAJLflvXOYSYNMs1/+aOKY1/QdcdzA3gfUfn715M82jmtVAGBaTUquAFA6H728AAB0QSMLsmoPjG1p1/oSpYEZmMIWHUycVfCpR9oLl1Y2Pwd5m1Cg671pC/1oAlFBQASlGLQCwIOPHHzfp+av3L8qJH3xrC3TYzqpJqT80WBDLjELy3+MUbfbHadTZkc7gtZtRPJiD0JK3K1WMXhx168usVjL9U5NDAhExMCIIoQLAAYQAoqOuvbrO8+/oldK8b6zF+y1H/7uxumFSyq/un5GJAAm6+QSH0Eb6JwNIWhNvQPyHR8Z7TRFoSzyMFkZGMhptfSSVZW3nT581+9fBHTrF902EeB/+IVPAkizVrRgaXbYkb2VHvnfn1lMnBRaPnX/5K03Tsg0M8tQo6yO3VSZdXQGYKJ6fdYJJogpXD8YeMgqrALKd694W4zOjzUTxRCHc+6WSWZgSKQoAwqQZpniPXfM3HPHzFEnDWzd1H7Z8QMHvrx/waJEEf3+phlZyfIOSQmagO0+MvaeSnbaYAAQsGNze9cWmL88adW1JWQIRIDAQIwCGKCvP7n7tkLnRVqpmtBokdJttmd6avha3uZqLyZV+PQXl+x3aKXThtlZYs4HhpNrLhvXKpUVBu08xqM4cajpAjKx0rrRaEbm4/CGzZyvkX3Y0qXkAfaDmLA51uFQrCtMx1pBA2sMiEIwmNDkuhE1hUJc8dkXly7fa97ytNVRaSYmxvnN/z3/ZccPNpv0hY9u0YBJRTCAuZMDOXJYAGaQqcw7+i+3N9747mqhc2Bh6KHZWwUABAEKIII7b6mbQM1zSR8AMKPAomDQxT4H9b7/M4vGx9p7H5jOTpFMkVFWq3jlxZsfvns6qaRaE3q7cwMzzMdWLISJ/7pjIMgP2xt9RHjK/bBfuo1bg9DigOO+4rmnm6NtlijMihMGrYnc9j7WRM3tMQLHd+onHm0vXJlAR6iCEah/SL7kqJrM4L4/9m16onjmqVzYuzHcSFwaJQToXK8+YGjVAbVdY21wYmFmRjbJpAaQyGM785eeMPjo/Z36jJZJBDtu0EKKvKWXr0oG+pP/+tS8/Q7NOq2k2QBmoRWKhOqztOnJ3Mxk+1FGEkLDP+3iGhMaye/04swGIxGgFye69gwZQgRMvI5MFHUKnCv3ufIHIdBM1RksEgJDxuBvO7YjZyGgNiB6B2RjWguBKFhrKOqQpPjvpy8YGk2v+vyOW34ygTKRCTC5xD2wX1Sa9l6XTU3kACiERASTkRnYY4I8p56BZJ+De1otNkm6RbNIBHlLjS6Q531zeVqBak1OjGkhhJQCAJTiNIHBkUQkIsYJV662MVxru7IPABDN0iDIssxLshRvwl+mkuF80no2ixLCdeUsZXYaAZS9jidyPu7KJPHaL2sNCwVf/tS23/18VkgCBCLBJBCF1jAwkqDgN713eNle6bwFQnUYhc02fS6AErc823720RZK1JoVUaFZE2jiQrMmJmalkQEe/MuM7mhTjQDrzszAxJwkPDwq3nr6/CUrs6xHGBkygCH1MoHJHcUlH9p0z+1NkSS20O21AAAARVFordwSRsOHgBlSc1Nbab7RmzN7phOEy9a2hLPpUuTE6FPvTKUDMEQ0n4UBghTChZrIU9DoRjSm2//vD7PEqIkNuwBkYso71Khz76B833mLz/v2kvnLMlIQagkAACwTUbSL234xlVSQgDWxVqQJNBl9sGZmATNTxW0/nXB3qlnrYmAhgAp66wcWnP/tPQ8+um96QqscNVmwIAKlCBPesa3zwF/qInEJTVxWAQCATp4XReHyN+NhBMxm5YQ30rJhlk3RKwMBEETI2Qzke+aNc9vgUjsATG4RpxE5kSkJhS7bIG3moNixyTStoEnltTFeAkTQClfsV128Mv3304dJFzovLH0HBgBdqN4BnL8snZ3RjKAUaWbbggalOC8YE37x+fbwIiFEiETGKot2fsARPae8Y3DeMpnVsCjATjKYYioBSKzWZN4x+1oEI+t6mQ1yGCC6ADCzvZU8OoEjquKNIdAypwi3YVNEXUJyZPyXgtZ8nYnBz41aFRmfNGufo5GjnWtDYAIQye2/3DU9rk798IJFe6ZFbiSAzIzArEArVopXH5C855yF993RuP9PraQqtCKjh04b1hxWAwGdDgEKQ77InEvMCJ1ZvWhVut8RPff/oWXWDAICk0DBbz194cq1lXauW3WSqTBnCwJFigiExLyhfvP96eu+tZO0RFd7wBJFZwDI85yILBkVLIgMfFWrlZIkS4gegY+d9rWWhYyJPwqdw6PbMCzsPQYWbjD8AQhAVss+WCKzmaUxod5McjgkRgBgIdO/P9TMlbE7xiSqDjAwQFFgVs2OeX3Por2qj963s9PJzb3pIhEqp6cfbb90j/5GnaU0U4pAmi0MAGvCasJP3N8Bty2/ACCtjjxp+JT/HGnWVbNOKJGYQSMwkUuQi5yTTL6wWZEWMhNErpwCYfNUI9h2p1MUhQUEIo1IWhNRpVIJcrRB1+MMl1wjVgqCydbR8zRr9r4MUNJmnMUZCVr9e7Wz0QqEP2MFG1QlRQ/fNZtV0mq/0ARaA2vQGs2SKs3MjPVptXhlct7GRfMXC2QUiQAiAP7LLY12A4hBEyvNhaJCk9KsmZQClLjtefXYXzuARJpkInVBr/vPeaedu2B6UqsCiaDQrJSJH3YlEUgYGE62b1KbnmyhFMHiu4TGAACdTrtQiomMr/vFo2E3C/AZlGsibHTp7TzIS4RCm8Mr70V+pqVUFPIcnUmTBluSNMv+qSgKA0Hs1A+20hVqb50O/Pgb2z53xnObnmoTgdagGUlzUZAi66UMQBqXrkpe8/ZR0kxKmVrr5E61Y2ueVoR2eKUUKAVKgyIGhIf+1GQCFIDIqp0Pzq+86s1D7Q6BAAJUGolREWgmIi4U5wV12nTL9eMXnfbs5idaaLesiaavy3oocqWVcumwUwGACcKBuZb5fPSVkR562inig0KZ2Bs8RPQzfORbM6shtNJaE2utgNlwandg8ER0LiESIaSc3KVHF1VsXdOUdkAQoVnJzgiq4OkJ3nP/yrFvGOgfFAACCFas7RldVm3MsiIuDPkhVpqUAmJoNuklJ/b2jkpmQYrXvbT3te8aAEnNulLK0EXQRASsGRSBZlYEWX/aaEG7hTJLORqhXz4XvzRpTcRgF3ub4bO7S8BhTddeiyHkejaKzqDLSxMDbXUJPgQ0c39Y1YUZCa1teUpTPCMWNeoRVQAiEzDgludaP/ryzsYsMZJSrDWQZmLUxqIVEHOhuWdQvvUTC1/1llHWApAf+8vU1E5ihEKzZtaalWYi0MSKqNKLzz3UGd/UQAG9g5V/O3PB4Sf3d9qkgQpFSnGhdFGQVlwoLhQTQFrFe26dufXHu4QEJif3YKyBd1sFaK0LRUrb23zILmQPc95lC/UEsntjDedgsQI8VrnpzbJmSifbYqQlwwaFNGlmvzLQdz8ah11wDgygtbj9pvFLz9j0wrNFUXChmNCuslOKioI0AQPJFBr14pATeqq9DKxnxvNnHm5kvaLTYVWA1qA0FARKQ6GQgf/6f2cBBKvOAUdVB+bLmSliwZpQacgV5zkTgWYm4k7O7Q7ddNXYledsmdhBHNG/yNSiRVRWkGycwN9qZSYHvEQ9IWGPwbGIY77BAMYkvVDKeFVOKqwOfKi2R0TRA4BBCmkWCQfcMaoNc9tgl/8JIRPZnNVFB3r6RVoBTVQorRQxWEgijaqATptZ8LvOWziyUCImf755ZnJMEYDSUGgoiAtN7UJrpgf+UN/0SAGAL3318EnvGGrUFQMUudCEheJCkwbWzJqYkHuHBAjctbVARJkl8RKxOAULIkEEACml8XYG1u5FmiIVWT0FQtqNR9EHDK56zJHGMVa5V0VQnleR8QN09WgzaWVWLfuDQgj3CxxsOGBimJlQXz5z8w/+Z+e2FzqdDheFmeA1c4NAzIXioiAqYNUh6WEnDzKLJftmJEgpUkyFprygvCCluVnXoyvSwQUoEzj6jcNZH3YUaSaluchZadaaleJOTu0WFwU/+MfZy8948f4/zIJA0tF92B5G0dlx9EqShIiUUlpprbXH4WglR8mGu5DEfRUadeXqLl2js4IAZhx64wrFdnECGC9kl/uVLsld2/SB04KpFydSKbjz11P1BlQHBEhgwYxcFDovoJMbiEWtoT4La4/u7R+VW5/IUQqloCg4LwyysyaQmZwa02Mv6IOPH+ydh7NTpArICyi0LkhrIqVZEROgrApIxB9/NbXtubbM0gg90K/e6SYv7lWpmI1a7HoIC8ReMujF6wgglGXog6+7gii7xJwo0qU7T0MRgNEK3d1WysDK7dvsde/NvnwRo2YEZnMr6vcu2nbHT6cnd3XabZ0rrYgKRUUOqkBiYIGdnKtD8o0fH9386OymR/K0hkqB1qAJGFkRZb344C2zK9Ymr/3gcLujGVkpKHLudIiYlWalWTO327T5750fbtjx7P1tkQjSEBEH9uaB0G2/5ohqtSqEiJbiM2kyxBQ8+3E/XchzyBbRW+9Zu7tBI1zXzRVHKol7ZAKANikAGzTUNicOLYXwX/LTQGWZCCd36Bu/ue3Om2Z6hlKlwciLAQgwV6wICsX1KZ6/orbH2tqffzZFiJqJNJCGIkeQuH1T54m/Nl5yYn+jpfKcNIJyhaaiYEWcK04yuXNLfvVnXnz8Lw1iaVJh6JISgFus6A06mGOtWhVSKqXsdDxbNuRUFg2+DC1z4/tuFBBIU2wQ7L+Id8yyXxExk7bTs2YldDl8ecSzQ4nqi8EsADBhkYhH72r9+eZGXkCzTkXOmkAzKYJ2Wxc5aMVC0IGv6k+q1DKfEBBwUbDS3GjreXtkS/apdJpcKDAfmrpprqDVhDyHZx9p/+mnM8AsEuAg7CDjAP2xNKwvIwDUajUhkGwtFwDsxk/PPfcsAIStH3bzwnLGa0WbWE5ZRh9PfEqZGZkjXS7HrO19XgAAfqlMTOaC16AjrwFd7WMOwcwQaWbEqTF901d33n4dvPb9C5avrbWbCqWh+ahyQgGNWb33y2sFqokdRf9gSsyAzMhai+kJfdy7htMaqpy1BhQsE9CAzKgVK0V/3Dj55N0tAAFCADMKhhB4oZxJ7SZ2mldvb28ibaGJgYtOZ968+XmhfvqTn6CQZhJtTvbm4qBdA4eMjGALbiI6KhzuS4B2Os4cXk4lDFdie3uESTA5Qjnfps8CA5f2QxbSrWqUQkghUkwyPTOW33/r9PhWVRuQSkGnzUVBmkFpLhR3ch4cTXc8WcgUiVlrQMS8Ca1xPbpn0mhRXmCuuFCQK8gLxgoSw2N/bLzwaFNIlhUUQggphEAhBYjIauNudrmx63uWZSiQmQVgu9kaHh5SqnjPe9+7Zct2mVZ8GaYsUht1nWm6peYIEB5h4g3UnufKoBjxmigh8C+zRgMA0N/3Etdvja4B3Y0hjAAo0PSTCtMLDaAAJEMKoAgUADx2V/3v9xT7vTw7/r9GMAPVZCGRAQmoaEFtWBaPd1p1LSpc5JxVxNTOzkBfoggVERABgy5YEPbPS577W/OO707P7NB28LoAyAAAQANoAAEgMAEAFgLtjDT7ZWd+OJ6AI2nSWnfyfNXeez/w4AMfeP8HduzYUenpV0qX1j2YYoIJKw6yY6QxHybsbblkBSE6YZgYtEL1WtBKWzG74mg8TVHyRQNTGtmCpwZQy/auVvvT/gGo9IjRJaki2RjPi1zXZ7Rm8dwD+WN/nJnZWaw7fmDPQ6oMpDrMiEoRAgwtS2am8qElqSbUAM2ZYtGyaqtO1rcJ0io2xtWD/zv7yG0zRQsHF2T7v6xnepdeunfWmoU99q1sfqzTN4BP/q09vCB9/L52p6lVx3RXoAQhI3l08WpEIl69asV11/34vPMu0Iwi7e00I0aLxvKidSh2HsDkSyW0s8tS0H6AbiO4SGXuTRxADF/WWvnMkc3mP9ydubjTGZiqPXJ0cbV3UCxdhfsdURuaL3uHktkpXRkQKJEUd5oVTIWQmBc0tlnNjKt7fzlz782TW5+rHPHGYZFCkYPKARDmr6xOvJDnTZYp1mdU1iPSAdFpMQpIqphWxfbnWnf/YEpqfMnxg/sdWav24+JVWd5kXVCSiLQCex9R04oOObl/aDTZ8kxR5HzfLfXpMTU9zjOT1G4UrpaAMQwUeVHJsr1Wrrzws5/9wQ9+kKQJFGJ4XrJydfXev84maWLWOdonBvk1U5Ex2oVPdqIYw7IUDAsDww4fbsGQx0WvGLs4HZnYbS1s+VUpyCMikuY990mPf/vI8jVZtReIuFmntAJa4eQ4K6b2FAFj0QGUBJKQMc85HcChvuQ1Z40mGTx1T+vvf5kZnJcmVVkbTphII2X9ol2nypDMOzS4MFXEKAERp3eqya15c5d+9QcXDC+QRYEMOpFi+yaVZcaOSCYCmBAgSXHXThpZJlUOr//gaNYrOk3dmNYP3V7/w3UzrYZZHhAk198/IKU89R3v+Ovdd1d6ejvNxooV2dd/vO8dd4zfc1dDVEDrIKsSY/S0y8mZARA4KVm+lbALvE45kQsGHWgirYwHgAAB0inSOpgHLEYBW54rbvja2PI11RVr00UrK/OWpXnOnSYVRCwAAZlQSGAUpEFpUsQmuckLQglL1lV0ByZfVFufaPaOpvNWZpCDqIJuc6uuZYqcoCo4n6UdT+VCwh4H9fSPou7AzIxGBCmQBEuBeWFukwXWLAQKiYoAiep1TjIY267HtxfPP9R+9oH2+DbK2x4PTA8JUNx1153X/ujap558IqvVOs3mCScvPevzy3G4MbajBeBuN3Jk3KqCbRS3K9i8EBkYISnJ1ks40loIP16s7ktNGu3Wg8JQIa09QQZ/XQBQCia368ntsw/9gdKq/JfT5y/dJ6nWZNYjWk1t7gdlBmJQiouCiYAAAIEUEnGrrVlh74J01dKkMVXMjOeyIqo1yYBaAQrMO9SpUzEDi9dUeoalLqA+adaqQoJCM+gCtGBAlmZHYwaZADIlKaY1nN6lqIA/Xj/75N0NO1AhhBDeCgFBE6FMb7nlfwFAyDRvtT545uq3nzn/mR0TA+2kkiFAgZA6SRpccJKI7lZ1AG/FY+aEoyfWlMDGfhgtWjZacJjIQEyG1qAGkx/abZ/dpIKL/CxS05IocvzFl3ZmNTr630YXrc6W7JOhxNkJpZG0BrMhACCwRkImgEKBmblsT2uRcjogsYJFHTodkhIZkYiBOesXvSNCsGjOanO7vExAJqAUCAEIxIQEpBgSRAEi7cVKLdm1OW9NFff/evqZ+9uAiUgkCrNGwGKIray4X2m1VrSLWg3P+fyaE/914LkXJ7kAKTA+ygotFmZkkvEL0dBQyxWDeZfdIJTTojUCDAiatLk5X5MCkEorTTrLUtM0ltcE+8l3RAIJeQt+9/0xFOLQ1wxkFbnHobW+hSgyrNawaBJWWOcMAAIB2iBSIarIAKrFnWnWipkQNDKASIA1qw4XBauEKlmapAkKMPs+AAhZZSJIUkEFZJmUFWxN6WoPPvdga3qbfvLu5tizbQABUpglFqy9mOwjXTyxkKks2vleq2uXXLn/kn3oiWeme3oSqBArUDlHD2dGm/eiy7NjsTpkMb8SH55L4FIiXtHnkerQd43NOj00P+PpaeN4cSnOrrphAoGIkhnv/dU0AD1yZy2pipWHV9MUF6xMC81pL2CCM1t1dVjsfDoXmcibJCT3zxO9IwlmghBbswokIWGayDRhYB5/rj2xSVUHRNYvKz1ieJGcfEEP7yEnNqskw/ou1ZnlbY91GrM8vS3PGwVAgjazhdID4rE8ZgREKNrt17x+yae+sGdbNnbsyCs1qTUAizSV1lBLK+McB3U3wQC4FSdRThtiQCQlD1Gx7UcaQruoREoJzGaS1CxGS5JExOsD/EgMMXMBye6rxAzAIhHAYmZ7DoATz7cAKOnJVJuzPqICdIdkJlSbRvfK9j6+f3i1REBBAiSzoufvbA2vkVvvbh9+6jASMkPvUiEHxK4n8od/NZ03kp55SXOiXRvATgOYkTUBkx+1SFMTe6J8xTFyJ3cGkBJVQUDqjE+sfueZ87ZPTHfanKZSExMQaZRSCGdl3TCD0Y+Q6FrdIFoaGtOlOIiGF3f9DaC0ZgBm1lojCgC2K5ZK7uP7ExEsH1QQgcFuO2N2E0YBIFSTACGfIQAJIEnpg988uOJlvYWmvK2ZgZSu9ePfrptuTPCiI9IdDxWbVnZWHVOb2FHIDKpDuOqY3j0Oqzzyi9bm+xooRWuKrHBR2IUniMBst7dBb/KRB1g1cJKIol30D6YXf3n/I07Kntk8maZCSsEKUAAK0ESa7XbWHPwohh6XD7ikNWbzloZG0G5JKUTrrea+EJCIVKHMhvAIwMQIkBf5yPCIGWwp+/CLpd1f/sFq4Q4RP5MgAIBRSGDI+uVh7xwaWZG1mpoUEAkCzgbw7/9b3/Fwa2h1VhnF6lD6yE3TmPLiQyudWa3bol0oWYED3tRLoF+8ry0Su7uQAT+wi/GC4I24ygGSEUFKLNqdvfcd+OJVa+avLJ7dNJ1lCQDafJ8QkBkh7+jxsSJsPeNMnu1usmGRhK9UOIoI5p4IjogpxCXLknJ8CwhFURRFIYUgIrPrOTOnWbZp06ajjz4aADSRdI83tS2aqoifg/aTr+ATTmE/99OWiAe/uX/+PpXmtC4UK2JCEBk896fW07cVgEIISFIUGTHpR38xM/l0URuQxKAZWrPcqusD39S/cL+UFKOQ1gmMdcdFaNur2AnMvstYtDsnvmbRxpvX9i5uvLilUetJAcxjUQAEAiMQyhSbDX3fXXVA4R4D6xRhGaaVKYcp3TD9G5RWYl3uU39CUAKDFHJ2dnpsbKzW08NsNnZmYpJS7ty5k6m44PwLqGirTlNKCfFTb6wa3CN5ANzzAvyftl9CIGu16lXV4X2S6R0KJSjFmCEKePb2xhM3zaAkYIEoi1kgxQCJLuC+70/telJVhyRpYEZAUbTh4LcODSypsGaza6lVsZ9uDegfHFWYFfB5fsbH9/781avGW+NTU3mWCfc0VnsTJwMXBY/MT35388zmp9pJBtRtq+xyp9iiS2AnwFknhHeIXnXujtaYFAgpmfSTT/x9YGDAVo6IAYCI+vv6H3r4kbXr1l717asOOvCgotMkrZwrRAW/YAZglmEhBDUAIpHoXZAuOqzSmDIP/YK+eUl7Uj9w7fSzt9VNxAFAkaLKzSQoogDdgXuumX7iN/WiyVkvggTSIGti3atrAAwo3NgdO3PrIAL4MAiJqqP6avjVjQe+66zh57aOaYVCiLDmGAEAtGaQOG9x9ptrJzdeukOkCRM4dzfWbh5C7xC/zGW8QoTnoGWwD6DIfocBfyAzAPy/e++bP39eURRoK/p278u+3r6/3n33zOz0ueed94mPf2JooF91miiEv2sxmFtsFG4i1oqFcMmRfdmIgARBwPQL+eM3z9z9jenxJ3OUks3tzaBBak5QJGyeXg4SAejp383ce/Xkc7e3ig5VhwQpGNwvHV6RckGIseghwJ3Df5mg6uSr9+n7wc0vOXx98uymqURKexNngGLUmpMMpaQrPrv18rO3KYXOXkuxF8BxvUh8WNYD9vQPh6gQDgG38tz/slPQdiEWsRR40YXnNZvNmZlZ00UhUJpXkuadTlEUa9etGxkZ+dGPfvSzn/0MANNqj9Y6ZmpRgPIRmCmHkbVy1b9UZ57l+gv59Oa8sUMxMWDiS2OIzFovflll5et7H/zmbP0FQmnudWAUwJoBOO3PhpYngwvT3sWINX7i5nZ73NwL740r6gkCIqhOfuKrF5z35ZUdUR8f71SqicVkAraPxISi4MGhZGxn8aVPvvDg3Q2ZpmZazmwejmB3/RWldS5x/CuReuzpG44TLPaLyiPJOwWYm3OBgQQK1WmuXbvugx88/e+PP44I5hE8wk5qACIKia1We2R4+JBDDn3++ecv+8rlTz/1JCYVKRN//5svFsWru1DQ6IFy8kksZhhAASgARGluHENLZRFY07y12bxDK5t/lze3KJTgJlMAQKAAVs5lgXqXZrWRZPwxZe4McMZqX8IwfV184GOr3v3xBS/umMw7LBPhuZJP44lhaDi9/88zl529ZefWQmYpafYrulx48zIXgeTGCYEdKCMg1vqGShrx1gEmzzVSDzvVWcLILBBV3jr22FeevP6kiYkJU7yykR7YKEPKhJlazeby5Xvsuddev/n1b777/e/nnXZS7S3fXQOREQCYyTIUmHJ0R7YBcb80hhEEMwILkAisSlMR5qZht98fIlIhAFEk7qiIoicJFu2ivz/Z8JW9jzql57kXphGE8EtMjMMJ1IplKrKKuPl7uzZetl0rlKkgKj0HxQV5LL/xFMs6fRgnMNb6hkK1je1knPnEL/xnrwULTTbyIoIuOi972ctPOeVftFKNRt2bVpomKIS5iT5N0rzTIaIDDzoIUXz7qqv+8IffA8i0WvULOubkeV7dLk8pcxYH33YUZnc9MNJAIO0zGA6wABhjjnkrBKhOvmZd/yXfWD1vL3phSzNLZFCRw0WtoKdfNuv8rQ0v3v6rKZSJmVj1HC6Kmlb4/nFQPuLM9TwAwFrfMESX8hAUNAJWFP7lFcDAiIKK9rx584499pi1+68FgFarKVAkaWI2LQa3txYzN5ut0Xnz1uy338MPP/LNK67YunWLSGtCoDaPmI2lwy4PZJAShMCiY74hLzpEZNY+c7N5kcluUmE31EIEt2WE1Zu/ZUcAM1NRvOHNiz+yYfl0Pjs9pSoV6WKMFZnpyNBw+uj9jcvPeXHz022ZpmS3g7fiBQ86EP+IaF231IMJYK1vuESUuHREEAOA2aDQ7xTmg4MQqIscgPfdb81xxx69cNGiTrvDTKl9QgsjoMmDmFkp1cnzPffcY97o6C9/9evrf/ozUkVa6bELzbrdgYGgf0Cc8cmlqw/sm9qVa8Ug2KyiQFdSQDbMGBBZF3zjteN33LYThJRSmAXzrgQI4J5mZHYEkpLP+uzq1/3H4HMvTBcFpCmS4+Gu/AxpKnv65C0/mfj257bkbZapNOsw4vUfPo1x4nZ+4G0/pNnsVec8oH8IGcEvB4AQEUL6ZAMyRQ7giBH4RQRIqpMk6ctedsQxRx9TrVY7nbZ0+2uaTTxIEwAIIRqNBgo8+OBDirzz7auuvuuuuwCTNKtorSLpO1Mg6BsSb/zv4SNf3ddpExPJDAGBNSMKFOZRkmiSNSlhwVDfnT+duvJLL7Y7mFalVtGYmQFAJli0i0VLqhd9bfWKg8XmF+oSJaLd6QDc+h2lodoriw5ee9m2390wDpgIiUTO6CEgjP0/RFrPycNhRqDoqtQhI671Dbu+lVGYvQOAt3ezAoXdru5OG/Y/IQRpAirmzZ9/4vHHr1u3lhjyvCPMFioReplXq9WaP3/+mjVrHnjwwW9884qdO7aLtCoQ7XqvyA9YA3Cx9vDet3xk/vAS2ZhSYPdYcYyC0NxtVeTcKWjPZbXWVrxiw/bHH67LLDFBzChBSFTtzuFHjXzi0j2LanPXeF7NQvnWbBZi0oqeQbHl2c7VF25/7tGmTFMia2k+mZgLON5mwG7dAJ4elZPh6EAXAyLYN+89CfClMm/8QZDsy58+ZAshqMgBeN26devXr1+4cGGjUSdNhiyY/b1t7iZEked5nq9Zs2ZoaOiGG2/80XXXs1Zptdc+9Br8FmeMAqjQQ/OzN50xuu6YWnNKkwYh7T1dNkohAINgbOd6ZH62eKD206+P/fx7OwGlTNHIlwr1tvcse/Pp857bMdnpULUqmUAAgEDSjCBQIjP2DYl7b5/5wSXbG9MkU+nS4Fj6XrToM0h3kPkRvoHdvxABDA3tVlEpJjga4iNxIKNgb1UFsDeKmpNMH1nn1WrtuFce+9KXvjRN03a7bZ5RSKSNAux8gJStVjtJ5EsOOqjVbn/1a1+/9557QGZpkmpdRCEIhAQqGIBe9pqB9e8crfRgu6Exsdm+m1VFAJQSSTMJXrG09vSdrSsu3jY1oQEwq+DHLll94PHZ35+YkEKkFVtgEAIAkAmIodaTCIm//u7YbT+cAJAiQSLP9AO8R8VE5wAWYyAComiLCZtbdSVjiLXeoRByfSG8FJHjaOxsPdIIBBmVPhQCSWtgvWTJkhNPPHHt/vt3Op1OpyMEmjyRmZABpUBErXWr1VqydOnqlav+/Oc/X3nV1VOTE+bhkZHKwew4zEot3KP62vfPX7p/1po1dwbajhszNF5MBI2GWrA461PZDy/dtWtb+2Nf3CtZqJ55draaJkI6U0MQCQCjVlzpFY1p+OUV44/fVTfr5pmD1XvIL/8JrrLnVj2UNePYXShKxjEYa71DoSN+36DYJ8reEGUMsbQ5Vo751oV/JJUDwBGHH37CiScM9A80Gg2zOpOIhHUFImYppFIqzzsrV62sVmvXX/+TX//61wAiqVS1VrbSa3iXRFIkJBzzb8OHv3YAkHXOaB+yBgBIDhpRcDvXfYPpinl9FRC7Ou3t29uZYTto00YhzXasmFXFE/c3b/radj0LAJAkqaKSnGEO5nhbLzPNSP6RufsFhjbOmCOsBwT4CVHSc6JYAeFXuVoB3U7iXcLt0aKL/v7+E45/1RFHvFQI0Wq3EMCBEpO5d1IgALRbzd6+/jVr1jz15NNXXXP1s888AzKz/mS7wqaiwKRXrKsd967R4SWJcQWURvqhpzJBAiDiRCAQJBKVJjDslUzyhkKIgdHsod/Xf3P59tecfMr7T3/vZ84+5+GHHpJpzRiHz6rKWB+jfhcFBSwZdDD6MtXxMcD11wCZs7W5WvGEKSI0UW7mhO7ihUc+g0hKAdDKlStPOeVf9txjj1arpbXZ+YjMXYqIyGw+gXanvWjRoqVLlvz2t//7gx9e2+m0ZVYlu7WHPRgFkNKVHnHUm4f3O643b2lSAIJdCAezuS8ismJmFiLewwYYQBPLDHv7s7uuH//bzTMf++jHPnzmGa1mm5m/dNllV111FaBM0oomt/A2JvulNyUniJi+FaYVrPnF4Y5UrPUNzRG0Vxy6HZhC8ZAtEnlrBw88sQJ8VhGrydQESHVQyCNfdsTxxx8/PDxSb9SZnAcx2D2AUSBCu91i4n322VcgXHXNxjvvvBNAyDTT5j4cdJFZMQDt8/Lew/51MO3FTl0DMrsnGxplgUUkNwwnLFnDxpi+4/vb2y8OXnHl5ccee+zzzz2XJKkUcumyZbfddusnPvnJ8V270lqfea6tmf2Op89KxTbvAxHMcxyau1+M1d6h8m6RnvhEKoy+D1OUERx5xHGiBvd4M+4+EMDsSsa6GBoeXr/+pEMPPpiIW62mWc/iXclshYSIzWZzeGho3333e/iRR6688spt27ahzASi3UPesFBE1rpvJDn834YXHZi2G9rtAmtjMhs+ja6WAcAEWU1Mby7u/tH02r0OvfjzFy5etHj7jp2VLJNSokCt1KJFS8bHd51z7rm33HKLzGoCzTY4ZcYfIX5ZalHFITreSdQKBqu9gxhpIM7G/L4JZQVYuuSb4DmWHqzZ6cV6kvvPuYIC0Pvss8/J69fvscfyTidXqghG4LppOFJe5Hut2GtkZORnP7/hJz/9KZM2N0SYeh8wmMgMAPu9qnefE3sBQTXJbMlGAMxMbLejM97PBGmveOr3jadua33xC5f+25vf+MwzzwiZmLs3THVdKd3b2zM6OnrFt771uc9fqpWu9PQqtyK2C4eiV3AAtJvxYKnEFiuj2jvoxwzl79kvajdxD9DP5jsnCWHXa6OskBJxin4YNSAikurIJD36qCOPO+64Wq3aaDTRPNUc7Uwnm8kOxna7labpypV7tdudazZ+5557/h8AyrSi3TOmLFBqPbwsXXtKf/9ymTcJBTCCyWPBLAtyARUFYJW3PpA/8euZN5z4po984owszRrNZrVakUIKgSikGcfSJUvuvffej3/irKeeejKr9TNpXzUqyfsfqCH0bs6BWOkZjHgOeHvvSh2cD4RgHrQZhdoub4gzthJ/tWezYT5EBKRGRkdPOvGEww49TJNut9uI6GODK6YxaV2v1+cvWLD//uvuvfeeK6741q5dYyKpAAIROYIErFgksPr43mVHVrUC3TEx3nfKOTIxKcAqtKfosZsml2Wrzr3wnMMPP3R6ajpJpLAPpUNEVIWeN29UKXXe+Rdcf/11mFTSLNNKu2wKwyxWudTmBWSRxNu2R6VKz4A7NqCKbc51tpQRlEmrGxNEIvYMyZu/H7rDJfS7utlDhBRUFAC0bt26V5988uLFixqNptLK7I5oUjFLVRHM/iwrVuw1MjJ84403/uhHPwaAJKuaAgYwo0AzRT66T7ZyfV/ah3lDCeHWwJqLs9kt3G4CLjLxwj1Ts/enZ7z/Q//xn6d22nme53YTGgQpEwaoViojwyM/v/GGs88+Z2pq0tyWBBESRdaOHtjZr/6KlOIBKSggkixC7BSxmLvcYM4rzsbKWokVUmKr/nMzhUGqk6bpsccec+yxx9aq1UazZRsmuyes6TqRnp2tVyqVo17xipnpmS9f9uX77r8PQMo0MSVVAESBrHTWK1ac0Du8JlNtdzu/3SzROTABaSbgyrBsbFFP3jD9qsNPuOjiC0ZGhiYnptI0lVIKKaSUCKhUsXjR4qefeeYjH/3oPffck1b7wDxYz+nBiTII3PjbblI181WlZ6BMeiI1dVt7lwK6cgvsQpyuCAHg8acMUlGUAHYlVVYLFy589cnr165dlxdFu9U0/M9cVJNWjhS2O+1lS5cdeOABd/75rq9cfvn09JRMK+w3dxbAigF40WG1xUfWGFm1zdI4YFOK0EAaGJkRQEFSBUT59P+Oj9SXn3ve2ccc+4r6bENKIaVxBUSBqlD9fX2VauVLl11++eVfAUwyO7XncduVjiJ5BusuMSjGas/gHHjBLtGXedCcV6S/SNpdwSAYvk/NvNBLQRvMkj5BypZUTzzh+IWLFrWaTSIGBHNnursmosBms6m1Pvyww0dHRq6+5pqbbroJAFCkzrEAAFhzzwK57FW12pJEtQjY6MYud2AE8xQSBJBVyGrpi3dPj99dnPbO9370rA8LFLOzM/6ZOUJIrbUQYuHChbfeeusnzjpr69atlZ4B+/CcaArMF4JChapbAdClgPCdNZNImiV1zNUCzznex7o4bYupkNcMRs7hznAcKc8qlWOOPvqoo46qVCr1+qzWiswWLSjM05YBUaCYnpkaHBg85uhjtu/Y8eUvf+Wxvz9h1erKZaxIpGLx0dWhdRIBkZA0MAALNigEAhKJQKBzwgoWs7zplunDVhx54UXnr161cnx8IklkkiTWE4RQhVqwcMH09PTHz/rUr355k8xqwq7VRCfDKGPwCBTsFQFKMaDrFXvQ7tB/br4G/0gB0PUreEYUsANc2T35AQFQoEGkRYsWn3DC8atWrSqKPM8LwztMZHCuAHlRIMh999nngb/97eqNGx3jdx00W2cS9S0XIwdVsj4JDCyBgLkAZkYJgpEUm2dLJb0yrSRP3jzeUx/45Cc/8ZY3v7nT6ZjIbLxBSgkMvf29tWrtG9/4xkUbLlZFUenpV1oBl6t4/4ipGhoas5TdBNiwnNwK2hfpIhXEZ86NGt1AtDu1xLlgACwjOFPAAID999//uFe+ctHixe12u1AFM5vn5gopKpWqUsVDDz38u9t+n+dtlBlzYHv+QnYmHxjss6zN7jSxBBDMHuLEKITMEtVoA9DrX/+Gc87+zPDw8PTMdCKTJEmsjxIR0aKFC++7/74zPvzRp578u8x6AtMJ9SInPghvEBgrtYFYfuy6hK4G5Iou5hd6nuqdokxSS3W7OY/U8DmFVYNtPDgOWweAKCowgHlUITDrIqvUDjn4oH3323d0dF6tWiWmVqs1NTW9ffv2Rx55/MUXngeUMknd/rGlnD30wdDPrholW8C2KMsuHAoQKLTqLFu27ILzzz/51SerQgkpiJi0TpNESKmVWrJ0abPZ+vCHP/Sj667X4fFbGM0Du+Aal+2yWn8E3oaahn2BbAwJffwHXhJ9xaGpcFL3gVHFoztrC+84GK77BgWy2WgUxODQYE9PjxDYbufTM9Mq7wAgJplJoEuz4b5/kUrRSzguv8QOXQ52MpE6bwPg+vUn9fT0mAeeM7EQaIrqWlOtVgPE2373+3q9ae4UcosBgtBsZHZqwKzWX+5l1Gmec9u7EfFcFbiBxfbWHTFC+zHex/Ll0g8352MF5UDJIBIzsFYAfot/KaSwkzDdkycuyvtBlTri+1cOjraCBYjBLkyMBSrgn74wqRqVxCUj1yP/t0OprNY/R1xRRubx3orJnRYpwRabAGy4CIPF3WkC5iogjgClb0txgru+dsMLhyLYB5VEk7HlS3PJ2iFYTCS+rsgVENaWEYXwqyii0aFfCsf+wd4WTyLBduXL4PdYBgCMkcl113zrHrcLUV/QVuoi64RYSd1stWvg0HVMBFjubaRu41w2/DCYi5e05pl3+IHltiFCV8DIu2OscWFNGLMCB9ngnqzCAJo0eqn5KwMSAoaHqPmedg27GxWiB0mBsywohd1SA4FXGOXEgBO1a5QSLtrViA/cpsrmbuWJ/MbL0Q3SPYooEsduQlF5rirkPDaoIYBb9+Onc92ZpV8MsegsEoHz+2AZ8XXnBpJowK63EaC4RpJKr23jH4XW0NBuTA5cjAksCbpcKajd+QcHw+q6QqliCaVIWYoQc1TuQlN5rqo7ovm30fIPfx3fMy5bnr94yUviU6M/0AV/9tfnubKNPCHxKWyM1hzeWHuKsMU34vbhcp3bLd477Ighns1Fu+Ny3D/3IxhLNF3tZ7vBRtjwrCg3geSEEKFAeZQxQbaRgN2Q0dRzAkxh1NBcOblP/okF7y7ym8/+P4APYQbmGYaMAAAAAElFTkSuQmCC';
+// Chrome hexagon + cannabis leaf emblem, embedded inline (base64) so the
+// mark never 404s regardless of which repo path this build is deployed under.
 function LogoMark({size=32}){
-  // Geometric side-profile fox in circle (Black Fox Manufacturing style)
-  const c='var(--accent)';
-  return el('svg',{width:size,height:size,viewBox:'0 0 100 100',xmlns:'http://www.w3.org/2000/svg',style:{flexShrink:0}},
-    // Outer circle
-    el('circle',{cx:'50',cy:'50',r:'47',fill:'none',stroke:c,strokeWidth:'4'}),
-    // Fox body / chest (bottom-left mass)
-    el('polygon',{points:'15,80 30,55 45,65 40,80',fill:c}),
-    // Neck
-    el('polygon',{points:'30,55 45,65 50,45 38,40',fill:c}),
-    // Head main shape
-    el('polygon',{points:'38,40 50,45 62,30 55,18 40,20 32,32',fill:c}),
-    // Ear tip (pointed, upper right)
-    el('polygon',{points:'55,18 62,30 70,10',fill:c}),
-    // Inner ear shadow
-    el('polygon',{points:'57,20 62,28 67,14',fill:'#ffffff',opacity:'0.25'}),
-    // Second ear behind
-    el('polygon',{points:'40,20 48,12 55,18 44,22',fill:c,opacity:'0.7'}),
-    // Snout / muzzle wedge
-    el('polygon',{points:'32,32 38,40 28,44 22,38',fill:c}),
-    // Muzzle light patch
-    el('polygon',{points:'28,44 38,40 35,50 24,48',fill:'#ffffff',opacity:'0.18'}),
-    // Eye (angular, geometric)
-    el('polygon',{points:'44,30 50,27 51,33 45,35',fill:'#ffffff'}),
-    // Pupil
-    el('polygon',{points:'46,30 49,28 50,33 47,34',fill:c,opacity:'0.5'}),
-    // Cheek shadow facet
-    el('polygon',{points:'38,40 44,35 46,42 40,46',fill:'#ffffff',opacity:'0.12'}),
-    // Fur texture line on chest
-    el('line',{x1:'32',y1:'58',x2:'38',y2:'70',stroke:'#ffffff',strokeWidth:'1',opacity:'0.2'}),
-  );
+  return el('img',{src:'data:image/png;base64,'+LOGO_EMBLEM_B64,width:size,height:size,style:{flexShrink:0,objectFit:'contain'},alt:'QMS420'});
 }
-// \u2500\u2500 SIDEBAR CHANGE PASSWORD (works on mobile/PWA, no prompt()) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+// --- SIDEBAR CHANGE PASSWORD (works on mobile/PWA, no prompt()) ---
 function SidebarChangePw({cu,SUPA_URL,SUPA_KEY}){
   const[open,setOpen]=React.useState(false);
   const[np,setNp]=React.useState('');
@@ -846,7 +821,7 @@ function SidebarChangePw({cu,SUPA_URL,SUPA_KEY}){
         style:{width:'100%',background:'rgba(255,255,255,.08)',border:'1px solid rgba(255,255,255,.2)',borderRadius:'var(--rs)',padding:'8px 10px',color:'#fff',fontFamily:'inherit',fontSize:12,outline:'none',boxSizing:'border-box'}}),
       msg&&el('div',{style:{fontSize:11,color:msg.includes('\u2713')?'#6ee7b7':msg.includes('\u274C')||msg.includes('\u26A0\uFE0F')?'#fca5a5':'rgba(255,255,255,.7)',padding:'2px 0'}},msg),
       el('button',{onClick:save,disabled:saving||np.length<6||np!==cp,
-        style:{width:'100%',background:np.length>=6&&np===cp?'rgba(255,255,255,.9)':'rgba(255,255,255,.2)',color:np.length>=6&&np===cp?'#1e3a5f':'rgba(255,255,255,.5)',border:'none',borderRadius:'var(--rs)',padding:'8px',fontFamily:'inherit',fontSize:12,fontWeight:700,cursor:saving?'not-allowed':'pointer',transition:'all .15s'}}
+        style:{width:'100%',background:np.length>=6&&np===cp?'rgba(255,255,255,.9)':'rgba(255,255,255,.2)',color:np.length>=6&&np===cp?'#6ba022':'rgba(255,255,255,.5)',border:'none',borderRadius:'var(--rs)',padding:'8px',fontFamily:'inherit',fontSize:12,fontWeight:700,cursor:saving?'not-allowed':'pointer',transition:'all .15s'}}
       ,saving?'Saving...':'Set New Password'),
     ),
   );
@@ -855,8 +830,8 @@ function SidebarChangePw({cu,SUPA_URL,SUPA_KEY}){
 function BFMlogo({size=32,labelSize=20,className='',textColor}){
   return el('div',{className,style:{display:'flex',alignItems:'center',gap:size*0.32}},
     el(LogoMark,{size}),
-    el('div',{style:{fontSize:labelSize,fontWeight:800,letterSpacing:'-0.5px',color:textColor||'var(--accent)',whiteSpace:'nowrap'}},
-      'BLACK FOX',el('span',{style:{color:'var(--text2)',fontWeight:300,letterSpacing:'1px'}},' QMS')
+    el('div',{style:{fontSize:labelSize,fontWeight:800,letterSpacing:'-0.5px',color:textColor||'var(--text)',whiteSpace:'nowrap'}},
+      'QMS',el('span',{style:{color:'var(--accent2)',fontWeight:800,letterSpacing:'-0.5px'}},'420')
     ),
   );
 }
@@ -1056,7 +1031,7 @@ function SetupScreen({onDone}){
   return el('div',{className:'auth-wrap'},
     el('div',{className:'auth-box',style:{width:540}},
       el(BFMlogo,{size:36,labelSize:24,className:'logo'}),
-      el('div',{className:'auth-sub'},'Black Fox QMS \u2014 One-time setup'),
+      el('div',{className:'auth-sub'},'QMS420 \u2014 One-time setup'),
       el('div',{style:{background:'var(--bg)',border:'1px solid var(--border)',borderRadius:8,padding:12,marginBottom:14,maxHeight:180,overflowY:'auto'}},
         el('pre',{style:{fontSize:11,color:'var(--text2)',whiteSpace:'pre-wrap',fontFamily:'DM Mono, monospace',lineHeight:1.5}},SETUP_SQL.trim())
       ),
@@ -1163,7 +1138,7 @@ function TaskModal({task,cu,users,onClose,onUpdate,onDelete}){
         sendEmail({to:creator.email,
           subject:`\uD83D\uDC41 Task completed & awaiting your review: "${task.title}"`,
           html:`<div style="font-family:sans-serif;background:#000000;color:#e8edf8;padding:28px;border-radius:12px;max-width:500px;border:1px solid #1a2d4f">
-            <div style="color:#f5a623;font-size:20px;font-weight:800;margin-bottom:16px">\uD83D\uDCCB Black Fox QMS</div>
+            <div style="color:#f5a623;font-size:20px;font-weight:800;margin-bottom:16px">\uD83D\uDCCB QMS420</div>
             <div style="background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);border-radius:10px;padding:20px;margin-bottom:20px;text-align:center">
               <div style="font-size:36px;margin-bottom:10px">\uD83D\uDC41</div>
               <div style="font-size:17px;font-weight:700;margin-bottom:6px">Task Completed \u2014 Awaiting Your Review</div>
@@ -1184,7 +1159,7 @@ function TaskModal({task,cu,users,onClose,onUpdate,onDelete}){
         if(u?.email) sendEmail({to:u.email,
           subject:`\u2705 Task approved & done: "${task.title}"`,
           html:`<div style="font-family:sans-serif;background:#000000;color:#e8edf8;padding:28px;border-radius:12px;max-width:500px;border:1px solid #1a2d4f">
-            <div style="color:#f5a623;font-size:20px;font-weight:800;margin-bottom:16px">\uD83D\uDCCB Black Fox QMS</div>
+            <div style="color:#f5a623;font-size:20px;font-weight:800;margin-bottom:16px">\uD83D\uDCCB QMS420</div>
             <div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);border-radius:10px;padding:20px;margin-bottom:20px;text-align:center">
               <div style="font-size:40px;margin-bottom:10px">\uD83C\uDF89</div>
               <div style="font-size:17px;font-weight:700;margin-bottom:6px">Task Approved & Done!</div>
@@ -1205,7 +1180,7 @@ function TaskModal({task,cu,users,onClose,onUpdate,onDelete}){
         if(u?.email) sendEmail({to:u.email,
           subject:`\u274C Task rejected: "${task.title}"`,
           html:`<div style="font-family:sans-serif;background:#000000;color:#e8edf8;padding:28px;border-radius:12px;max-width:500px;border:1px solid #7f1d1d">
-            <div style="color:#f5a623;font-size:20px;font-weight:800;margin-bottom:16px">\uD83D\uDCCB Black Fox QMS</div>
+            <div style="color:#f5a623;font-size:20px;font-weight:800;margin-bottom:16px">\uD83D\uDCCB QMS420</div>
             <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.3);border-radius:10px;padding:20px;margin-bottom:20px;text-align:center">
               <div style="font-size:40px;margin-bottom:10px">\u274C</div>
               <div style="font-size:17px;font-weight:700;margin-bottom:6px">Task Rejected</div>
@@ -1270,7 +1245,7 @@ function TaskModal({task,cu,users,onClose,onUpdate,onDelete}){
       const creator=users.find(u=>u.id===task.created_by_id);
       if(creator?.email) sendEmail({to:creator.email,
         subject:`\uD83C\uDF89 Cart task fully completed: "${task.title}"`,
-        html:`<div style="font-family:sans-serif;background:#000000;color:#e8edf8;padding:28px;border-radius:12px;max-width:500px;border:1px solid #1a2d4f"><div style="color:#f5a623;font-size:20px;font-weight:800;margin-bottom:16px">\uD83D\uDCCB Black Fox QMS</div><div style="text-align:center;padding:20px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);border-radius:10px;margin-bottom:20px"><div style="font-size:40px">\uD83C\uDF89</div><div style="font-size:17px;font-weight:700;margin-top:8px">All Steps Complete!</div><div style="font-size:13px;color:#6ee7b7;margin-top:4px">"${task.title}"</div></div><p style="font-size:13px;color:#7b8db8">All ${CART_WORKFLOW.length} production steps completed successfully. Task is now Done.</p><a href="${APP_URL}" style="display:inline-block;margin-top:16px;background:#10b981;color:#fff;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:700">View Task \u2192</a></div>`
+        html:`<div style="font-family:sans-serif;background:#000000;color:#e8edf8;padding:28px;border-radius:12px;max-width:500px;border:1px solid #1a2d4f"><div style="color:#f5a623;font-size:20px;font-weight:800;margin-bottom:16px">\uD83D\uDCCB QMS420</div><div style="text-align:center;padding:20px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);border-radius:10px;margin-bottom:20px"><div style="font-size:40px">\uD83C\uDF89</div><div style="font-size:17px;font-weight:700;margin-top:8px">All Steps Complete!</div><div style="font-size:13px;color:#6ee7b7;margin-top:4px">"${task.title}"</div></div><p style="font-size:13px;color:#7b8db8">All ${CART_WORKFLOW.length} production steps completed successfully. Task is now Done.</p><a href="${APP_URL}" style="display:inline-block;margin-top:16px;background:#10b981;color:#fff;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:700">View Task \u2192</a></div>`
       });
       return;
     }
@@ -1298,7 +1273,7 @@ function TaskModal({task,cu,users,onClose,onUpdate,onDelete}){
       sendEmail({to:u.email,
         subject:`\uD83D\uDCCB Production step advanced: "${task.title}" \u2192 ${nextStep.label}`,
         html:`<div style="font-family:sans-serif;background:#000000;color:#e8edf8;padding:28px;border-radius:12px;max-width:500px;border:1px solid #1a2d4f">
-          <div style="color:#f5a623;font-size:20px;font-weight:800;margin-bottom:16px">\uD83D\uDCCB Black Fox QMS \u2014 Production Workflow</div>
+          <div style="color:#f5a623;font-size:20px;font-weight:800;margin-bottom:16px">\uD83D\uDCCB QMS420 \u2014 Production Workflow</div>
           <div style="display:flex;align-items:center;gap:12px;background:rgba(30,58,95,.06);border:1px solid rgba(30,58,95,.15);border-radius:10px;padding:16px;margin-bottom:20px">
             <div style="font-size:28px">\u2705</div>
             <div>
@@ -1347,7 +1322,7 @@ function TaskModal({task,cu,users,onClose,onUpdate,onDelete}){
         sendEmail({to:u.email,
           subject:`\uD83D\uDEA8 Testing FAILED & task on hold: "${task.title}"`,
           html:`<div style="font-family:sans-serif;background:#000000;color:#e8edf8;padding:28px;border-radius:12px;max-width:500px;border:1px solid #7f1d1d">
-            <div style="color:#f5a623;font-size:20px;font-weight:800;margin-bottom:16px">\uD83D\uDCCB Black Fox QMS</div>
+            <div style="color:#f5a623;font-size:20px;font-weight:800;margin-bottom:16px">\uD83D\uDCCB QMS420</div>
             <div style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.4);border-radius:10px;padding:20px;margin-bottom:20px;text-align:center">
               <div style="font-size:40px;margin-bottom:8px">\uD83D\uDEA8</div>
               <div style="font-size:18px;font-weight:800;color:#ef4444">TESTING FAILED</div>
@@ -2343,8 +2318,8 @@ function Team({users,setUsers,cu}){
       await db.update('pf_users',id,{approved:true});
       setUsers(p=>p.map(u=>u.id===id?{...u,approved:true}:u));
       const user=users.find(u=>u.id===id);
-      sendLocalNotification('\u2705 Account Approved','Welcome to Black Fox QMS!').catch(()=>{});
-      if(user?.email) sendEmail({to:user.email,subject:'Your Black Fox QMS account is approved',html:`<div style="font-family:sans-serif;background:#0f1117;color:#e8eaf0;padding:24px;border-radius:12px;max-width:500px"><div style="color:#f5a623;font-size:20px;font-weight:700;margin-bottom:12px">Black Fox QMS</div><p>Hi ${user.name}, your account has been approved.</p><a href="${APP_URL}" style="display:inline-block;background:#f5a623;color:#000000;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:600;margin-top:12px">Sign In \u2192</a></div>`});
+      sendLocalNotification('\u2705 Account Approved','Welcome to QMS420!').catch(()=>{});
+      if(user?.email) sendEmail({to:user.email,subject:'Your QMS420 account is approved',html:`<div style="font-family:sans-serif;background:#0f1117;color:#e8eaf0;padding:24px;border-radius:12px;max-width:500px"><div style="color:#f5a623;font-size:20px;font-weight:700;margin-bottom:12px">QMS420</div><p>Hi ${user.name}, your account has been approved.</p><a href="${APP_URL}" style="display:inline-block;background:#f5a623;color:#000000;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:600;margin-top:12px">Sign In \u2192</a></div>`});
     }catch(e){console.error('approve error:',e);}
   }
 
@@ -3454,7 +3429,7 @@ Create comprehensive meeting notes in this EXACT JSON format (no markdown, just 
       recipients.forEach(a=>{
         sendEmail({to:a.email,subject:`\uD83D\uDCCB Meeting Notes: ${event.title} \u2014 ${event.date}`,
           html:`<div style="font-family:sans-serif;background:#000000;color:#e8edf8;padding:32px;border-radius:12px;max-width:620px;border:1px solid #1a2d4f">
-            <div style="color:#f5a623;font-size:22px;font-weight:800;margin-bottom:4px">\uD83D\uDCCB Black Fox QMS</div>
+            <div style="color:#f5a623;font-size:22px;font-weight:800;margin-bottom:4px">\uD83D\uDCCB QMS420</div>
             <div style="font-size:13px;color:#7b8db8;margin-bottom:24px">AI-Generated Meeting Notes</div>
             <div style="font-size:20px;font-weight:700;margin-bottom:6px">${event.title}</div>
             <div style="font-size:13px;color:#7b8db8;margin-bottom:24px">\uD83D\uDCC5 ${event.date}${event.start_time?' at '+event.start_time:''} \u00B7 Notes by ${cu.name}</div>
@@ -3945,7 +3920,7 @@ const LOG_TYPES={
     {key:'compliance_verification',label:'Compliance Verification',type:'checkbox'},
     {key:'supervisor_name',label:'Supervisor Name *',type:'text',placeholder:'Verifying supervisor full name'},
   ]},
-  security_inspection:{id:'security_inspection',label:'Security Equipment Inspection',icon:'\uD83D\uDEE1\uFE0F',color:'#1e3a5f',bg:'#eff6ff',table:'pf_log_security_inspection',dcr:'Michigan CRA Security Requirements — Weekly',freq:'Weekly',
+  security_inspection:{id:'security_inspection',label:'Security Equipment Inspection',icon:'\uD83D\uDEE1\uFE0F',color:'#6ba022',bg:'#eff6ff',table:'pf_log_security_inspection',dcr:'Michigan CRA Security Requirements — Weekly',freq:'Weekly',
     cameras:["VAULT 1", "VAULT 2", "VAULT FISHEYE", "VAULT 4", "BIOMASS 1", "BIOMASS 2", "WAREHOUSE AIR COMPRESSOR", "WAREHOUSE SHIPPING OFFICE DOOR", "WAREHOUSE DOOR INSIDE", "MAIN ENTRANCE DOOR IN", "MAIN ENTRANCE OUT", "MAIN ENTRANCE OUT 2", "FRONT OFFICE", "TESTING 1", "TESTING 2", "1 ETHANOL EXTRACTION", "2 ETHANOL EXTRACTION", "STORAGE 1", "STORAGE 1B", "STORAGE 2", "STORAGE 3", "EXECUTIVE OFFICE", "EXECUTIVE OFFICE 2", "WASTE 1", "WASTE 2", "WASTE 3", "SECURITY HALLWAY", "SHIP/REC OFFICE", "FREEZER 1", "FREEZER 2", "FREEZER 3", "HWY 47 N", "HWY 47 S", "WAREHOUSE SECURITY OUT", "SHIPPING DOCK", "DUNCAN ST E", "DUNCAN ST W", "SANITATION ROOM DOOR", "EMERGENCY EXIT INSIDE", "EMERGENCY EXIT OUTSIDE", "SECURITY ROOM", "1 BUTANE EXTRACTION", "2 BUTANE EXTRACTION", "3 BUTANE EXTRACTION", "C1D1 A", "C1D1 B", "DATA ROOM", "PRE ROLL FILLING", "PACKAGING / PRE ROLL", "GUMMY PRODUCTION", "CART FILLING", "PRODUCTION CART FILLING", "GUMMY DEMOLDING AREA", "PRODUCTION CENTER WEST", "PRODUCTION PACKAGING AREA", "TESTING / WASTE", "QC", "RESTROOMS"],
     door_locks:["MAIN ENTRANCE", "SECURITY 1 ENTRANCE", "FLOOR MANAGERS OFFICE", "SOUTH EAST PRODUCTION", "WAREHOUSE ENTRANCE", "SECURITY 2 ENTRANCE", "WAREHOUSE", "VAULT", "BUTANE EXTRACTION", "BIOMASS", "ETHANOL EXTRACTION", "DATA ROOM", "EXECUTIVE OFFICE", "DOOR BELL", "MAIN ENTRANCE (2)", "WAREHOUSE ENTRANCE (2)"],
     alarms:["MAIN ENTRANCE CONTACT SENSOR", "SECURITY 2 ENTRANCE CONTACT SENSOR", "WAREHOUSE ENTRANCE CONTACT SENSOR", "DISTRIBUTION CONTACT SENSOR", "EMERGENCY EXIT CONTACT SENSOR", "DATA ROOM CONTACT SENSOR", "MAIN ENTRANCE MOTION DETECTOR", "EMERGENCY EXIT MOTION DETECTOR", "WAREHOUSE MOTION DETECTOR", "EXECUTIVE OFFICE MOTION DETECTOR 1", "SECURITY 2 ENTRANCE MOTION DETECTOR", "BASE STATION", "EXECUTIVE OFFICE MOTION DETECTOR 2", "SECURITY 1 PANIC BUTTON", "SECURITY 2 PANIC BUTTON", "SECURITY 1 KEY PAD", "SECURITY 2 KEY PAD"],
@@ -3956,7 +3931,7 @@ const LOG_TYPES={
       {key:'notes',label:'General Notes / Issues Found',type:'textarea',placeholder:'Any issues, failures, or observations'},
     ],
   },
-  security:{id:'security',label:'Security Malfunction Log',icon:'\uD83D\uDD12',color:'#1e3a5f',bg:'#eff6ff',table:'pf_log_security',dcr:'Michigan CRA Security Requirements',freq:'Every malfunction event',fields:[
+  security:{id:'security',label:'Security Malfunction Log',icon:'\uD83D\uDD12',color:'#6ba022',bg:'#eff6ff',table:'pf_log_security',dcr:'Michigan CRA Security Requirements',freq:'Every malfunction event',fields:[
     {key:'date',label:'Date *',type:'date'},{key:'time',label:'Time Discovered',type:'time'},
     {key:'system_type',label:'System Type *',type:'select',options:['CCTV Camera','DVR/NVR Recorder','Motion Sensor','Door Access Control','Alarm System','Perimeter Fence/Gate','Safe/Vault','Other']},
     {key:'location',label:'Location *',type:'text',placeholder:'e.g. Front entrance camera'},
@@ -4337,7 +4312,7 @@ function exportLogPdf(logType,entries,dateFrom,dateTo){
   let y=0,pageNum=1;
   function header(){
     doc.setFillColor(...NAVY);doc.rect(0,0,W,78,'F');
-    doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(15);doc.text('BLACK FOX QMS',margin,30);
+    doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(15);doc.text('QMS420',margin,30);
     doc.setFont('helvetica','normal');doc.setFontSize(10);doc.setTextColor(180,200,230);doc.text(lt.label+' \u2014 Official Record',margin,50);
     doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(11);doc.text('Page '+pageNum,W-margin,30,{align:'right'});
     doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(180,200,230);doc.text('Generated: '+new Date().toLocaleString(),W-margin,50,{align:'right'});
@@ -4506,7 +4481,7 @@ function exportLogPdf(logType,entries,dateFrom,dateTo){
     });
   });
   doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(22,163,74);
-  doc.text('Official record \u2014 Black Fox QMS \u00B7 TBD-PENDING \u00B7 HMBF Management Inc. \u00B7 Retain 4+ years per Michigan CRA',margin,H-20);
+  doc.text('Official record \u2014 QMS420 \u00B7 TBD-PENDING \u00B7 HMBF Management Inc. \u00B7 Retain 4+ years per Michigan CRA',margin,H-20);
   doc.save('BlackFox_'+lt.label.replace(/[^a-z0-9]/gi,'_')+'_'+new Date().toISOString().slice(0,10)+'.pdf');
 }
 
@@ -5055,13 +5030,13 @@ function SecurityInspectionForm({cu,onSave,onClose,editData,SUPA_URL,SUPA_KEY,H}
 
         // Tab buttons
         el('div',{style:{display:'flex',gap:4,background:'var(--surface2)',borderRadius:8,padding:4,marginBottom:14}},
-          TABS.map(t=>el('button',{key:t.id,onClick:()=>setTab(t.id),style:{flex:1,padding:'7px 4px',borderRadius:6,border:'none',fontFamily:'inherit',fontSize:12,fontWeight:tab===t.id?700:500,cursor:'pointer',background:tab===t.id?'#1e3a5f':'transparent',color:tab===t.id?'#fff':'var(--text2)',transition:'all .15s'}},' '+t.label)),
+          TABS.map(t=>el('button',{key:t.id,onClick:()=>setTab(t.id),style:{flex:1,padding:'7px 4px',borderRadius:6,border:'none',fontFamily:'inherit',fontSize:12,fontWeight:tab===t.id?700:500,cursor:'pointer',background:tab===t.id?'#6ba022':'transparent',color:tab===t.id?'#fff':'var(--text2)',transition:'all .15s'}},' '+t.label)),
         ),
 
         // CAMERAS TAB
         tab==='cameras'&&el('div',null,
           el('div',{style:{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:10,overflow:'hidden'}},
-            el('div',{style:{display:'grid',gridTemplateColumns:'1fr 100px 120px',background:'#1e3a5f',color:'#fff',padding:'8px 12px',fontSize:11,fontWeight:700}},
+            el('div',{style:{display:'grid',gridTemplateColumns:'1fr 100px 120px',background:'#6ba022',color:'#fff',padding:'8px 12px',fontSize:11,fontWeight:700}},
               el('span',null,'CAMERA NAME'),el('span',{style:{textAlign:'center'}},'CAMERA VIEW'),el('span',{style:{textAlign:'center'}},'FUNCTIONALITY'),
             ),
             lt.cameras.map((cam,i)=>el('div',{key:cam,style:{display:'grid',gridTemplateColumns:'1fr 100px 120px',padding:'7px 12px',background:i%2===0?'#ffffff':'var(--surface2)',borderBottom:'1px solid var(--border)',alignItems:'center',gap:8}},
@@ -5078,7 +5053,7 @@ function SecurityInspectionForm({cu,onSave,onClose,editData,SUPA_URL,SUPA_KEY,H}
         // DOOR LOCKS TAB
         tab==='doors'&&el('div',null,
           el('div',{style:{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:10,overflow:'hidden'}},
-            el('div',{style:{display:'grid',gridTemplateColumns:'1fr 110px 120px',background:'#1e3a5f',color:'#fff',padding:'8px 12px',fontSize:11,fontWeight:700}},
+            el('div',{style:{display:'grid',gridTemplateColumns:'1fr 110px 120px',background:'#6ba022',color:'#fff',padding:'8px 12px',fontSize:11,fontWeight:700}},
               el('span',null,'DOOR NAME'),el('span',{style:{textAlign:'center'}},'BATTERY LEVEL'),el('span',{style:{textAlign:'center'}},'FUNCTIONALITY'),
             ),
             lt.door_locks.map((door,i)=>el('div',{key:door,style:{display:'grid',gridTemplateColumns:'1fr 110px 120px',padding:'7px 12px',background:i%2===0?'#ffffff':'var(--surface2)',borderBottom:'1px solid var(--border)',alignItems:'center',gap:8}},
@@ -5095,7 +5070,7 @@ function SecurityInspectionForm({cu,onSave,onClose,editData,SUPA_URL,SUPA_KEY,H}
         // ALARM TAB
         tab==='alarms'&&el('div',null,
           el('div',{style:{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:10,overflow:'hidden'}},
-            el('div',{style:{display:'grid',gridTemplateColumns:'1fr 110px 120px',background:'#1e3a5f',color:'#fff',padding:'8px 12px',fontSize:11,fontWeight:700}},
+            el('div',{style:{display:'grid',gridTemplateColumns:'1fr 110px 120px',background:'#6ba022',color:'#fff',padding:'8px 12px',fontSize:11,fontWeight:700}},
               el('span',null,'COMPONENT NAME'),el('span',{style:{textAlign:'center'}},'BATTERY LEVEL'),el('span',{style:{textAlign:'center'}},'FUNCTIONALITY'),
             ),
             lt.alarms.map((alarm,i)=>el('div',{key:alarm,style:{display:'grid',gridTemplateColumns:'1fr 110px 120px',padding:'7px 12px',background:i%2===0?'#ffffff':'var(--surface2)',borderBottom:'1px solid var(--border)',alignItems:'center',gap:8}},
@@ -5119,7 +5094,7 @@ function SecurityInspectionForm({cu,onSave,onClose,editData,SUPA_URL,SUPA_KEY,H}
         el('div',{style:{borderTop:'1px solid var(--border)',paddingTop:14,marginTop:8}},
           el('div',{style:{fontSize:13,fontWeight:700,marginBottom:8}},'\u270D\uFE0F Inspector Signature *'),
           sig
-            ?el('div',null,el('img',{src:sig,style:{border:'2px solid #1e3a5f',borderRadius:8,maxWidth:'100%',height:80}}),el('button',{onClick:()=>setSig(null),className:'btn b-ghost btn-sm',style:{marginLeft:8}},'Clear'))
+            ?el('div',null,el('img',{src:sig,style:{border:'2px solid #6ba022',borderRadius:8,maxWidth:'100%',height:80}}),el('button',{onClick:()=>setSig(null),className:'btn b-ghost btn-sm',style:{marginLeft:8}},'Clear'))
             :el(SignaturePad,{label:'Sign to certify this inspection was completed accurately',onSave:d=>setSig(d),onClear:()=>setSig(null)}),
           el('div',{style:{fontSize:11,color:'var(--text3)',marginTop:5}},'Certifying as: '+cu.name+' \u00B7 '+new Date().toLocaleString()),
         ),
@@ -5173,7 +5148,7 @@ function FacilityLogs({cu,isElevated,isAdmin,SUPA_URL,SUPA_KEY,H}){
   );
 
   if(!activeLog) return el('div',{style:{padding:'0 0 48px'}},
-    el('div',{style:{background:'linear-gradient(135deg,#1e3a5f,#2d5282)',borderRadius:14,padding:'24px 28px',marginBottom:24,color:'#fff'}},
+    el('div',{style:{background:'linear-gradient(135deg,#6ba022,#8bc93f)',borderRadius:14,padding:'24px 28px',marginBottom:24,color:'#fff'}},
       el('div',{style:{fontSize:22,fontWeight:800,marginBottom:4}},'\uD83D\uDCCB Facility Logs'),
       el('div',{style:{fontSize:13,opacity:.85,lineHeight:1.6}},'All logs are timestamped, signed, and exportable as PDF for CRA inspections and ISO 9001 audits. Retain all records for minimum 4 years per Michigan CRA.'),
     ),
@@ -5213,15 +5188,15 @@ function FacilityLogs({cu,isElevated,isAdmin,SUPA_URL,SUPA_KEY,H}){
           'Print or display this QR code at your reception area. Visitors scan it with their phone to sign in and out. Sign-in includes name, company, ID, purpose and signature. Sign-out: enter name to find record and sign.'
         ),
         el('div',{style:{display:'flex',gap:8,flexWrap:'wrap'}},
-          el('a',{href:kioskUrl,target:'_blank',style:{background:'#1e3a5f',color:'#fff',borderRadius:8,padding:'8px 16px',fontSize:13,fontWeight:700,textDecoration:'none'}},'\uD83D\uDD17 Open Kiosk Page'),
+          el('a',{href:kioskUrl,target:'_blank',style:{background:'#6ba022',color:'#fff',borderRadius:8,padding:'8px 16px',fontSize:13,fontWeight:700,textDecoration:'none'}},'\uD83D\uDD17 Open Kiosk Page'),
           el('button',{onClick:()=>navigator.clipboard?.writeText(kioskUrl).then(()=>alert('Link copied!')),style:{background:'var(--surface2)',border:'1px solid var(--border)',borderRadius:8,padding:'8px 16px',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:'inherit'}},'\uD83D\uDCCB Copy Link'),
         ),
         el('div',{style:{fontSize:12,color:'var(--text3)',marginTop:8}},'Kiosk URL: '+kioskUrl),
       ),
       el('div',{style:{flexShrink:0,textAlign:'center'}},
-        el('img',{src:`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(kioskUrl)}&bgcolor=ffffff&color=1e3a5f&margin=8`,alt:'QR Code',style:{borderRadius:10,border:'4px solid #1e3a5f',width:180,height:180}}),
+        el('img',{src:`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(kioskUrl)}&bgcolor=ffffff&color=6ba022&margin=8`,alt:'QR Code',style:{borderRadius:10,border:'4px solid #6ba022',width:180,height:180}}),
         el('div',{style:{fontSize:11,color:'var(--text3)',marginTop:6}},'Scan to open visitor kiosk'),
-        el('button',{onClick:()=>{const a=document.createElement('a');a.href=`https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(kioskUrl)}&bgcolor=ffffff&color=1e3a5f&margin=10`;a.download='visitor-qr-code.png';a.click();},style:{background:'var(--surface2)',border:'1px solid var(--border)',borderRadius:6,padding:'5px 12px',fontSize:11,cursor:'pointer',fontFamily:'inherit',marginTop:6}},'\u2B07\uFE0F Download QR'),
+        el('button',{onClick:()=>{const a=document.createElement('a');a.href=`https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(kioskUrl)}&bgcolor=ffffff&color=6ba022&margin=10`;a.download='visitor-qr-code.png';a.click();},style:{background:'var(--surface2)',border:'1px solid var(--border)',borderRadius:6,padding:'5px 12px',fontSize:11,cursor:'pointer',fontFamily:'inherit',marginTop:6}},'\u2B07\uFE0F Download QR'),
       ),
     ),
     el('div',{style:{display:'flex',gap:10,marginBottom:16,flexWrap:'wrap',alignItems:'center'}},
@@ -5739,7 +5714,7 @@ Rules:
           el('button',{onClick:generateAllPdfs,style:{background:'#dc2626',color:'#fff',border:'none',borderRadius:8,padding:'9px 20px',fontFamily:'inherit',fontSize:13,fontWeight:700,cursor:'pointer'}},'\uD83D\uDCC4 Download All PDFs ('+Object.keys(results.flavors||{}).length+')'),
         ),
         // Grand total card
-        results.grand_total&&el('div',{style:{background:'#1e3a5f',borderRadius:12,padding:'16px 20px',marginBottom:16,color:'#fff'}},
+        results.grand_total&&el('div',{style:{background:'#6ba022',borderRadius:12,padding:'16px 20px',marginBottom:16,color:'#fff'}},
           el('div',{style:{fontSize:13,fontWeight:800,marginBottom:8,opacity:.85,textTransform:'uppercase',letterSpacing:'.5px'}},'Grand Total \u2014 All Flavors Combined'),
           el('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(140px,1fr))',gap:8}},
             (results.grand_total||[]).map((ing,i)=>el('div',{key:i,style:{background:'rgba(255,255,255,.1)',borderRadius:8,padding:'8px 12px'}},
@@ -5829,7 +5804,7 @@ function AIReporter({cu,SUPA_URL,SUPA_KEY,H}){
       return `## ${t} (${rows.length} records)\n${str}`;
     }).join('\n\n');
     const capped=dataStr.length>25000?dataStr.slice(0,25000)+'\u2026':dataStr;
-    return `AI Reporter for Black Fox QMS (Black Fox Manufacturing / HMBF Management Inc, TBD-PENDING). Today: ${now}. User: ${cu.name} (${cu.role}).\n\nAnswer using ONLY the data below. Be specific with record IDs, batch numbers, dates, names. Lead with a direct answer, then details. Flag any compliance gaps.\n\n${capped}`;
+    return `AI Reporter for QMS420 (Black Fox Manufacturing / HMBF Management Inc, TBD-PENDING). Today: ${now}. User: ${cu.name} (${cu.role}).\n\nAnswer using ONLY the data below. Be specific with record IDs, batch numbers, dates, names. Lead with a direct answer, then details. Flag any compliance gaps.\n\n${capped}`;
   }
 
   async function send(){
@@ -6967,19 +6942,19 @@ function RiskRegister({cu,isElevated,isAdmin,SUPA_URL,SUPA_KEY,H}){
 }
 
 const COMPLIANCE_FRAMEWORKS={
-  iso9001:{label:'ISO 9001:2015',color:'#1e3a5f',icon:'\uD83C\uDFC6',clauses:[
+  iso9001:{label:'ISO 9001:2015',color:'#6ba022',icon:'\uD83C\uDFC6',clauses:[
     {id:'4.1',title:'Context of the Organization',req:'Understand internal/external issues affecting the QMS.',actions:['Conduct SWOT analysis annually','Document interested parties and their requirements','Review context at management review meetings']},
     {id:'5.1',title:'Leadership & Commitment',req:'Top management must demonstrate QMS leadership and commitment.',actions:['Hold quarterly management review meetings','Document and communicate quality policy','Assign QMS roles and responsibilities to leadership']},
-    {id:'5.3',title:'Roles & Responsibilities',req:'Define, assign and communicate QMS roles throughout the organization.',actions:['Maintain current org chart','Document role responsibilities in Black Fox QMS','Ensure all staff acknowledge their QMS role in writing']},
+    {id:'5.3',title:'Roles & Responsibilities',req:'Define, assign and communicate QMS roles throughout the organization.',actions:['Maintain current org chart','Document role responsibilities in QMS420','Ensure all staff acknowledge their QMS role in writing']},
     {id:'6.1',title:'Risk & Opportunity Management',req:'Plan actions to address risks and opportunities.',actions:['Complete risk register annually','Review and update CAPA log monthly','Document risk treatment actions and verify effectiveness']},
-    {id:'7.2',title:'Competence & Training',req:'Ensure all personnel are competent based on education, training and experience.',actions:['Maintain training matrix for all employees in Black Fox QMS','Document competency assessments per role','Record all SOP acknowledgements and training completions']},
+    {id:'7.2',title:'Competence & Training',req:'Ensure all personnel are competent based on education, training and experience.',actions:['Maintain training matrix for all employees in QMS420','Document competency assessments per role','Record all SOP acknowledgements and training completions']},
     {id:'7.5',title:'Documented Information',req:'Create, maintain and control all required QMS documents.',actions:['All SOPs must have version number and review date','Ensure SOPs are reviewed at minimum annually','Maintain document control log for external regulations']},
     {id:'8.1',title:'Operational Planning & Control',req:'Plan, implement and control processes needed to meet requirements.',actions:['Document production processes and batch records','Set measurable quality objectives per product line','Review operational KPIs at management meetings']},
-    {id:'8.4',title:'Control of External Providers',req:'Qualify and monitor suppliers and external service providers.',actions:['Maintain approved supplier list in Black Fox QMS','Conduct annual supplier audits and document findings','Obtain COAs for all incoming raw materials and packaging']},
+    {id:'8.4',title:'Control of External Providers',req:'Qualify and monitor suppliers and external service providers.',actions:['Maintain approved supplier list in QMS420','Conduct annual supplier audits and document findings','Obtain COAs for all incoming raw materials and packaging']},
     {id:'8.7',title:'Nonconforming Outputs',req:'Control outputs that do not conform to requirements.',actions:['Document all deviations in QMS Deviations module','Quarantine non-conforming materials immediately','Conduct root cause analysis and issue CAPA within 48 hours']},
     {id:'9.2',title:'Internal Audit',req:'Conduct internal audits at planned intervals to ensure QMS conformity.',actions:['Complete annual internal audit schedule for all departments','Audit each department at least once per year','Document findings in QMS Audits module and assign CAPAs']},
     {id:'9.3',title:'Management Review',req:'Top management must review the QMS at planned intervals.',actions:['Hold quarterly management review meetings','Document review minutes including quality objectives progress','Review customer feedback, audit results, and CAPA status']},
-    {id:'10.2',title:'Nonconformity & Corrective Action',req:'React to nonconformities, take corrective action and verify effectiveness.',actions:['Issue corrective actions in Black Fox QMS within 5 business days','Track and report CAPA closure rate at management review','Verify effectiveness of all corrective actions before closing']},
+    {id:'10.2',title:'Nonconformity & Corrective Action',req:'React to nonconformities, take corrective action and verify effectiveness.',actions:['Issue corrective actions in QMS420 within 5 business days','Track and report CAPA closure rate at management review','Verify effectiveness of all corrective actions before closing']},
   ]},
   gmp:{label:'cGMP (21 CFR)',color:'#065f46',icon:'\uD83E\uDDEA',clauses:[
     {id:'GMP-1',title:'Personnel Hygiene & Training',req:'All personnel must meet hygiene, health and training requirements.',actions:['Enforce glove change protocol per SOP','Document PPE training for all production staff','Conduct monthly hygiene compliance inspections']},
@@ -7076,7 +7051,7 @@ function ComplianceModule({cu,isElevated,isAdmin,LICENSES,SUPA_URL,SUPA_KEY,H,db
 
   return el('div',{style:{padding:'0 0 48px'}},
     // Header card
-    el('div',{style:{background:'linear-gradient(135deg,#1e3a5f 0%,#2d5282 100%)',borderRadius:14,padding:'24px 28px',marginBottom:24,color:'#fff'}},
+    el('div',{style:{background:'linear-gradient(135deg,#6ba022 0%,#8bc93f 100%)',borderRadius:14,padding:'24px 28px',marginBottom:24,color:'#fff'}},
       el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:12}},
         el('div',null,
           el('div',{style:{fontSize:22,fontWeight:800,marginBottom:3}},'\u2705 Compliance Center'),
@@ -7871,7 +7846,7 @@ Write a formal, professional Corrective Action notice. Be factual, specific, and
         await sendEmail({to:employee.email,
           subject:`\u2696\uFE0F Corrective Action Notice \u2014 ${editedCA.title}`,
           html:`<div style="font-family:sans-serif;background:#121212;color:#f0eee8;padding:28px;border-radius:12px;max-width:520px;border:1px solid #333">
-            <div style="color:#f5a623;font-size:20px;font-weight:800;margin-bottom:16px">\u2696\uFE0F Black Fox QMS</div>
+            <div style="color:#f5a623;font-size:20px;font-weight:800;margin-bottom:16px">\u2696\uFE0F QMS420</div>
             <div style="background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:20px;margin-bottom:20px;text-align:center">
               <div style="font-size:36px;margin-bottom:10px">\u2696\uFE0F</div>
               <div style="font-size:17px;font-weight:700;margin-bottom:6px">Corrective Action Notice</div>
@@ -9095,7 +9070,7 @@ function QMS({cu,users,tasks,sops,setSops,deviations,setDeviations,capas,setCapa
                     setCorrective(p=>p.map(c=>c.id===sel.id?{...c,status:'pending'}:c));
                     setSel(p=>({...p,status:'pending'}));
                     await sendEmail({to:sel.employee_email,subject:`\u2696\uFE0F Corrective Action Notice \u2014 ${sel.title}`,
-                      html:`<div style="font-family:sans-serif;background:#121212;color:#f0eee8;padding:28px;border-radius:12px;max-width:520px;border:1px solid #333"><div style="color:#f5a623;font-size:20px;font-weight:800;margin-bottom:16px">\u2696\uFE0F Black Fox QMS</div><p style="font-size:14px">A corrective action has been issued to you. Please log in to review and sign.</p><a href="${APP_URL}" style="display:inline-block;background:#f5a623;color:#000;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:700;margin-top:12px">Review & Sign \u2192</a></div>`
+                      html:`<div style="font-family:sans-serif;background:#121212;color:#f0eee8;padding:28px;border-radius:12px;max-width:520px;border:1px solid #333"><div style="color:#f5a623;font-size:20px;font-weight:800;margin-bottom:16px">\u2696\uFE0F QMS420</div><p style="font-size:14px">A corrective action has been issued to you. Please log in to review and sign.</p><a href="${APP_URL}" style="display:inline-block;background:#f5a623;color:#000;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:700;margin-top:12px">Review & Sign \u2192</a></div>`
                     });
                     alert('\u2713 Sent to '+sel.employee_name+'. Status: Pending Acknowledgement.');
                   }catch(e){alert('Failed: '+e.message);}
@@ -9151,7 +9126,7 @@ function QMS({cu,users,tasks,sops,setSops,deviations,setDeviations,capas,setCapa
                             if(issuer?.email) sendEmail({to:issuer.email,
                               subject:`Corrective Action Acknowledged \u2014 ${sel.employee_name}`,
                               html:`<div style="font-family:sans-serif;background:#121212;color:#f0eee8;padding:24px;border-radius:12px;max-width:480px;border:1px solid #333">
-                                <div style="color:#f5a623;font-size:18px;font-weight:800;margin-bottom:12px">\u2696\uFE0F Black Fox QMS</div>
+                                <div style="color:#f5a623;font-size:18px;font-weight:800;margin-bottom:12px">\u2696\uFE0F QMS420</div>
                                 <p style="font-size:14px">${sel.employee_name} has signed and acknowledged corrective action ${sel.ca_number} ("${sel.title}") on ${update.acknowledged_at.slice(0,10)}.</p>
                               </div>`
                             });
@@ -9610,7 +9585,7 @@ function exportSopPdf(sop){
     doc.setTextColor(255,255,255);
     doc.setFont('helvetica','bold');
     doc.setFontSize(18);
-    doc.text('BLACK FOX QMS',margin,26);
+    doc.text('QMS420',margin,26);
     doc.setFont('helvetica','normal');
     doc.setFontSize(10);
     doc.setTextColor(180,200,230);
@@ -9870,7 +9845,7 @@ function exportSopPdf(sop){
     doc.setFont('helvetica','bold');
     doc.setFontSize(9);
     doc.setTextColor(22,163,74);
-    doc.text('Electronically signed via Black Fox QMS \u2014 Records are tamper-evident.',margin,y);
+    doc.text('Electronically signed via QMS420 \u2014 Records are tamper-evident.',margin,y);
     y+=10;
   } else {
     checkPageBreak(70);
@@ -10274,7 +10249,7 @@ function exportCorrectiveActionPdf(ca){
     doc.setFont('helvetica','bold');
     doc.setTextColor(40,140,80);
     doc.setFontSize(9);
-    doc.text('Electronically signed via Black Fox QMS on '+(ca.acknowledged_at?.slice(0,10)||''),margin,y);
+    doc.text('Electronically signed via QMS420 on '+(ca.acknowledged_at?.slice(0,10)||''),margin,y);
     y+=8;
     doc.setFont('helvetica','normal');
     doc.setTextColor(...TEXT2);
@@ -10309,7 +10284,7 @@ function exportEmployeeTrainingPdf(employee,applicableSOPs){
     doc.setTextColor(...GOLD);
     doc.setFont('helvetica','bold');
     doc.setFontSize(16);
-    doc.text('Black Fox QMS',margin,32);
+    doc.text('QMS420',margin,32);
     doc.setTextColor(230,230,230);
     doc.setFont('helvetica','normal');
     doc.setFontSize(9);
@@ -10680,7 +10655,7 @@ function LicenseChart(){
   ];
 
   return el('div',{style:{padding:'0 0 48px'}},
-    el('div',{style:{background:'#1e3a5f',borderRadius:14,padding:'20px 24px',marginBottom:24,color:'#fff'}},
+    el('div',{style:{background:'#6ba022',borderRadius:14,padding:'20px 24px',marginBottom:24,color:'#fff'}},
       el('div',{style:{fontSize:20,fontWeight:800,marginBottom:4}},'\uD83C\uDFDB\uFE0F Michigan Facility \u2014 Org Chart & License'),
       el('div',{style:{fontSize:12,opacity:.85}},'Black Fox Michigan \u00B7 Processor License \u00B7 TBD-PENDING'),
       el('div',{style:{fontSize:11,opacity:.65,marginTop:4}},'Michigan CRA / MRTMA \u00B7 R 420.301\u2013420.807'),
@@ -10706,7 +10681,7 @@ function LicenseChart(){
 
     // Michigan facility GM
     el('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',marginBottom:8}},
-      el('div',{style:{...cardStyle('#1e3a5f',true),maxWidth:280}},
+      el('div',{style:{...cardStyle('#6ba022',true),maxWidth:280}},
         el('div',{style:titleStyle},'General Manager \u2014 Michigan'),
         el('div',{style:tbdNameStyle},'TBD'),
         el('div',{style:{fontSize:11,color:'var(--text3)',marginTop:6,lineHeight:1.4}},'Michigan facility operations'),
@@ -10903,14 +10878,14 @@ function SOPs({sops,setSops,cu,users}){
       users.filter(u=>u.approved&&u.email).forEach(u=>{
         sendEmail({to:u.email,subject:`\uD83D\uDCCB New SOP Published: "${sop.title}"`,
           html:`<div style="font-family:sans-serif;background:#000000;color:#e8edf8;padding:28px;border-radius:12px;max-width:500px;border:1px solid #1a2d4f">
-            <div style="color:#f5a623;font-size:20px;font-weight:800;margin-bottom:4px">\uD83D\uDCCB Black Fox QMS</div>
+            <div style="color:#f5a623;font-size:20px;font-weight:800;margin-bottom:4px">\uD83D\uDCCB QMS420</div>
             <div style="font-size:18px;font-weight:700;margin-bottom:12px">${sop.title}</div>
             <div style="background:rgba(30,58,95,.06);border:1px solid rgba(30,58,95,.15);border-radius:10px;padding:14px;margin-bottom:20px">
               <div style="margin-bottom:6px">\uD83D\uDCC2 Department: <strong>${sop.dept}</strong></div>
               <div style="margin-bottom:6px">\uD83D\uDCDD Version: <strong>${sop.version}</strong></div>
               <div>\uD83D\uDC64 Published by: <strong>${cu.name}</strong></div>
             </div>
-            <p style="color:#7b8db8;margin-bottom:20px">Please review and acknowledge this SOP in the Black Fox QMS app.</p>
+            <p style="color:#7b8db8;margin-bottom:20px">Please review and acknowledge this SOP in the QMS420 app.</p>
             <a href="${APP_URL}" style="background:#f5a623;color:#000000;padding:10px 24px;border-radius:8px;text-decoration:none;font-weight:700">Review SOP \u2192</a>
           </div>`
         });
@@ -11178,7 +11153,7 @@ function SOPs({sops,setSops,cu,users}){
           if(u.email) sendEmail({to:u.email,
             subject:`\uD83D\uDCCB SOP Updated \u2014 Re-acknowledgement Required: "${updated.title}"`,
             html:`<div style="font-family:sans-serif;background:#000000;color:#e8edf8;padding:28px;border-radius:12px;max-width:500px;border:1px solid #1a2d4f">
-              <div style="color:#f5a623;font-size:20px;font-weight:800;margin-bottom:16px">\uD83D\uDCCB Black Fox QMS</div>
+              <div style="color:#f5a623;font-size:20px;font-weight:800;margin-bottom:16px">\uD83D\uDCCB QMS420</div>
               <div style="background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.25);border-radius:10px;padding:20px;margin-bottom:20px;text-align:center">
                 <div style="font-size:36px;margin-bottom:10px">\uD83D\uDD04</div>
                 <div style="font-size:17px;font-weight:700;margin-bottom:6px">SOP Revised \u2014 v${updated.version}</div>
@@ -11445,14 +11420,14 @@ function Calendar({events,setEvents,tasks,cu,users,locFilter,meetingNotes,setMee
       f.attendees.filter(a=>a.email&&a.id!==cu.id).forEach(a=>{
         sendEmail({to:a.email,subject:`\uD83D\uDCC5 Invite: "${f.title}"`,
           html:`<div style="font-family:sans-serif;background:#000000;color:#e8edf8;padding:28px;border-radius:12px;max-width:500px;border:1px solid #1a2d4f">
-            <div style="color:#f5a623;font-size:20px;font-weight:800;margin-bottom:4px">\uD83D\uDCC5 Black Fox QMS</div>
+            <div style="color:#f5a623;font-size:20px;font-weight:800;margin-bottom:4px">\uD83D\uDCC5 QMS420</div>
             <div style="font-size:18px;font-weight:700;margin-bottom:16px">${f.title}</div>
             <div style="background:rgba(30,58,95,.06);border:1px solid rgba(30,58,95,.15);border-radius:10px;padding:16px;margin-bottom:20px">
               <div style="margin-bottom:8px">\uD83D\uDCC5 ${f.date}${f.start_time?' at '+f.start_time:''}</div>
               ${f.location?`<div style="margin-bottom:8px">\uD83D\uDCCD ${f.location}</div>`:''}
               ${meetLink?`<div>\uD83C\uDFA5 <a href="${meetLink}" style="color:#f5a623">${meetLink}</a></div>`:''}
             </div>
-            <p style="font-size:13px;color:#7b8db8">${cu.name} invited you. Log in to Black Fox QMS to accept or decline.</p>
+            <p style="font-size:13px;color:#7b8db8">${cu.name} invited you. Log in to QMS420 to accept or decline.</p>
             <a href="${APP_URL}" style="display:inline-block;background:#f5a623;color:#000000;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:700;margin-top:8px">Review Invite \u2192</a>
           </div>`
         });
@@ -11783,7 +11758,7 @@ function SanitationKiosk(){
   const INP=(f)=>{
     if(f.type==='section'){
       const isOptional=f.label.includes('Optional');
-      return el('div',{key:f.key,style:{background:isOptional?'#7c3aed':'#1e3a5f',color:'#fff',borderRadius:8,padding:'8px 14px',marginBottom:12,marginTop:8,fontSize:11,fontWeight:800,letterSpacing:'.5px',display:'flex',justifyContent:'space-between',alignItems:'center'}},
+      return el('div',{key:f.key,style:{background:isOptional?'#7c3aed':'#6ba022',color:'#fff',borderRadius:8,padding:'8px 14px',marginBottom:12,marginTop:8,fontSize:11,fontWeight:800,letterSpacing:'.5px',display:'flex',justifyContent:'space-between',alignItems:'center'}},
         f.label.replace(/^--- /,'').replace(/ ---$/,''),
         isOptional&&el('span',{style:{fontSize:10,fontWeight:400,opacity:.8}},'Not required'));
     }
@@ -11808,7 +11783,7 @@ function SanitationKiosk(){
     el('div',{style:{fontSize:15,opacity:.85,marginBottom:8}},'Signed by: '+form.cleaned_by),
     el('div',{style:{fontSize:14,opacity:.7,marginBottom:32}},new Date().toLocaleString()),
     el('div',{style:{background:'rgba(255,255,255,.15)',borderRadius:12,padding:'16px 24px',fontSize:13,marginBottom:32,maxWidth:360}},
-      'Your sanitation record has been saved and signed. It is now available in Black Fox QMS for inspection and compliance review.'
+      'Your sanitation record has been saved and signed. It is now available in QMS420 for inspection and compliance review.'
     ),
     el('button',{onClick:()=>{setDone(false);setForm(init());setSig(null);},style:{background:'#fff',color:'#065f46',border:'none',borderRadius:12,padding:'14px 32px',fontFamily:'inherit',fontSize:15,fontWeight:800,cursor:'pointer'}},'Submit Another'),
   );
@@ -11845,7 +11820,7 @@ function SanitationKiosk(){
       el('button',{onClick:submit,disabled:saving,style:{width:'100%',background:saving?'#94a3b8':'#065f46',color:'#fff',border:'none',borderRadius:14,padding:'16px',fontFamily:'inherit',fontSize:16,fontWeight:800,cursor:saving?'not-allowed':'pointer',boxShadow:'0 4px 16px rgba(6,95,70,.3)'}},
         saving?'Saving...':'\u2705 Submit Sanitation Log'
       ),
-      el('div',{style:{textAlign:'center',fontSize:11,color:'#94a3b8',marginTop:12}},'Black Fox QMS \u2014 TBD-PENDING \u2014 HMBF Management Inc.'),
+      el('div',{style:{textAlign:'center',fontSize:11,color:'#94a3b8',marginTop:12}},'QMS420 \u2014 TBD-PENDING \u2014 HMBF Management Inc.'),
     ),
   );
 }
@@ -11921,7 +11896,7 @@ function LogKiosk({logKey}){
     el('div',{style:{fontSize:14,opacity:.85,marginBottom:8}},nameField?'Submitted by: '+form[nameField.key]:''),
     el('div',{style:{fontSize:13,opacity:.7,marginBottom:32}},new Date().toLocaleString()),
     el('div',{style:{background:'rgba(255,255,255,.15)',borderRadius:12,padding:'16px 24px',fontSize:13,marginBottom:32,maxWidth:360,lineHeight:1.7}},
-      'Your record has been saved and signed. It is now available in Black Fox QMS for inspection and compliance review.'
+      'Your record has been saved and signed. It is now available in QMS420 for inspection and compliance review.'
     ),
     el('button',{onClick:()=>{setDone(false);setForm(init());setSig(null);},style:{background:'#fff',color:lt.color,border:'none',borderRadius:12,padding:'14px 32px',fontFamily:'inherit',fontSize:15,fontWeight:800,cursor:'pointer'}},'Submit Another'),
   );
@@ -11956,7 +11931,7 @@ function LogKiosk({logKey}){
       el('button',{onClick:submit,disabled:saving,style:{width:'100%',background:saving?'#94a3b8':lt.color,color:'#fff',border:'none',borderRadius:14,padding:'16px',fontFamily:'inherit',fontSize:16,fontWeight:800,cursor:saving?'not-allowed':'pointer',boxShadow:'0 4px 16px rgba(0,0,0,.2)'}},
         saving?'Saving...':'\u2705 Submit '+lt.label
       ),
-      el('div',{style:{textAlign:'center',fontSize:11,color:'#94a3b8',marginTop:12}},'Black Fox QMS \u2014 TBD-PENDING \u2014 HMBF Management Inc.'),
+      el('div',{style:{textAlign:'center',fontSize:11,color:'#94a3b8',marginTop:12}},'QMS420 \u2014 TBD-PENDING \u2014 HMBF Management Inc.'),
     ),
   );
 }
@@ -12016,16 +11991,16 @@ function SecurityKiosk(){
   const totalCount=lt.cameras.length+lt.door_locks.length+lt.alarms.length;
   const TABS=[{id:'cameras',label:'\uD83D\uDCF7 Cameras ('+lt.cameras.length+')'},{id:'doors',label:'\uD83D\uDD10 Doors ('+lt.door_locks.length+')'},{id:'alarms',label:'\uD83D\uDEA8 Alarms ('+lt.alarms.length+')'}];
 
-  if(done) return el('div',{style:{minHeight:'100vh',background:'linear-gradient(135deg,#1e3a5f 0%,#2d5282 100%)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:24,fontFamily:'Inter,sans-serif',color:'#fff',textAlign:'center'}},
+  if(done) return el('div',{style:{minHeight:'100vh',background:'linear-gradient(135deg,#6ba022 0%,#8bc93f 100%)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:24,fontFamily:'Inter,sans-serif',color:'#fff',textAlign:'center'}},
     el('div',{style:{fontSize:72,marginBottom:16}},'\u2705'),
     el('div',{style:{fontSize:24,fontWeight:800,marginBottom:8}},'Inspection Submitted!'),
     el('div',{style:{fontSize:14,opacity:.85,marginBottom:8}},'Inspected by: '+form.inspected_by),
     failCount>0&&el('div',{style:{background:'rgba(220,38,38,.25)',border:'1px solid rgba(220,38,38,.5)',borderRadius:10,padding:'8px 16px',fontSize:13,fontWeight:700,marginBottom:16}},'\u26A0\uFE0F '+failCount+' FAIL'+(failCount!==1?'s':'')+' recorded \u2014 notify management'),
     el('div',{style:{fontSize:13,opacity:.7,marginBottom:32}},new Date().toLocaleString()),
     el('div',{style:{background:'rgba(255,255,255,.15)',borderRadius:12,padding:'16px 24px',fontSize:13,marginBottom:32,maxWidth:360,lineHeight:1.7}},
-      'This inspection has been saved and signed. It is now available in Black Fox QMS Facility Logs for review.'
+      'This inspection has been saved and signed. It is now available in QMS420 Facility Logs for review.'
     ),
-    el('button',{onClick:()=>{setDone(false);setForm(init());setSig(null);setTab('cameras');},style:{background:'#fff',color:'#1e3a5f',border:'none',borderRadius:12,padding:'14px 32px',fontFamily:'inherit',fontSize:15,fontWeight:800,cursor:'pointer'}},'Submit Another'),
+    el('button',{onClick:()=>{setDone(false);setForm(init());setSig(null);setTab('cameras');},style:{background:'#fff',color:'#6ba022',border:'none',borderRadius:12,padding:'14px 32px',fontFamily:'inherit',fontSize:15,fontWeight:800,cursor:'pointer'}},'Submit Another'),
   );
 
   return el('div',{style:{minHeight:'100vh',background:lt.bg,fontFamily:'Inter,sans-serif'}},
@@ -12063,11 +12038,11 @@ function SecurityKiosk(){
       ),
 
       el('div',{style:{display:'flex',gap:4,background:'#e2e8f0',borderRadius:8,padding:4,marginBottom:14}},
-        TABS.map(t=>el('button',{key:t.id,onClick:()=>setTab(t.id),style:{flex:1,padding:'9px 4px',borderRadius:6,border:'none',fontFamily:'inherit',fontSize:12,fontWeight:tab===t.id?700:500,cursor:'pointer',background:tab===t.id?'#1e3a5f':'transparent',color:tab===t.id?'#fff':'#475569'}},t.label)),
+        TABS.map(t=>el('button',{key:t.id,onClick:()=>setTab(t.id),style:{flex:1,padding:'9px 4px',borderRadius:6,border:'none',fontFamily:'inherit',fontSize:12,fontWeight:tab===t.id?700:500,cursor:'pointer',background:tab===t.id?'#6ba022':'transparent',color:tab===t.id?'#fff':'#475569'}},t.label)),
       ),
 
       tab==='cameras'&&el('div',{style:{background:'#fff',border:'1px solid #e2e8f0',borderRadius:10,overflow:'hidden',marginBottom:16}},
-        el('div',{style:{display:'grid',gridTemplateColumns:'1fr 100px 140px',background:'#1e3a5f',color:'#fff',padding:'8px 10px',fontSize:11,fontWeight:700}},
+        el('div',{style:{display:'grid',gridTemplateColumns:'1fr 100px 140px',background:'#6ba022',color:'#fff',padding:'8px 10px',fontSize:11,fontWeight:700}},
           el('span',null,'CAMERA'),el('span',{style:{textAlign:'center'}},'VIEW'),el('span',{style:{textAlign:'center'}},'STATUS'),
         ),
         lt.cameras.map((cam,i)=>el('div',{key:cam,style:{display:'grid',gridTemplateColumns:'1fr 100px 140px',padding:'7px 10px',background:i%2===0?'#ffffff':'#f8fafc',borderBottom:'1px solid #e2e8f0',alignItems:'center',gap:6}},
@@ -12081,7 +12056,7 @@ function SecurityKiosk(){
       ),
 
       tab==='doors'&&el('div',{style:{background:'#fff',border:'1px solid #e2e8f0',borderRadius:10,overflow:'hidden',marginBottom:16}},
-        el('div',{style:{display:'grid',gridTemplateColumns:'1fr 110px 140px',background:'#1e3a5f',color:'#fff',padding:'8px 10px',fontSize:11,fontWeight:700}},
+        el('div',{style:{display:'grid',gridTemplateColumns:'1fr 110px 140px',background:'#6ba022',color:'#fff',padding:'8px 10px',fontSize:11,fontWeight:700}},
           el('span',null,'DOOR'),el('span',{style:{textAlign:'center'}},'BATTERY'),el('span',{style:{textAlign:'center'}},'STATUS'),
         ),
         lt.door_locks.map((door,i)=>el('div',{key:door,style:{display:'grid',gridTemplateColumns:'1fr 110px 140px',padding:'7px 10px',background:i%2===0?'#ffffff':'#f8fafc',borderBottom:'1px solid #e2e8f0',alignItems:'center',gap:6}},
@@ -12095,7 +12070,7 @@ function SecurityKiosk(){
       ),
 
       tab==='alarms'&&el('div',{style:{background:'#fff',border:'1px solid #e2e8f0',borderRadius:10,overflow:'hidden',marginBottom:16}},
-        el('div',{style:{display:'grid',gridTemplateColumns:'1fr 110px 140px',background:'#1e3a5f',color:'#fff',padding:'8px 10px',fontSize:11,fontWeight:700}},
+        el('div',{style:{display:'grid',gridTemplateColumns:'1fr 110px 140px',background:'#6ba022',color:'#fff',padding:'8px 10px',fontSize:11,fontWeight:700}},
           el('span',null,'COMPONENT'),el('span',{style:{textAlign:'center'}},'BATTERY'),el('span',{style:{textAlign:'center'}},'STATUS'),
         ),
         lt.alarms.map((alarm,i)=>el('div',{key:alarm,style:{display:'grid',gridTemplateColumns:'1fr 110px 140px',padding:'7px 10px',background:i%2===0?'#ffffff':'#f8fafc',borderBottom:'1px solid #e2e8f0',alignItems:'center',gap:6}},
@@ -12116,7 +12091,7 @@ function SecurityKiosk(){
       el('div',{style:{borderTop:'2px solid #e2e8f0',paddingTop:16,marginBottom:16}},
         el('div',{style:{fontSize:14,fontWeight:700,color:'#0f172a',marginBottom:8}},'Inspector Signature *'),
         sig
-          ?el('div',null,el('img',{src:sig,style:{border:'2px solid #1e3a5f',borderRadius:8,maxWidth:'100%',height:80,display:'block',marginBottom:8}}),el('button',{onClick:()=>setSig(null),style:{background:'none',border:'1px solid #cbd5e1',borderRadius:6,padding:'5px 14px',fontSize:12,cursor:'pointer',fontFamily:'inherit'}},'Clear & Re-sign'))
+          ?el('div',null,el('img',{src:sig,style:{border:'2px solid #6ba022',borderRadius:8,maxWidth:'100%',height:80,display:'block',marginBottom:8}}),el('button',{onClick:()=>setSig(null),style:{background:'none',border:'1px solid #cbd5e1',borderRadius:6,padding:'5px 14px',fontSize:12,cursor:'pointer',fontFamily:'inherit'}},'Clear & Re-sign'))
           :el(SignaturePad,{label:'Sign to certify this inspection was completed accurately',onSave:d=>setSig(d),onClear:()=>setSig(null)}),
         el('div',{style:{fontSize:11,color:'#94a3b8',marginTop:6}},'This record is legally valid for CRA inspections and ISO 9001 audits.'),
       ),
@@ -12125,7 +12100,7 @@ function SecurityKiosk(){
       el('button',{onClick:submit,disabled:saving,style:{width:'100%',background:saving?'#94a3b8':lt.color,color:'#fff',border:'none',borderRadius:14,padding:'16px',fontFamily:'inherit',fontSize:16,fontWeight:800,cursor:saving?'not-allowed':'pointer',boxShadow:'0 4px 16px rgba(0,0,0,.2)'}},
         saving?'Saving...':'\u2705 Submit Inspection'
       ),
-      el('div',{style:{textAlign:'center',fontSize:11,color:'#94a3b8',marginTop:12}},'Black Fox QMS \u2014 TBD-PENDING \u2014 HMBF Management Inc.'),
+      el('div',{style:{textAlign:'center',fontSize:11,color:'#94a3b8',marginTop:12}},'QMS420 \u2014 TBD-PENDING \u2014 HMBF Management Inc.'),
     ),
   );
 }
@@ -12224,12 +12199,12 @@ function VisitorKiosk(){
 
   const CARD_STYLE={background:'#ffffff',borderRadius:16,padding:'28px 24px',boxShadow:'0 4px 24px rgba(15,23,42,.12)',width:'100%',maxWidth:480,margin:'0 auto'};
 
-  return el('div',{style:{minHeight:'100vh',background:'linear-gradient(135deg,#1e3a5f 0%,#2d5282 100%)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'24px 16px',fontFamily:'Inter,sans-serif'}},
+  return el('div',{style:{minHeight:'100vh',background:'linear-gradient(135deg,#6ba022 0%,#8bc93f 100%)',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'24px 16px',fontFamily:'Inter,sans-serif'}},
 
     // Header
     el('div',{style:{textAlign:'center',marginBottom:28,color:'#fff'}},
       el('div',{style:{fontSize:36,marginBottom:4}},'\uD83E\uDD8A'),
-      el('div',{style:{fontSize:22,fontWeight:800,letterSpacing:'-0.5px'}},['BLACK FOX QMS'].join('')),
+      el('div',{style:{fontSize:22,fontWeight:800,letterSpacing:'-0.5px'}},['QMS420'].join('')),
       el('div',{style:{fontSize:13,opacity:.75,marginTop:2}},'Visitor Management \u00B7 Black Fox Manufacturing'),
     ),
 
@@ -12239,11 +12214,11 @@ function VisitorKiosk(){
       el('div',{style:{fontSize:13,color:'#475569',marginBottom:24,textAlign:'center'}},'Please select an option below'),
       el('button',{
         onClick:()=>setStep('signin'),
-        style:{width:'100%',background:'#1e3a5f',color:'#fff',border:'none',borderRadius:12,padding:'18px',fontFamily:'inherit',fontSize:16,fontWeight:700,cursor:'pointer',marginBottom:12,display:'flex',alignItems:'center',justifyContent:'center',gap:10}
+        style:{width:'100%',background:'#6ba022',color:'#fff',border:'none',borderRadius:12,padding:'18px',fontFamily:'inherit',fontSize:16,fontWeight:700,cursor:'pointer',marginBottom:12,display:'flex',alignItems:'center',justifyContent:'center',gap:10}
       },el('span',{style:{fontSize:24}},'\uD83D\uDC4B'),'Sign In \u2014 I am arriving'),
       el('button',{
         onClick:()=>setStep('signout'),
-        style:{width:'100%',background:'#f0f9ff',color:'#1e3a5f',border:'2px solid #1e3a5f',borderRadius:12,padding:'18px',fontFamily:'inherit',fontSize:16,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:10}
+        style:{width:'100%',background:'#f0f9ff',color:'#6ba022',border:'2px solid #6ba022',borderRadius:12,padding:'18px',fontFamily:'inherit',fontSize:16,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',gap:10}
       },el('span',{style:{fontSize:24}},'\uD83D\uDEAA'),'Sign Out \u2014 I am leaving'),
     ),
 
@@ -12258,13 +12233,13 @@ function VisitorKiosk(){
       el('div',{style:{marginBottom:20,textAlign:'center'}},
         selfie
           ?el('div',null,
-              el('img',{src:selfie,style:{width:120,height:90,objectFit:'cover',borderRadius:12,border:'3px solid #1e3a5f',marginBottom:8}}),
+              el('img',{src:selfie,style:{width:120,height:90,objectFit:'cover',borderRadius:12,border:'3px solid #6ba022',marginBottom:8}}),
               el('div',null,el('button',{onClick:retakeSelfie,style:{background:'none',border:'1px solid #cbd5e1',borderRadius:8,padding:'4px 12px',fontSize:12,cursor:'pointer',color:'#64748b'}},'Retake Photo')),
             )
           :cameraActive
             ?el('div',null,
                 el('video',{ref:videoRef,autoPlay:true,playsInline:true,style:{width:'100%',maxWidth:320,borderRadius:12,marginBottom:8}}),
-                el('button',{onClick:takeSelfie,style:{background:'#1e3a5f',color:'#fff',border:'none',borderRadius:10,padding:'10px 24px',fontFamily:'inherit',fontSize:14,fontWeight:700,cursor:'pointer'}},'\uD83D\uDCF8 Take Photo'),
+                el('button',{onClick:takeSelfie,style:{background:'#6ba022',color:'#fff',border:'none',borderRadius:10,padding:'10px 24px',fontFamily:'inherit',fontSize:14,fontWeight:700,cursor:'pointer'}},'\uD83D\uDCF8 Take Photo'),
               )
             :el('button',{onClick:startCamera,style:{background:'#f1f5f9',border:'2px dashed #cbd5e1',borderRadius:12,padding:'16px 32px',fontFamily:'inherit',fontSize:13,color:'#64748b',cursor:'pointer',width:'100%'}},
                 '\uD83D\uDCF8 Take a Selfie (Optional)',
@@ -12304,7 +12279,7 @@ function VisitorKiosk(){
 
       el('div',{style:{fontSize:11,color:'#94a3b8',marginBottom:14,lineHeight:1.5}},'By signing, you confirm you have read and will follow all facility safety, security, and compliance rules. This visit is being logged for regulatory compliance.'),
 
-      el('button',{onClick:submitSignIn,disabled:saving,style:{width:'100%',background:saving?'#94a3b8':'#1e3a5f',color:'#fff',border:'none',borderRadius:12,padding:'16px',fontFamily:'inherit',fontSize:16,fontWeight:700,cursor:saving?'not-allowed':'pointer'}},saving?'Saving...':'\u2705 Sign In'),
+      el('button',{onClick:submitSignIn,disabled:saving,style:{width:'100%',background:saving?'#94a3b8':'#6ba022',color:'#fff',border:'none',borderRadius:12,padding:'16px',fontFamily:'inherit',fontSize:16,fontWeight:700,cursor:saving?'not-allowed':'pointer'}},saving?'Saving...':'\u2705 Sign In'),
     ),
 
     // SIGN OUT SCREEN
@@ -12317,7 +12292,7 @@ function VisitorKiosk(){
         el('div',{style:{fontSize:14,color:'#475569',marginBottom:16}},'Enter your name to find your sign-in record:'),
         el('input',{type:'text',value:lookupName,onChange:ev=>setLookupName(ev.target.value),onKeyDown:ev=>ev.key==='Enter'&&lookupVisitor(),placeholder:'Your full name',autoFocus:true,style:{width:'100%',border:'1px solid #cbd5e1',borderRadius:8,padding:'12px',fontFamily:'inherit',fontSize:16,color:'#0f172a',boxSizing:'border-box',marginBottom:12}}),
         lookupError&&el('div',{style:{color:'#dc2626',fontSize:13,marginBottom:8}},lookupError),
-        el('button',{onClick:lookupVisitor,style:{width:'100%',background:'#1e3a5f',color:'#fff',border:'none',borderRadius:10,padding:'14px',fontFamily:'inherit',fontSize:15,fontWeight:700,cursor:'pointer'}},'Find My Visit \u2192'),
+        el('button',{onClick:lookupVisitor,style:{width:'100%',background:'#6ba022',color:'#fff',border:'none',borderRadius:10,padding:'14px',fontFamily:'inherit',fontSize:15,fontWeight:700,cursor:'pointer'}},'Find My Visit \u2192'),
       ):el('div',null,
         el('div',{style:{background:'#f0fdf4',border:'1px solid #bbf7d0',borderRadius:10,padding:'14px',marginBottom:16}},
           el('div',{style:{fontSize:13,fontWeight:700,color:'#16a34a',marginBottom:4}},'\u2713 Visit Found'),
@@ -12329,7 +12304,7 @@ function VisitorKiosk(){
         sig
           ?el('div',null,el('img',{src:sig,style:{border:'1px solid #cbd5e1',borderRadius:8,maxWidth:'100%',height:80}}),el('button',{onClick:()=>setSig(null),style:{marginLeft:8,background:'none',border:'1px solid #cbd5e1',borderRadius:6,padding:'4px 10px',fontSize:12,cursor:'pointer'}},'Clear'))
           :el(SignaturePad,{label:'Sign to confirm you are leaving',onSave:dataUrl=>setSig(dataUrl),onClear:()=>setSig(null)}),
-        el('button',{onClick:submitSignOut,disabled:saving,style:{width:'100%',background:saving?'#94a3b8':'#1e3a5f',color:'#fff',border:'none',borderRadius:12,padding:'16px',fontFamily:'inherit',fontSize:16,fontWeight:700,cursor:saving?'not-allowed':'pointer',marginTop:16}},saving?'Saving...':'\uD83D\uDEAA Complete Sign Out'),
+        el('button',{onClick:submitSignOut,disabled:saving,style:{width:'100%',background:saving?'#94a3b8':'#6ba022',color:'#fff',border:'none',borderRadius:12,padding:'16px',fontFamily:'inherit',fontSize:16,fontWeight:700,cursor:saving?'not-allowed':'pointer',marginTop:16}},saving?'Saving...':'\uD83D\uDEAA Complete Sign Out'),
       ),
     ),
 
@@ -12340,7 +12315,7 @@ function VisitorKiosk(){
         el('div',{style:{fontSize:22,fontWeight:800,color:'#16a34a',marginBottom:8}},step==='done'&&lookupResult?'Signed Out Successfully':'Signed In Successfully'),
         el('div',{style:{fontSize:14,color:'#475569',marginBottom:8}},new Date().toLocaleString()),
         el('div',{style:{fontSize:13,color:'#64748b',marginBottom:24,lineHeight:1.6}},'Thank you. Your visit has been logged and signed.\nA staff member will assist you shortly.'),
-        el('button',{onClick:()=>{setStep('choice');setForm({visitor_name:'',visitor_company:'',visitor_id:'',purpose:'Vendor / delivery',escorted_by:'',areas_accessed:'',notes:''});setSig(null);setSelfie(null);setLookupName('');setLookupResult(null);setLookupError('');},style:{background:'#1e3a5f',color:'#fff',border:'none',borderRadius:10,padding:'12px 32px',fontFamily:'inherit',fontSize:14,fontWeight:700,cursor:'pointer'}},'\u2190 Back to Start'),
+        el('button',{onClick:()=>{setStep('choice');setForm({visitor_name:'',visitor_company:'',visitor_id:'',purpose:'Vendor / delivery',escorted_by:'',areas_accessed:'',notes:''});setSig(null);setSelfie(null);setLookupName('');setLookupResult(null);setLookupError('');},style:{background:'#6ba022',color:'#fff',border:'none',borderRadius:10,padding:'12px 32px',fontFamily:'inherit',fontSize:14,fontWeight:700,cursor:'pointer'}},'\u2190 Back to Start'),
       ),
     ),
   );
@@ -12472,7 +12447,7 @@ function App(){
     if('Notification' in window&&Notification.permission==='default'){
       Notification.requestPermission().then(p=>{
         if(p==='granted'){
-          new Notification('\uD83D\uDD14 Black Fox QMS',{body:'Black Fox QMS notifications enabled!',icon:'/qms420/icon-192.png'});
+          new Notification('\uD83D\uDD14 QMS420',{body:'QMS420 notifications enabled!',icon:'/qms420/icon-192.png'});
         }
       });
     }
@@ -12520,7 +12495,7 @@ function App(){
   const isAdmin=cu.role==='admin';
   const isElevated=isAdmin||hasAnyRole(cu,['general_manager','assistant_general_manager','compliance_officer','security_manager']);
   // QMS access: Admin, Managers, and Supervisors. Employees, Leads, and Staff
-  // get SOPs only (per Black Fox QMS QMS RBAC policy).
+  // get SOPs only (per QMS420 QMS RBAC policy).
   const qmsRoleGroup=topRoleGroup(cu);
   const canAccessQms=isAdmin||isElevated||canRead(cu,'qms');
   const canAccessLogs=isAdmin||isElevated||canRead(cu,'logs');
@@ -12597,7 +12572,7 @@ function App(){
               return;
             }
             const perm=await Notification.requestPermission();
-            if(perm==='granted'){requestPushPermission(cu.id);new Notification('Black Fox QMS',{body:'Notifications enabled!',icon:'/qms420/icon-192.png'});}
+            if(perm==='granted'){requestPushPermission(cu.id);new Notification('QMS420',{body:'Notifications enabled!',icon:'/qms420/icon-192.png'});}
             else if(perm==='denied'){alert('Notifications blocked.\n\nTo fix:\n1. Click the \uD83D\uDD12 lock icon in your browser address bar\n2. Find Notifications\n3. Set to Allow\n4. Refresh the page');}
           },
           style:{marginTop:8,width:'100%',background:typeof Notification!=='undefined'&&Notification.permission==='granted'?'rgba(16,185,129,.08)':'rgba(30,58,95,.05)',border:'1px solid',borderColor:typeof Notification!=='undefined'&&Notification.permission==='granted'?'rgba(16,185,129,.2)':'rgba(30,58,95,.15)',borderRadius:'var(--rs)',padding:'8px',color:typeof Notification!=='undefined'&&Notification.permission==='granted'?'var(--green)':'var(--accent)',fontFamily:'inherit',fontSize:12,fontWeight:600,cursor:'pointer',transition:'all .15s',letterSpacing:'.3px'}
@@ -12609,11 +12584,11 @@ function App(){
             try{
               await sendEmail({
                 to:cu.email,
-                subject:'\u2705 Black Fox QMS \u2014 Email Test',
+                subject:'\u2705 QMS420 \u2014 Email Test',
                 html:`<div style="font-family:sans-serif;background:#000000;color:#e8edf8;padding:28px;border-radius:12px;max-width:500px;border:1px solid #1a2d4f">
                   <div style="color:#f5a623;font-size:20px;font-weight:800;margin-bottom:16px">\u2705 Email Working!</div>
                   <p>Hi ${cu.name},</p>
-                  <p style="margin:12px 0;color:#7b8db8">This is a test email from Black Fox QMS. If you received this, email notifications are working correctly.</p>
+                  <p style="margin:12px 0;color:#7b8db8">This is a test email from QMS420. If you received this, email notifications are working correctly.</p>
                   <div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.25);border-radius:8px;padding:12px;margin-top:16px;font-size:13px;color:#10b981">
                     \u2705 Resend API connected<br>\u2705 Email delivery confirmed
                   </div>
@@ -12688,7 +12663,7 @@ function App(){
     // \u2500\u2500 PWA INSTALL BANNER \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
     showInstallBanner&&el('div',{style:{
       position:'fixed',bottom:80,left:'50%',transform:'translateX(-50%)',
-      background:'#1e3a5f',color:'#ffffff',borderRadius:16,
+      background:'#6ba022',color:'#ffffff',borderRadius:16,
       padding:'16px 20px',zIndex:9999,
       boxShadow:'0 8px 32px rgba(15,23,42,.35)',
       display:'flex',alignItems:'center',gap:14,
@@ -12698,8 +12673,8 @@ function App(){
       el('img',{src:'/qms420/icon-192.png',width:48,height:48,style:{borderRadius:10,flexShrink:0},
         onError:e=>{e.target.style.display='none';}}),
       el('div',{style:{flex:1,minWidth:0}},
-        el('div',{style:{fontSize:14,fontWeight:700,marginBottom:3}},'Install Black Fox QMS'),
-        el('div',{style:{fontSize:12,opacity:.8,lineHeight:1.4}},'Black Fox QMS \u2014 works like a native app on any device'),
+        el('div',{style:{fontSize:14,fontWeight:700,marginBottom:3}},'Install QMS420'),
+        el('div',{style:{fontSize:12,opacity:.8,lineHeight:1.4}},'QMS420 \u2014 works like a native app on any device'),
       ),
       el('div',{style:{display:'flex',flexDirection:'column',gap:6,flexShrink:0}},
         el('button',{
@@ -12722,7 +12697,7 @@ function App(){
               setShowInstallBanner(false);
             }
           },
-          style:{background:'#ffffff',color:'#1e3a5f',border:'none',borderRadius:8,padding:'7px 16px',fontSize:12,fontWeight:700,cursor:'pointer',whiteSpace:'nowrap'}
+          style:{background:'#ffffff',color:'#6ba022',border:'none',borderRadius:8,padding:'7px 16px',fontSize:12,fontWeight:700,cursor:'pointer',whiteSpace:'nowrap'}
         },'Install App'),
         el('button',{
           onClick:()=>{
@@ -12747,7 +12722,7 @@ function App(){
           if(!('Notification' in window)){alert('Not supported');return;}
           if(Notification.permission==='granted'){alert('Notifications already enabled \u2713');return;}
           const p=await Notification.requestPermission();
-          if(p==='granted'){requestPushPermission(cu.id);new Notification('Black Fox QMS',{body:'Notifications enabled!',icon:'/qms420/icon-192.png'});}
+          if(p==='granted'){requestPushPermission(cu.id);new Notification('QMS420',{body:'Notifications enabled!',icon:'/qms420/icon-192.png'});}
           else alert('Blocked \u2014 go to browser settings to allow notifications');
         }},
         el('span',{className:'mnav-ico'},typeof Notification!=='undefined'&&Notification.permission==='granted'?'\uD83D\uDD14':'\uD83D\uDD15'),'Alerts'
@@ -12835,8 +12810,8 @@ window.addEventListener('beforeinstallprompt', e => {
     if(deferredPrompt) {
       const banner = document.createElement('div');
       banner.id = 'install-banner';
-      banner.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1e3a5f;color:#ffffff;padding:12px 20px;border-radius:12px;font-family:Inter,sans-serif;font-size:13px;font-weight:700;cursor:pointer;z-index:9999;box-shadow:0 8px 24px rgba(30,58,95,.3);display:flex;align-items:center;gap:10px;';
-      banner.innerHTML = '<span>📱</span><span>Add Black Fox QMS to Home Screen</span><span style="margin-left:8px;opacity:.6">×</span>';
+      banner.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#6ba022;color:#ffffff;padding:12px 20px;border-radius:12px;font-family:Inter,sans-serif;font-size:13px;font-weight:700;cursor:pointer;z-index:9999;box-shadow:0 8px 24px rgba(30,58,95,.3);display:flex;align-items:center;gap:10px;';
+      banner.innerHTML = '<span>📱</span><span>Add QMS420 to Home Screen</span><span style="margin-left:8px;opacity:.6">×</span>';
       banner.onclick = (e) => {
         if(e.target.textContent === '×') { banner.remove(); return; }
         deferredPrompt.prompt();
