@@ -794,12 +794,11 @@ function SidebarChangePw({cu,SUPA_URL,SUPA_KEY}){
     if(np!==cp){setMsg('\u26A0\uFE0F Passwords do not match');return;}
     setSaving(true);setMsg('Saving...');
     try{
-      const r=await fetch(`${SUPA_URL}/rest/v1/pf_users?id=eq.${cu.id}`,{
-        method:'PATCH',
-        headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=representation'},
-        body:JSON.stringify({pw:np}),
-      });
-      if(!r.ok)throw new Error(await r.text());
+      // Goes through secure_write (authenticated via this user's existing
+      // session token) instead of an unauthenticated direct PATCH, both
+      // because the table itself has no direct anon/authenticated UPDATE
+      // grant, and because secure_write now hashes 'pw' automatically.
+      await db.update('pf_users',cu.id,{pw:np});
       const updated={...cu,pw:np};
       localStorage.setItem('pf_session',JSON.stringify(updated));
       setMsg('\u2713 Password updated!');
@@ -889,14 +888,16 @@ function Auth({onLogin}){
       const exists=await db.get('pf_users_safe',`email=eq.${encodeURIComponent(f.email)}`);
       if(exists.length){setMsg('Email already registered.');setLoading(false);return;}
       const fullName=f.firstName.trim()+' '+f.lastName.trim();
-      // Registration is unauthenticated \u2014 use direct REST insert with anon key
-      // (not rpcWrite which requires a valid session token a new user can't have yet).
-      const regRes=await fetch(`${SUPA_URL}/rest/v1/pf_users`,{
+      // Registration is unauthenticated \u2014 goes through the register_user RPC,
+      // which hashes the password server-side and is grantable to anon even
+      // though the pf_users table itself has no direct anon INSERT grant.
+      const regRes=await fetch(`${SUPA_URL}/rest/v1/rpc/register_user`,{
         method:'POST',
-        headers:{...H.headers,'Content-Type':'application/json','Prefer':'return=minimal'},
-        body:JSON.stringify({id:'u'+Date.now(),name:fullName,first_name:f.firstName,last_name:f.lastName,email:f.email,pw:f.pw,role:'team_member',dept:(f.depts||[])[0]||'Production',depts:f.depts||[],licenses:f.licenses||[],loc:f.loc,approved:false,perms:[],managers:[],oversees_depts:[]}),
+        headers:{...H.headers,'Content-Type':'application/json'},
+        body:JSON.stringify({p_data:{id:'u'+Date.now(),name:fullName,first_name:f.firstName,last_name:f.lastName,email:f.email,pw:f.pw,role:'team_member',dept:(f.depts||[])[0]||'Production',depts:f.depts||[],licenses:f.licenses||[],loc:f.loc,approved:false,perms:[],managers:[],oversees_depts:[]}}),
       });
-      if(!regRes.ok){const t=await regRes.text();throw new Error(t);}
+      const regResult=await regRes.json().catch(()=>null);
+      if(!regRes.ok||!regResult||!regResult.ok){throw new Error((regResult&&regResult.error)||'Registration failed.');}
       setPend(true);
     }catch(e){setMsg('Error registering. Please try again.');console.error(e);}
     setLoading(false);
@@ -2543,11 +2544,11 @@ function Team({users,setUsers,cu}){
                   if(newPw.length<6){setPwMsg('\u26A0\uFE0F Min 6 characters');return;}
                   setPwMsg('Saving...');
                   try{
-                    await fetch(`${SUPA_URL}/rest/v1/pf_users?id=eq.${editU.id}`,{
-                      method:'PATCH',
-                      headers:{...H.headers,'Prefer':'return=representation'},
-                      body:JSON.stringify({pw:newPw}),
-                    });
+                    // Goes through secure_write (admin's own session token)
+                    // instead of an unauthenticated direct PATCH \u2014 the table
+                    // has no direct UPDATE grant, and secure_write now hashes
+                    // 'pw' automatically before it touches the column.
+                    await db.update('pf_users',editU.id,{pw:newPw});
                     setNewPw('');
                     setPwMsg('\u2713 Password updated!');
                     setTimeout(()=>setPwMsg(''),3000);
