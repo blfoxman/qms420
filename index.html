@@ -8,11 +8,11 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="default"/>
 <meta name="apple-mobile-web-app-title" content="Black Fox QMS"/>
-<link rel="manifest" href="/bfm-mi/manifest.json"/>
-<link rel="apple-touch-icon" sizes="180x180" href="/bfm-mi/icon-192.png"/>
-<link rel="apple-touch-icon" sizes="152x152" href="/bfm-mi/icon-192.png"/>
-<link rel="apple-touch-icon" sizes="120x120" href="/bfm-mi/icon-192.png"/>
-<link rel="icon" type="image/png" sizes="192x192" href="/bfm-mi/icon-192.png"/>
+<link rel="manifest" href="/qms420/manifest.json"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/qms420/icon-192.png"/>
+<link rel="apple-touch-icon" sizes="152x152" href="/qms420/icon-192.png"/>
+<link rel="apple-touch-icon" sizes="120x120" href="/qms420/icon-192.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="/qms420/icon-192.png"/>
 <title>Black Fox QMS</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
@@ -191,7 +191,7 @@ const el=React.createElement;
 const SUPA_URL='https://mrfmceatgnmylesqiplb.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1yZm1jZWF0Z25teWxlc3FpcGxiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc2MjUxNjAsImV4cCI6MjEwMzIwMTE2MH0.ew5e5r1GyfuifOMkj3v6kzi90PPE__1z9DM3fqss8ZI';
 // Email handled via Supabase Edge Function (key stored server-side only)
-const APP_URL='https://blfoxman.github.io/bfm-mi';
+const APP_URL='https://blfoxman.github.io/qms420';
 const H={headers:{'Content-Type':'application/json','apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}};
 
 function getSessionToken(){
@@ -867,8 +867,8 @@ async function sendLocalNotification(title,body){
   if(Notification.permission==='granted'){
     try{
       const reg=await navigator.serviceWorker.getRegistration();
-      if(reg){await reg.showNotification(title,{body,icon:'/bfm-mi/icon-192.png',badge:'/bfm-mi/icon-192.png'});}
-      else{new Notification(title,{body,icon:'/bfm-mi/icon-192.png'});}
+      if(reg){await reg.showNotification(title,{body,icon:'/qms420/icon-192.png',badge:'/qms420/icon-192.png'});}
+      else{new Notification(title,{body,icon:'/qms420/icon-192.png'});}
     }catch(e){new Notification(title,{body});}
   }
 }
@@ -12130,7 +12130,7 @@ function SecurityKiosk(){
   );
 }
 
-// URL: blfoxman.github.io/bfm-mi/?kiosk=visitor
+// URL: blfoxman.github.io/qms420/?kiosk=visitor
 // \u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550
 function VisitorKiosk(){
   const[step,setStep]=React.useState('choice'); // choice | signin | signout | done
@@ -12472,7 +12472,7 @@ function App(){
     if('Notification' in window&&Notification.permission==='default'){
       Notification.requestPermission().then(p=>{
         if(p==='granted'){
-          new Notification('\uD83D\uDD14 Black Fox QMS',{body:'Black Fox QMS notifications enabled!',icon:'/bfm-mi/icon-192.png'});
+          new Notification('\uD83D\uDD14 Black Fox QMS',{body:'Black Fox QMS notifications enabled!',icon:'/qms420/icon-192.png'});
         }
       });
     }
@@ -12593,11 +12593,11 @@ function App(){
           onClick:async()=>{
             if(!('Notification' in window)){alert('Notifications not supported on this browser.');return;}
             if(Notification.permission==='granted'){
-              new Notification('\uD83D\uDD14 Test Notification',{body:'Notifications are working!',icon:'/bfm-mi/icon-192.png'});
+              new Notification('\uD83D\uDD14 Test Notification',{body:'Notifications are working!',icon:'/qms420/icon-192.png'});
               return;
             }
             const perm=await Notification.requestPermission();
-            if(perm==='granted'){requestPushPermission(cu.id);new Notification('Black Fox QMS',{body:'Notifications enabled!',icon:'/bfm-mi/icon-192.png'});}
+            if(perm==='granted'){requestPushPermission(cu.id);new Notification('Black Fox QMS',{body:'Notifications enabled!',icon:'/qms420/icon-192.png'});}
             else if(perm==='denied'){alert('Notifications blocked.\n\nTo fix:\n1. Click the \uD83D\uDD12 lock icon in your browser address bar\n2. Find Notifications\n3. Set to Allow\n4. Refresh the page');}
           },
           style:{marginTop:8,width:'100%',background:typeof Notification!=='undefined'&&Notification.permission==='granted'?'rgba(16,185,129,.08)':'rgba(30,58,95,.05)',border:'1px solid',borderColor:typeof Notification!=='undefined'&&Notification.permission==='granted'?'rgba(16,185,129,.2)':'rgba(30,58,95,.15)',borderRadius:'var(--rs)',padding:'8px',color:typeof Notification!=='undefined'&&Notification.permission==='granted'?'var(--green)':'var(--accent)',fontFamily:'inherit',fontSize:12,fontWeight:600,cursor:'pointer',transition:'all .15s',letterSpacing:'.3px'}
@@ -12695,7 +12695,7 @@ function App(){
       maxWidth:380,width:'calc(100% - 32px)',
       border:'1px solid rgba(255,255,255,.15)',
     }},
-      el('img',{src:'/bfm-mi/icon-192.png',width:48,height:48,style:{borderRadius:10,flexShrink:0},
+      el('img',{src:'/qms420/icon-192.png',width:48,height:48,style:{borderRadius:10,flexShrink:0},
         onError:e=>{e.target.style.display='none';}}),
       el('div',{style:{flex:1,minWidth:0}},
         el('div',{style:{fontSize:14,fontWeight:700,marginBottom:3}},'Install Black Fox QMS'),
@@ -12747,7 +12747,7 @@ function App(){
           if(!('Notification' in window)){alert('Not supported');return;}
           if(Notification.permission==='granted'){alert('Notifications already enabled \u2713');return;}
           const p=await Notification.requestPermission();
-          if(p==='granted'){requestPushPermission(cu.id);new Notification('Black Fox QMS',{body:'Notifications enabled!',icon:'/bfm-mi/icon-192.png'});}
+          if(p==='granted'){requestPushPermission(cu.id);new Notification('Black Fox QMS',{body:'Notifications enabled!',icon:'/qms420/icon-192.png'});}
           else alert('Blocked \u2014 go to browser settings to allow notifications');
         }},
         el('span',{className:'mnav-ico'},typeof Notification!=='undefined'&&Notification.permission==='granted'?'\uD83D\uDD14':'\uD83D\uDD15'),'Alerts'
@@ -12804,7 +12804,7 @@ function App(){
 <script>
 if('serviceWorker' in navigator && window.location.hostname !== 'www.claudeusercontent.com'){
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/bfm-mi/sw.js')
+    navigator.serviceWorker.register('/qms420/sw.js')
       .then(reg => {
         console.log('SW registered');
         setInterval(() => reg.update(), 30 * 60 * 1000);
