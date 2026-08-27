@@ -10719,6 +10719,1026 @@ function LicenseChart(){
   );
 }
 
+function MyDocuments({cu,corrective,setCorrective}){
+  const[sel,setSel]=useState(null);
+  const[showSignModal,setShowSignModal]=useState(false);
+  const[signatureName,setSignatureName]=useState('');
+
+  // Hard scope: only records issued to this specific person, regardless of role.
+  const myRecords=corrective.filter(c=>c.employee_id===cu.id);
+
+  if(!sel){
+    return el('div',null,
+      el('div',{className:'ph'},
+        el('div',null,
+          el('div',{className:'pt'},'My Documents'),
+          el('div',{className:'ps'},'Personnel records issued to you \u2014 only visible to you and Admin'),
+        ),
+      ),
+      myRecords.length===0?el('div',{className:'empty'},el('div',{className:'eico'},'\uD83D\uDCC1'),el('div',{className:'etxt'},'No documents on file')):
+      el('div',{style:{display:'flex',flexDirection:'column',gap:6}},
+        myRecords.map(c=>el('div',{key:c.id,onClick:()=>setSel(c),style:{background:'var(--surface)',border:'1px solid var(--border)',borderLeft:'3px solid '+(c.status==='acknowledged'?'var(--green)':'var(--red)'),borderRadius:10,padding:'14px 16px',cursor:'pointer',transition:'all .15s'},onMouseEnter:ev=>ev.currentTarget.style.borderColor='rgba(30,58,95,.25)',onMouseLeave:ev=>ev.currentTarget.style.borderColor='var(--border)'},
+          el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}},
+            el('div',{style:{flex:1}},
+              el('div',{style:{display:'flex',gap:6,marginBottom:5,flexWrap:'wrap'}},
+                el('span',{style:{background:c.status==='acknowledged'?'rgba(16,185,129,.1)':c.status==='draft'?'rgba(100,116,139,.1)':'rgba(245,158,11,.1)',color:c.status==='acknowledged'?'var(--green)':c.status==='draft'?'var(--text2)':'#d97706',border:'1px solid',borderColor:c.status==='acknowledged'?'rgba(16,185,129,.3)':c.status==='draft'?'rgba(100,116,139,.3)':'rgba(245,158,11,.3)',borderRadius:4,padding:'2px 7px',fontSize:11,fontWeight:700}},c.status==='acknowledged'?'\u2705 Completed':c.status==='draft'?'\uD83D\uDCDD Draft':'\u26A0\uFE0F Action Required'),
+                el('span',{style:{background:'var(--surface2)',color:'var(--text2)',border:'1px solid var(--border)',borderRadius:4,padding:'2px 7px',fontSize:11}},c.ca_number),
+              ),
+              el('div',{style:{fontSize:14,fontWeight:700,marginBottom:3}},c.title),
+            ),
+            el('div',{style:{fontSize:11,color:'var(--text3)',flexShrink:0,marginLeft:12}},c.created_at?.slice(0,10)),
+          ),
+        ))
+      ),
+    );
+  }
+
+  // \u2500\u2500 DETAIL VIEW \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+  const gen=sel.generated_content?JSON.parse(sel.generated_content):{};
+  const canAck=sel.status!=='acknowledged';
+
+  return el('div',null,
+    el('button',{className:'btn b-ghost btn-sm',onClick:()=>setSel(null),style:{marginBottom:14}},'\u2190 Back to My Documents'),
+
+    el('div',{style:{background:'rgba(239,68,68,.06)',border:'1px solid rgba(239,68,68,.2)',borderRadius:10,padding:'16px 18px',marginBottom:16}},
+      el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:8}},
+        el('div',null,
+          el('div',{style:{fontSize:11,fontWeight:700,color:'var(--red)',textTransform:'uppercase',letterSpacing:'.8px',marginBottom:4}},sel.ca_number),
+          el('div',{style:{fontSize:18,fontWeight:800}},sel.title),
+          el('div',{style:{display:'flex',gap:10,flexWrap:'wrap',marginTop:6}},
+            el('span',{style:{fontSize:12,color:'var(--text2)'}},'Issued: '+sel.created_at?.slice(0,10)),
+          ),
+        ),
+        el('span',{style:{background:sel.status==='acknowledged'?'rgba(16,185,129,.1)':sel.status==='draft'?'rgba(100,116,139,.1)':'rgba(245,158,11,.1)',color:sel.status==='acknowledged'?'var(--green)':sel.status==='draft'?'var(--text2)':'#d97706',border:'1px solid',borderColor:sel.status==='acknowledged'?'rgba(16,185,129,.3)':sel.status==='draft'?'rgba(100,116,139,.3)':'rgba(245,158,11,.3)',borderRadius:6,padding:'5px 12px',fontSize:12,fontWeight:700}},sel.status==='acknowledged'?'\u2705 Completed \u2014 '+sel.acknowledged_at?.slice(0,10):sel.status==='draft'?'\uD83D\uDCDD Draft':'\u23F3 Pending Acknowledgement'),
+      ),
+    ),
+
+    sel.status==='acknowledged'&&el('div',{style:{background:'rgba(16,185,129,.06)',border:'1px solid rgba(16,185,129,.25)',borderRadius:10,padding:'14px 18px',marginBottom:16}},
+      el('div',{style:{fontSize:11,fontWeight:700,color:'var(--green)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:8}},'Signed Acknowledgement'),
+      el('div',{style:{display:'flex',alignItems:'baseline',gap:16,flexWrap:'wrap'}},
+        el('div',null,
+          el('div',{style:{fontFamily:'cursive',fontSize:22,color:'var(--text)',borderBottom:'1px solid var(--border2)',paddingBottom:4,marginBottom:3}},sel.signature_name||sel.employee_name),
+          el('div',{style:{fontSize:10,color:'var(--text3)'}},'Employee Signature'),
+        ),
+        el('div',null,
+          el('div',{style:{fontFamily:'cursive',fontSize:18,color:'var(--text)',borderBottom:'1px solid var(--border2)',paddingBottom:4,marginBottom:3}},sel.acknowledged_at?.slice(0,10)),
+          el('div',{style:{fontSize:10,color:'var(--text3)'}},'Date'),
+        ),
+      ),
+    ),
+
+    [['Incident Summary',gen.incident_summary],['Policy/SOP Violated',gen.policy_reference],['Expected Standard',gen.expected_standard]].filter(([,v])=>v).map(([label,val])=>
+      el('div',{key:label,style:{marginBottom:12}},
+        el('div',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:5}},label),
+        el('div',{style:{background:'var(--surface2)',borderRadius:8,padding:'10px 14px',fontSize:13,lineHeight:1.6,color:'var(--text2)'}},val),
+      )
+    ),
+
+    (gen.corrective_steps||[]).length>0&&el('div',{style:{marginBottom:12}},
+      el('div',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:6}},'Corrective Steps Required'),
+      gen.corrective_steps.map((s,i)=>el('div',{key:i,style:{display:'flex',gap:8,marginBottom:6,alignItems:'flex-start'}},
+        el('div',{style:{width:20,height:20,borderRadius:'50%',background:'var(--accent)',color:'#000',display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:800,flexShrink:0,marginTop:1}},i+1),
+        el('div',{style:{fontSize:13,color:'var(--text2)',lineHeight:1.5}},s),
+      )),
+    ),
+
+    [['Consequences if Repeated',gen.consequences_of_recurrence],['Support Offered',gen.support_offered]].filter(([,v])=>v).map(([label,val])=>
+      el('div',{key:label,style:{marginBottom:12}},
+        el('div',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:5}},label),
+        el('div',{style:{background:'var(--surface2)',borderRadius:8,padding:'10px 14px',fontSize:13,lineHeight:1.6,color:'var(--text2)'}},val),
+      )
+    ),
+
+    gen.employee_acknowledgement_text&&el('div',{style:{background:'var(--surface2)',border:'1px solid var(--border)',borderRadius:10,padding:'14px 16px',marginTop:16,marginBottom:16}},
+      el('div',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:6}},'Acknowledgement Statement'),
+      el('div',{style:{fontSize:12,color:'var(--text2)',lineHeight:1.6,fontStyle:'italic'}},gen.employee_acknowledgement_text),
+    ),
+
+    el('div',{style:{display:'flex',gap:8,marginTop:16}},
+      el('button',{className:'btn b-ghost',onClick:()=>exportCorrectiveActionPdf(sel)},'\uD83D\uDCC4 Download PDF'),
+      canAck&&el('button',{
+        onClick:()=>{setSignatureName(cu.name);setShowSignModal(true);},
+        style:{background:'var(--green)',color:'#fff',border:'none',borderRadius:'var(--rs)',padding:'10px 24px',fontFamily:'inherit',fontSize:14,fontWeight:700,cursor:'pointer'}
+      },'I Have Read and Understood This Notice'),
+      !canAck&&el('div',{style:{fontSize:12,color:'var(--green)',fontWeight:600,display:'flex',alignItems:'center'}},'This document has been signed and is locked'),
+    ),
+
+    showSignModal&&el('div',{className:'mo',style:{zIndex:1200},onClick:ev=>ev.target===ev.currentTarget&&setShowSignModal(false)},
+      el('div',{className:'md',style:{width:480}},
+        el('div',{className:'mh'},
+          el('div',{className:'mt2'},'Sign & Acknowledge'),
+          el('button',{className:'mc',onClick:()=>setShowSignModal(false)},'\u00D7'),
+        ),
+        el('div',{className:'mbd'},
+          el('div',{style:{fontSize:13,color:'var(--text2)',marginBottom:16,lineHeight:1.6}},
+            gen.employee_acknowledgement_text||'I acknowledge that I have read and understand this Corrective Action Notice.'
+          ),
+          el('div',{className:'fg'},
+            el('label',null,'Sign below to acknowledge *'),
+            el(SignaturePad,{
+              label:'Draw your signature to confirm you have read and understand this notice',
+              onSave:dataUrl=>{setSignatureName(cu.name);window._caSigData=dataUrl;},
+              onClear:()=>{setSignatureName('');window._caSigData=null;},
+            }),
+            el('div',{style:{fontSize:11,color:'var(--text3)',marginTop:6}},'Signing as: '+cu.name+' \u00B7 Date: '+new Date().toISOString().slice(0,10)),
+          ),
+          el('div',{className:'mf'},
+            el('button',{className:'btn b-ghost',onClick:()=>{setShowSignModal(false);setSignatureName('');window._caSigData=null;}},'Cancel'),
+            el('button',{
+              disabled:!signatureName,
+              onClick:async()=>{
+                const update={status:'acknowledged',acknowledged_at:new Date().toISOString(),signature_name:signatureName.trim(),signature_image:window._caSigData||null,updated_at:new Date().toISOString(),updated_by:cu.name};
+                try{
+                  await db.update('pf_qms_corrective',sel.id,update);
+                  setCorrective(p=>p.map(c=>c.id===sel.id?{...c,...update}:c));
+                  setSel(p=>({...p,...update}));
+                  setShowSignModal(false);
+                  window._caSigData=null;
+                }catch(e){console.error(e);alert('Failed to save acknowledgement: '+e.message);}
+              },
+              style:{background:signatureName?'var(--green)':'rgba(16,185,129,.3)',color:'#fff',border:'none',borderRadius:'var(--rs)',padding:'10px 24px',fontFamily:'inherit',fontSize:14,fontWeight:700,cursor:signatureName?'pointer':'not-allowed'}
+            },'Sign & Submit'),
+          ),
+        ),
+      )
+    ),
+  );
+}
+
+// \u2500\u2500 LICENSE-WIDE COMPLIANCE SNAPSHOT PDF \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+// One-click audit-ready report: every active SOP for a license, every employee
+// who's required to have signed it, and who has/hasn't \u2014 with timestamps.
+// This is the document you hand an inspector who walks in unannounced.
+function exportComplianceSnapshotPdf(license,publishedSOPs,scopeUsers,targetUsersForSop){
+  const{jsPDF}=window.jspdf;
+  const doc=pdfSafeDoc(new jsPDF({unit:'pt',format:'letter'}));
+  const W=612,H=792;
+  const margin=50;
+  let y=0;
+
+  const DARK=[18,18,18],GOLD=[245,166,35],GREEN=[16,150,90],RED=[200,60,60],TEXT=[20,20,20],TEXT2=[90,90,90],BORDER=[210,210,215];
+
+  function header(){
+    doc.setFillColor(...DARK);
+    doc.rect(0,0,W,70,'F');
+    doc.setFillColor(...GOLD);
+    doc.rect(0,68,W,2,'F');
+    doc.setTextColor(...GOLD);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(16);
+    doc.text('Black Fox QMS',margin,32);
+    doc.setTextColor(230,230,230);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(9);
+    doc.text('Compliance Snapshot \u2014 SOP Training Status',margin,48);
+    doc.setTextColor(...GOLD);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(10);
+    doc.text(new Date().toISOString().slice(0,10),W-margin,32,{align:'right'});
+    y=95;
+  }
+
+  function footer(pageNum){
+    doc.setDrawColor(...BORDER);
+    doc.line(margin,H-50,W-margin,H-50);
+    doc.setTextColor(...TEXT2);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(7);
+    doc.text('CONFIDENTIAL \u2014 Generated for regulatory/audit purposes \u2014 '+license.name,margin,H-35);
+    doc.text('Page '+pageNum,W-margin,H-35,{align:'right'});
+  }
+
+  function checkPageBreak(neededHeight){
+    if(y+neededHeight>H-70){
+      doc.addPage();
+      header();
+    }
+  }
+
+  header();
+
+  doc.setTextColor(...DARK);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(18);
+  doc.text(license.name,margin,y);
+  y+=20;
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(11);
+  doc.setTextColor(...TEXT2);
+  doc.text(license.state+' \u2014 '+(license.license_type||''),margin,y);
+  y+=22;
+
+  doc.setDrawColor(...BORDER);
+  doc.setLineWidth(0.5);
+  doc.line(margin,y,W-margin,y);
+  y+=16;
+
+  // Overall summary stats across all SOPs for this license
+  let totalRequired=0,totalSigned=0;
+  const sopStats=publishedSOPs.map(s=>{
+    const targets=targetUsersForSop(s).filter(t=>scopeUsers.some(u=>u.id===t.id));
+    const signed=targets.filter(t=>(s.acknowledgements||[]).some(a=>a.id===t.id));
+    totalRequired+=targets.length;
+    totalSigned+=signed.length;
+    return{sop:s,targets,signed};
+  });
+  const overallRate=totalRequired>0?Math.round(totalSigned/totalRequired*100):100;
+
+  const boxW=(W-margin*2-16)/3;
+  function statBox(x,label,value,color){
+    doc.setFillColor(245,246,250);
+    doc.rect(x,y,boxW,54,'F');
+    doc.setTextColor(...color);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(20);
+    doc.text(String(value),x+12,y+30);
+    doc.setTextColor(...TEXT2);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(8.5);
+    doc.text(label.toUpperCase(),x+12,y+44);
+  }
+  statBox(margin,'Active SOPs',publishedSOPs.length,DARK);
+  statBox(margin+boxW+8,'Team Members in Scope',scopeUsers.length,DARK);
+  statBox(margin+(boxW+8)*2,'Overall Sign-Off Rate',overallRate+'%',overallRate===100?GREEN:overallRate>=90?GOLD:RED);
+  y+=72;
+
+  // Per-SOP breakdown
+  sopStats.forEach(({sop,targets,signed})=>{
+    checkPageBreak(50);
+    const rate=targets.length>0?Math.round(signed.length/targets.length*100):100;
+    doc.setFillColor(245,246,250);
+    doc.rect(margin,y,W-margin*2,28,'F');
+    doc.setDrawColor(...(rate===100?GREEN:rate>=80?GOLD:RED));
+    doc.setLineWidth(2.5);
+    doc.line(margin,y,margin,y+28);
+    doc.setTextColor(...DARK);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(11);
+    doc.text(sop.title,margin+12,y+13);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(...TEXT2);
+    doc.text('Rev '+(sop.version||'1.0')+' \u2014 Published '+(sop.published_at?.slice(0,10)||sop.created_at?.slice(0,10)||''),margin+12,y+24);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(11);
+    doc.setTextColor(...(rate===100?GREEN:rate>=80?GOLD:RED));
+    doc.text(signed.length+'/'+targets.length+' signed ('+rate+'%)',W-margin-12,y+17,{align:'right'});
+    y+=34;
+
+    // List the people who have NOT signed \u2014 this is the actionable part of the report
+    const unsigned=targets.filter(t=>!signed.some(s2=>s2.id===t.id));
+    if(unsigned.length>0){
+      checkPageBreak(unsigned.length*13+10);
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(8);
+      doc.setTextColor(...RED);
+      doc.text('PENDING SIGNATURE:',margin+12,y);
+      y+=12;
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(8.5);
+      doc.setTextColor(...TEXT);
+      unsigned.forEach(u=>{
+        checkPageBreak(13);
+        doc.text('\u2022 '+u.name+(u.dept?' ('+u.dept+')':''),margin+18,y);
+        y+=12.5;
+      });
+    }
+    y+=10;
+  });
+
+  if(publishedSOPs.length===0){
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(11);
+    doc.setTextColor(...TEXT2);
+    doc.text('No published SOPs apply to this license.',margin,y);
+  }
+
+  const pageCount=doc.internal.getNumberOfPages();
+  for(let i=1;i<=pageCount;i++){
+    doc.setPage(i);
+    footer(i);
+  }
+
+  doc.save('Compliance_Snapshot_'+license.name.replace(/[^a-z0-9]/gi,'_')+'_'+new Date().toISOString().slice(0,10)+'.pdf');
+}
+
+// \u2500\u2500 SOP REVISION MODAL \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function SOPReviseModal({sop,cu,onClose,onSave}){
+  const[step,setStep]=useState(1); // 1=describe changes, 2=generating, 3=review
+  const[changeRequest,setChangeRequest]=useState('');
+  const[generating,setGenerating]=useState(false);
+  const[error,setError]=useState('');
+  const[revisedSOP,setRevisedSOP]=useState(null);
+  const[editedSOP,setEditedSOP]=useState(null);
+  const[editMode,setEditMode]=useState(false);
+  const[saving,setSaving]=useState(false);
+
+  let original=null;
+  try{ original=sop.generated_content?JSON.parse(sop.generated_content):null; }catch(e){ original=null; }
+  const license=LICENSES.find(l=>l.id===sop.license_id)||LICENSES.find(l=>l.name===sop.license_name)||LICENSES[0];
+  const state=sop.state||license.state;
+  const nextRevision=(()=>{
+    const cur=parseFloat(sop.version||'1.0');
+    return (cur+0.1).toFixed(1);
+  })();
+
+  async function generateRevision(){
+    if(!changeRequest.trim()){setError('Please describe what needs to change.');return;}
+    setGenerating(true);setError('');setStep(2);
+
+    const _origData=original||{title:sop.title,steps:sop.steps||[],description:sop.description||''};
+    const prompt=`You are revising an existing cannabis SOP. Current SOP (JSON): ${JSON.stringify(_origData)}
+
+LICENSE: ${license.name} (${state})
+REGULATORY CONTEXT: ${STATE_REGS[state].agency} \u2014 ${STATE_REGS[state].code}
+
+REQUESTED CHANGES: ${changeRequest}
+
+Return a REVISED version as JSON only (no markdown). Increment revision to "${nextRevision}". Add entry to revision_history dated ${new Date().toISOString().slice(0,10)}. Keep all unchanged fields identical. Fields: sop_number, title, revision, effective_date, review_frequency, department, license_name, state, regulatory_references, purpose, scope, responsibilities, definitions, required_materials, steps (each: step_number,title,instruction,regulatory_note,critical), quality_checks, documentation_required, deviation_procedure, training_requirements, revision_history.`;
+
+    try{
+      const res=await fetch(`${SUPA_URL}/functions/v1/claude-proxy`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPA_KEY},
+        body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:4000,messages:[{role:'user',content:prompt}]}),
+      });
+      const data=await res.json();
+      if(!res.ok||data.error){const msg=data.error?.message||data.message||(typeof data.error==='string'?data.error:null)||('HTTP '+res.status);throw new Error(msg);}
+      const raw=data.content?.[0]?.text||'';
+      let clean=raw.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+      if(!clean.endsWith('}')){
+        const lastBrace=clean.lastIndexOf('}');
+        if(lastBrace>0){
+          clean=clean.slice(0,lastBrace+1);
+          let depth=0;
+          for(const ch of clean){if(ch==='{')depth++;else if(ch==='}')depth--;}
+          while(depth>0){clean+='}';depth--;}
+        }
+      }
+      let parsed;
+      try{parsed=JSON.parse(clean);}catch(pe){throw new Error('Could not parse Claude response as JSON. Try again.');}
+      setRevisedSOP(parsed);
+      setEditedSOP(parsed);
+      setStep(3);
+    }catch(e){
+      console.error('SOP revision error:',e);
+      setError('Revision failed: '+e.message);
+      setStep(1);
+    }
+    setGenerating(false);
+  }
+
+  async function approveAndPublish(){
+    if(!editedSOP) return;
+    setSaving(true);
+    const update={
+      title:editedSOP.title||sop.title,
+      description:editedSOP.purpose||sop.description,
+      steps:(editedSOP.steps||[]).map((s,i)=>({id:'s'+i,text:typeof s==='string'?s:`[${s.step_number||i+1}] ${s.title}: ${s.instruction}`})),
+      version:editedSOP.revision||nextRevision,
+      status:'published', // auto-publish on approval
+      generated_content:JSON.stringify(editedSOP),
+      regulatory_references:editedSOP.regulatory_references||[],
+      // Reset acknowledgements \u2014 everyone must re-read and re-sign the revised SOP
+      acknowledgements:[],
+      published_at:new Date().toISOString(),
+      updated_at:new Date().toISOString(),
+      updated_by:cu.name,
+      revised_by:cu.name,
+      revised_at:new Date().toISOString(),
+      revision_note:changeRequest,
+    };
+    try{
+      await db.update('pf_sops',sop.id,update);
+      onSave({...sop,...update});
+    }catch(e){
+      console.error(e);
+      alert('Save failed: '+e.message);
+    }
+    setSaving(false);
+  }
+
+  return el('div',{className:'mo',style:{zIndex:1100},onClick:ev=>ev.target===ev.currentTarget&&onClose()},
+    el('div',{className:'md',style:{width:750,maxHeight:'94vh'}},
+      el('div',{className:'mh'},
+        el('div',{style:{flex:1}},
+          el('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:4}},
+            el('span',{style:{fontSize:20}},'\uD83D\uDD04'),
+            el('div',{className:'mt2'},'Revise SOP \u2014 '+sop.title),
+          ),
+          el('div',{style:{display:'flex',gap:8}},
+            [{n:1,l:'Describe Changes'},{n:2,l:'AI Revising'},{n:3,l:'Review & Approve'}].map(({n,l})=>
+              el('div',{key:n,style:{display:'flex',alignItems:'center',gap:4,fontSize:11,color:step>=n?'var(--accent)':'var(--text3)',fontWeight:step===n?700:400}},
+                el('div',{style:{width:18,height:18,borderRadius:'50%',background:step>=n?'var(--accent)':'var(--surface2)',border:'1px solid',borderColor:step>=n?'var(--accent)':'var(--border)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:9,fontWeight:700,color:step>=n?'#000000':'var(--text3)'}},n),
+                l,n<3&&el('span',{style:{color:'var(--border)'}},'\u2192'),
+              )
+            )
+          ),
+        ),
+        el('button',{className:'mc',onClick:onClose},'\u00D7'),
+      ),
+
+      el('div',{className:'mbd'},
+
+        // STEP 1
+        step===1&&el('div',null,
+          el('div',{style:{background:'var(--surface2)',border:'1px solid var(--border)',borderRadius:10,padding:'12px 16px',marginBottom:16}},
+            el('div',{style:{fontSize:11,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:4}},'Current Version'),
+            el('div',{style:{fontSize:14,fontWeight:700}},sop.title+' \u2014 v'+sop.version),
+            el('div',{style:{fontSize:11,color:'var(--text3)',marginTop:2}},sop.license_name+' \u00B7 '+state),
+          ),
+          el('div',{style:{background:'rgba(30,58,95,.05)',border:'1px solid rgba(30,58,95,.15)',borderRadius:8,padding:'10px 14px',marginBottom:16,fontSize:12,color:'var(--text2)'}},
+            'Next version will be: ',el('strong',{style:{color:'var(--accent)'}},'v'+nextRevision),
+            ' \u2014 published immediately upon your approval. All employees will be required to re-acknowledge.',
+          ),
+          el('div',{className:'fg'},
+            el('label',null,'What needs to be updated? *'),
+            el('textarea',{
+              value:changeRequest,onChange:ev=>setChangeRequest(ev.target.value),
+              placeholder:'e.g. "Add a step requiring double-check of weight before sealing" or "Update PPE requirements to include face shields" or "Change cleaning frequency from daily to twice daily"',
+              autoFocus:true,
+              style:{width:'100%',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:'10px 14px',color:'var(--text)',fontFamily:'inherit',fontSize:13,outline:'none',minHeight:120,resize:'vertical'},
+            }),
+          ),
+          error&&el('div',{style:{background:'rgba(239,68,68,.1)',border:'1px solid rgba(239,68,68,.3)',borderRadius:8,padding:'10px 14px',fontSize:13,color:'var(--red)',marginBottom:8}},error),
+          el('div',{className:'mf'},
+            el('button',{className:'btn b-ghost',onClick:onClose},'Cancel'),
+            el('button',{
+              onClick:generateRevision,disabled:!changeRequest.trim(),
+              style:{background:changeRequest.trim()?'var(--accent)':'rgba(30,58,95,.15)',color:changeRequest.trim()?'#000000':'var(--text3)',border:'none',borderRadius:'var(--rs)',padding:'10px 24px',fontFamily:'inherit',fontSize:14,fontWeight:700,cursor:changeRequest.trim()?'pointer':'not-allowed',display:'flex',alignItems:'center',gap:8}
+            },el('span',null,'\uD83E\uDD16'),'Generate Revised SOP'),
+          ),
+        ),
+
+        // STEP 2
+        step===2&&el('div',{style:{textAlign:'center',padding:'60px 20px'}},
+          el('div',{style:{width:60,height:60,border:'4px solid var(--border)',borderTopColor:'var(--accent)',borderRadius:'50%',animation:'spin .8s linear infinite',margin:'0 auto 20px'}}),
+          el('div',{style:{fontSize:18,fontWeight:700,marginBottom:8}},'AI is revising the SOP...'),
+          el('div',{style:{fontSize:13,color:'var(--text2)'}},'Applying your changes while preserving regulatory compliance'),
+        ),
+
+        // STEP 3
+        step===3&&revisedSOP&&el('div',null,
+          el('div',{style:{background:'rgba(16,185,129,.06)',border:'1px solid rgba(16,185,129,.2)',borderRadius:10,padding:'14px 16px',marginBottom:16}},
+            el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:8}},
+              el('div',null,
+                el('div',{style:{fontSize:11,fontWeight:700,color:'var(--green)',textTransform:'uppercase',letterSpacing:'.8px',marginBottom:4}},'v'+sop.version+' \u2192 v'+(editedSOP.revision||nextRevision)),
+                el('div',{style:{fontSize:17,fontWeight:800}},editedSOP.title),
+                el('div',{style:{fontSize:11,color:'var(--text3)',marginTop:4}},'Effective: '+editedSOP.effective_date),
+              ),
+              el('button',{onClick:()=>setEditMode(!editMode),className:'btn b-ghost btn-sm'},editMode?'\uD83D\uDC41 Preview':'\u270F\uFE0F Edit JSON'),
+            ),
+          ),
+
+          el('div',{style:{background:'var(--surface2)',borderRadius:8,padding:'10px 14px',marginBottom:16,fontSize:12,color:'var(--text2)'}},
+            el('div',{style:{fontWeight:700,color:'var(--text)',marginBottom:4}},'What changed:'),
+            changeRequest,
+          ),
+
+          !editMode&&el('div',null,
+            (editedSOP.steps||[]).length>0&&el('div',{style:{marginBottom:14}},
+              el('div',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:8}},'Procedure Steps ('+(editedSOP.steps||[]).length+')'),
+              (editedSOP.steps||[]).map((s,i)=>el('div',{key:i,style:{display:'flex',gap:10,marginBottom:8,background:s.critical?'rgba(239,68,68,.04)':'var(--surface2)',border:'1px solid',borderColor:s.critical?'rgba(239,68,68,.2)':'var(--border)',borderLeft:'3px solid',borderLeftColor:s.critical?'var(--red)':'var(--accent)',borderRadius:8,padding:'10px 14px'}},
+                el('div',{style:{width:24,height:24,borderRadius:'50%',background:s.critical?'var(--red)':'var(--accent)',color:'#ffffff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:800,flexShrink:0}},s.step_number||i+1),
+                el('div',{style:{flex:1}},
+                  el('div',{style:{fontWeight:600,fontSize:12,marginBottom:3}},s.title),
+                  el('div',{style:{fontSize:12,color:'var(--text2)',lineHeight:1.5}},s.instruction),
+                ),
+              )),
+            ),
+          ),
+
+          editMode&&el('div',{className:'fg'},
+            el('textarea',{value:JSON.stringify(editedSOP,null,2),onChange:ev=>{try{setEditedSOP(JSON.parse(ev.target.value));}catch(e){}},style:{width:'100%',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:10,color:'var(--text)',fontFamily:'DM Mono, monospace',fontSize:11,outline:'none',minHeight:300,resize:'vertical'}}),
+          ),
+
+          el('div',{className:'mf',style:{justifyContent:'space-between'}},
+            el('div',{style:{fontSize:12,color:'var(--text3)'}},'Approving will publish immediately and notify all assigned staff to re-acknowledge'),
+            el('div',{style:{display:'flex',gap:8}},
+              el('button',{className:'btn b-ghost',onClick:()=>setStep(1)},'\u2190 Back'),
+              el('button',{
+                onClick:approveAndPublish,disabled:saving,
+                style:{background:'var(--green)',color:'#fff',border:'none',borderRadius:'var(--rs)',padding:'10px 24px',fontFamily:'inherit',fontSize:14,fontWeight:700,cursor:'pointer'}
+              },saving?'Publishing...':'\u2705 Approve & Publish v'+(editedSOP.revision||nextRevision)),
+            ),
+          ),
+        ),
+      ),
+    )
+  );
+}
+
+// \u2500\u2500 SOP GENERATOR MODAL \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+
+function SOPGenerator({cu,onClose,onSave}){
+  const[step,setStep]=useState(1); // 1=setup, 2=generating, 3=review
+  const[license,setLicense]=useState(LICENSES[0]);
+  const[state,setState]=useState(LICENSES[0].state);
+  const[title,setTitle]=useState('');
+  const[category,setCategory]=useState('Production \u2014 Cart Department');
+  const[uploadedText,setUploadedText]=useState('');
+  const[uploadedFileName,setUploadedFileName]=useState('');
+  const[customInstructions,setCustomInstructions]=useState('');
+  const[generating,setGenerating]=useState(false);
+  const[generatedSOP,setGeneratedSOP]=useState(null);
+  const[error,setError]=useState('');
+  const[saving,setSaving]=useState(false);
+  const[editMode,setEditMode]=useState(false);
+  const[editedSOP,setEditedSOP]=useState(null);
+
+  function handleLicenseChange(id){
+    const l=LICENSES.find(x=>x.id===id);
+    setLicense(l);
+    setState(l.state);
+  }
+
+  async function handleFileUpload(ev){
+    const file=ev.target.files[0];
+    if(!file) return;
+    setUploadedFileName(file.name);
+    if(file.name.endsWith('.txt')||file.name.endsWith('.md')){
+      const text=await file.text();
+      setUploadedText(text);
+    } else if(file.name.endsWith('.pdf')){
+      // Read as base64 and send to Claude API with document type
+      const reader=new FileReader();
+      reader.onload=re=>{
+        // Store base64 for API call
+        setUploadedText('__PDF__:'+re.target.result.split(',')[1]);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      // Try reading as text
+      try{
+        const text=await file.text();
+        setUploadedText(text.slice(0,5000));
+      }catch(e){
+        setUploadedText('');
+      }
+    }
+  }
+
+  // Accepts the JSON exported by the standalone Black Fox SOP Generator tool
+  // (same field shape as generateSOP() below produces) and jumps straight to
+  // the review/save screen \u2014 so an imported SOP is saved through the exact
+  // same saveSOP() path as one generated inside QMS itself.
+  async function handleImportJSON(ev){
+    const file=ev.target.files[0];
+    if(!file) return;
+    setError('');
+    try{
+      const text=await file.text();
+      const parsed=JSON.parse(text);
+      if(!parsed||!parsed.title){throw new Error('This file doesn\u2019t look like a Black Fox SOP export.');}
+      if(parsed.title) setTitle(parsed.title);
+      setGeneratedSOP(parsed);
+      setEditedSOP(parsed);
+      setStep(3);
+    }catch(e){
+      setError('Import failed: '+e.message);
+    }
+  }
+
+  async function generateSOP(){
+    if(!title.trim()){setError('Please enter an SOP title.');return;}
+    setGenerating(true);setError('');setStep(2);
+
+    try{
+      const isPDF=uploadedText.startsWith('__PDF__:');
+      let refText=uploadedText;
+
+      // \u2500\u2500 STEP 0 (only if PDF): extract a short plain-text summary ONCE so the
+      // two main calls below never need to re-send the binary PDF (which is what was slow). \u2500\u2500
+      if(isPDF){
+        const extractRes=await fetch(`${SUPA_URL}/functions/v1/claude-proxy`,{
+          method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPA_KEY},
+          body:JSON.stringify({
+            model:'claude-sonnet-4-6',max_tokens:1000,
+            messages:[{role:'user',content:[
+              {type:'document',source:{type:'base64',media_type:'application/pdf',data:uploadedText.replace('__PDF__:','')}},
+              {type:'text',text:'Summarize the key procedural and regulatory content of this document relevant to "'+title+'" in under 600 words, plain text, no markdown. Focus on facts useful for writing an SOP.'},
+            ]}],
+          }),
+        });
+        const extractData=await extractRes.json();
+        if(!extractRes.ok||extractData.error){throw new Error(extractData.error?.message||'PDF extraction failed');}
+        refText=(extractData.content?.[0]?.text||'').slice(0,3000);
+      }
+
+      // \u2500\u2500 CALL 1: Metadata, purpose, scope, responsibilities, materials (fast, small, text-only) \u2500\u2500
+      const metaPrompt=`You are a cannabis compliance officer writing an SOP for ${state} (license: ${license.name}, ${license.license_type}).
+Regulatory agency: ${STATE_REGS[state].agency} \u2014 ${STATE_REGS[state].code}
+Key regulations: ${STATE_REGS[state].key_rules.slice(0,6).join('; ')}
+
+SOP Title: ${title}
+Category: ${category}
+${refText?'Reference material: '+refText:''}
+${customInstructions.trim()?'\nIMPORTANT \u2014 follow these instructions from the facility, they take priority over your own judgment on formatting/content choices:\n'+customInstructions.trim()+'\n':''}
+
+Respond with ONLY this JSON (no markdown, be concise):
+{
+  "sop_number": "SOP-[DEPT]-[3digit]",
+  "title": "${title}",
+  "revision": "1.0",
+  "effective_date": "${new Date().toISOString().slice(0,10)}",
+  "review_frequency": "Annual",
+  "department": "...",
+  "purpose": "2-3 sentences",
+  "scope": "1-2 sentences",
+  "regulatory_references": ["3-5 specific citations"],
+  "responsibilities": [{"role":"...","responsibility":"..."}],
+  "required_materials": ["..."],
+  "deviation_procedure": "1-2 sentences",
+  "training_requirements": "1-2 sentences"
+}`;
+
+      const metaRes=await fetch(`${SUPA_URL}/functions/v1/claude-proxy`,{
+        method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPA_KEY},
+        body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1200,messages:[{role:'user',content:metaPrompt}]}),
+      });
+      const metaData=await metaRes.json();
+      if(!metaRes.ok||metaData.error){throw new Error(metaData.error?.message||'Metadata generation failed');}
+      let metaClean=(metaData.content?.[0]?.text||'').replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+      const metaParsed=JSON.parse(metaClean);
+
+      // \u2500\u2500 CALL 2: Procedure steps + quality checks + docs (text-only, no PDF re-attach) \u2500\u2500
+      const stepsPrompt=`You are writing the procedure steps for this cannabis SOP:
+Title: ${title}
+Purpose: ${metaParsed.purpose}
+Department: ${metaParsed.department}
+${refText?'Reference material: '+refText:''}
+${customInstructions.trim()?'\nIMPORTANT \u2014 follow these instructions from the facility, they take priority over your own judgment:\n'+customInstructions.trim()+'\n':''}
+
+Write 6-10 clear procedure steps. Keep each instruction to 1-2 sentences. Flag CRITICAL steps where a regulatory violation or product risk exists.
+
+Respond with ONLY this JSON (no markdown, be concise, this must NOT be truncated so keep instructions short):
+{
+  "steps": [{"step_number":1,"title":"short title","instruction":"1-2 sentences","regulatory_note":"optional, brief","critical":false}],
+  "quality_checks": ["5-8 short checkpoints"],
+  "documentation_required": ["3-6 short items"]
+}`;
+
+      const stepsRes=await fetch(`${SUPA_URL}/functions/v1/claude-proxy`,{
+        method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPA_KEY},
+        body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:3000,messages:[{role:'user',content:stepsPrompt}]}),
+      });
+      const stepsData=await stepsRes.json();
+      if(!stepsRes.ok||stepsData.error){throw new Error(stepsData.error?.message||'Steps generation failed');}
+      let stepsClean=(stepsData.content?.[0]?.text||'').replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+      let stepsParsed;
+      try{stepsParsed=JSON.parse(stepsClean);}
+      catch(e){
+        const lastBrace=stepsClean.lastIndexOf('}');
+        if(lastBrace>0){
+          let repaired=stepsClean.slice(0,lastBrace+1);
+          let depth=0;
+          for(const ch of repaired){if(ch==='{')depth++;else if(ch==='}')depth--;}
+          while(depth>0){repaired+='}';depth--;}
+          try{stepsParsed=JSON.parse(repaired);}catch(e2){stepsParsed={steps:[],quality_checks:[],documentation_required:[]};}
+        }else{stepsParsed={steps:[],quality_checks:[],documentation_required:[]};}
+      }
+
+      // \u2500\u2500 MERGE \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+      const parsed={
+        ...metaParsed,
+        license_name:license.name,
+        state,
+        steps:stepsParsed.steps||[],
+        quality_checks:stepsParsed.quality_checks||[],
+        documentation_required:stepsParsed.documentation_required||[],
+        definitions:metaParsed.definitions||[],
+        revision_history:[{revision:'1.0',date:new Date().toISOString().slice(0,10),description:'Initial release',approved_by:''}],
+      };
+
+      setGeneratedSOP(parsed);
+      setEditedSOP(parsed);
+      setStep(3);
+    }catch(e){
+      console.error(e);
+      setError('Generation failed: '+e.message);
+      setStep(1);
+    }
+    setGenerating(false);
+  }
+
+
+  async function saveSOP(){
+    if(!generatedSOP) return;
+    setSaving(true);
+    // Map category (e.g. "Production \u2014 Cart Department") to one of the 8 real departments
+    const targetDept=SOP_CATEGORY_TO_DEPT[category]||'Facility';
+    const sop={
+      id:'sop-'+Date.now(),
+      title:editedSOP.title||title,
+      depts:[targetDept],
+      license_id:license.id,
+      description:editedSOP.purpose||'',
+      steps:(editedSOP.steps||[]).map((s,i)=>({id:'s'+i,text:typeof s==='string'?s:`[${s.step_number||i+1}] ${s.title}: ${s.instruction}`})),
+      version:editedSOP.revision||'1.0',
+      status:'draft',
+      attachments:[],
+      visible_to_roles:[],
+      // Restrict to the specific department this SOP is for.
+      visible_to_depts:[targetDept],
+      acknowledgements:[],
+      // Store full generated content
+      generated_content:JSON.stringify(editedSOP),
+      sop_number:editedSOP.sop_number||'',
+      license_name:editedSOP.license_name||license.name,
+      state:editedSOP.state||state,
+      regulatory_references:editedSOP.regulatory_references||[],
+      created_by:cu.name,created_by_id:cu.id,
+      created_at:new Date().toISOString(),
+      updated_at:new Date().toISOString(),updated_by:cu.name,
+    };
+    try{
+      await db.insert('pf_sops',sop);
+      onSave(sop);
+    }catch(e){
+      console.error(e);
+      alert('Save failed: '+e.message);
+    }
+    setSaving(false);
+  }
+
+  const regs=STATE_REGS[state];
+
+  return el('div',{className:'mo',onClick:ev=>ev.target===ev.currentTarget&&onClose()},
+    el('div',{className:'md',style:{width:750,maxHeight:'94vh'}},
+
+      // Header
+      el('div',{className:'mh'},
+        el('div',{style:{flex:1}},
+          el('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:4}},
+            el('span',{style:{fontSize:20}},'\uD83E\uDD16'),
+            el('div',{className:'mt2'},'AI SOP Generator'),
+          ),
+          el('div',{style:{display:'flex',gap:8}},
+            [{n:1,l:'Setup'},{n:2,l:'Generating'},{n:3,l:'Review & Save'}].map(({n,l})=>
+              el('div',{key:n,style:{display:'flex',alignItems:'center',gap:4,fontSize:11,color:step>=n?'var(--accent)':'var(--text3)',fontWeight:step===n?700:400}},
+                el('div',{style:{width:18,height:18,borderRadius:'50%',background:step>=n?'var(--accent)':'var(--surface2)',border:'1px solid',borderColor:step>=n?'var(--accent)':'var(--border)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:9,fontWeight:700,color:step>=n?'#000000':'var(--text3)'}},n),
+                l,
+                n<3&&el('span',{style:{color:'var(--border)'}},'\u2192'),
+              )
+            )
+          ),
+        ),
+        el('button',{className:'mc',onClick:onClose},'\u00D7'),
+      ),
+
+      el('div',{className:'mbd'},
+
+        // \u2500\u2500 STEP 1: SETUP \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+        step===1&&el('div',null,
+
+          // License & State
+          el('div',{style:{background:'rgba(30,58,95,.05)',border:'1px solid rgba(30,58,95,.15)',borderRadius:10,padding:'14px 16px',marginBottom:16}},
+            el('div',{style:{fontSize:11,fontWeight:700,color:'var(--accent)',textTransform:'uppercase',letterSpacing:'.8px',marginBottom:10}},'License & Jurisdiction'),
+            el('div',{className:'g2'},
+              el('div',{className:'fg',style:{marginBottom:0}},
+                el('label',null,'License Holder'),
+                el('select',{value:license.id,onChange:ev=>handleLicenseChange(ev.target.value),style:{width:'100%',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:'9px 13px',color:'var(--text)',fontFamily:'inherit',fontSize:13}},
+                  LICENSES.map(l=>el('option',{key:l.id,value:l.id},l.name+' ('+l.state+')'))
+                ),
+                el('div',{style:{fontSize:11,color:'var(--text3)',marginTop:4}},license.license_type),
+              ),
+              el('div',{className:'fg',style:{marginBottom:0}},
+                el('label',null,'State'),
+                el('div',{style:{display:'flex',gap:8,marginTop:4}},
+                  ['Michigan'].map(s=>el('button',{key:s,
+                    onClick:()=>setState(s),
+                    style:{flex:1,padding:'9px',borderRadius:'var(--rs)',border:'2px solid',borderColor:state===s?'var(--accent)':'var(--border)',background:state===s?'rgba(107,160,34,.12)':'transparent',color:state===s?'var(--accent)':'var(--text2)',fontFamily:'inherit',fontWeight:600,fontSize:13,cursor:'pointer',transition:'all .15s'}
+                  },'\uD83D\uDDFA '+s))
+                ),
+                el('div',{style:{fontSize:11,color:'var(--text3)',marginTop:4}},regs.agency),
+              ),
+            ),
+          ),
+
+          // Regulatory preview
+          el('div',{style:{background:'rgba(59,130,246,.04)',border:'1px solid rgba(59,130,246,.15)',borderRadius:8,padding:'10px 14px',marginBottom:16}},
+            el('div',{style:{fontSize:11,fontWeight:700,color:'#93c5fd',marginBottom:6,textTransform:'uppercase',letterSpacing:'.5px'}},'AI will incorporate '+state+' regulations:'),
+            el('div',{style:{display:'flex',flexWrap:'wrap',gap:4}},
+              regs.key_rules.slice(0,4).map((r,i)=>el('div',{key:i,style:{background:'rgba(59,130,246,.08)',borderRadius:4,padding:'2px 8px',fontSize:10,color:'#93c5fd'}},r.slice(0,60)+(r.length>60?'...':''))),
+              el('div',{style:{background:'rgba(59,130,246,.08)',borderRadius:4,padding:'2px 8px',fontSize:10,color:'#93c5fd'}},`+${regs.key_rules.length-4} more regulations`),
+            ),
+          ),
+
+          // SOP Details
+          el('div',{className:'fg'},
+            el('label',null,'SOP Title *'),
+            el('input',{value:title,onChange:ev=>setTitle(ev.target.value),placeholder:'e.g. Cart Filling Standard Operating Procedure',autoFocus:true,style:{width:'100%',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:'10px 14px',color:'var(--text)',fontFamily:'inherit',fontSize:13,outline:'none'}}),
+          ),
+          el('div',{className:'fg'},
+            el('label',null,'Category / Department'),
+            el('select',{value:category,onChange:ev=>setCategory(ev.target.value),style:{width:'100%',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:'9px 13px',color:'var(--text)',fontFamily:'inherit',fontSize:13}},
+              SOP_CATEGORIES.map(c=>el('option',{key:c,value:c},c))
+            ),
+          ),
+
+          // Upload reference
+          el('div',{className:'fg'},
+            el('label',null,'Upload Reference Document (optional)'),
+            el('div',{style:{fontSize:11,color:'var(--text3)',marginBottom:6}},'Upload an existing SOP, procedure notes, or any document. AI will use it as a reference to generate the formal SOP.'),
+            el('label',{style:{display:'flex',alignItems:'center',gap:8,padding:'10px 14px',background:'var(--surface2)',border:'1px dashed var(--border)',borderRadius:'var(--rs)',cursor:'pointer',transition:'all .15s'},
+              onMouseEnter:ev=>{ev.currentTarget.style.borderColor='var(--accent)';},
+              onMouseLeave:ev=>{ev.currentTarget.style.borderColor='var(--border)';}},
+              el('input',{type:'file',accept:'.pdf,.txt,.doc,.docx,.md',onChange:handleFileUpload,style:{display:'none'}}),
+              el('span',{style:{fontSize:18}},'\uD83D\uDCC4'),
+              el('div',null,
+                el('div',{style:{fontSize:13,fontWeight:600,color:'var(--text)'}},'Click to upload (PDF, TXT, DOC)'),
+                el('div',{style:{fontSize:11,color:'var(--text3)'}},uploadedFileName||'No file selected \u2014 AI will create SOP from title and category'),
+              ),
+              uploadedFileName&&el('span',{style:{marginLeft:'auto',color:'var(--green)',fontWeight:700,fontSize:12}},'\u2713 Ready'),
+            ),
+          ),
+
+          // Custom instructions for the AI
+          el('div',{className:'fg'},
+            el('label',null,'Instructions for the AI (optional)'),
+            el('div',{style:{fontSize:11,color:'var(--text3)',marginBottom:6}},'Tell it what to do differently \u2014 e.g. "don\u2019t change the safety warnings, just clean up the formatting" or "keep this section word-for-word."'),
+            el('textarea',{value:customInstructions,onChange:ev=>setCustomInstructions(ev.target.value),rows:3,placeholder:'e.g. Leave the weight tolerances exactly as written, just reorganize into our standard sections.',style:{width:'100%',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:'10px 14px',color:'var(--text)',fontFamily:'inherit',fontSize:13,resize:'vertical',boxSizing:'border-box'}}),
+          ),
+
+          // Import from the standalone SOP Generator tool
+          el('div',{className:'fg'},
+            el('label',null,'Or Import a Generated SOP (from the Black Fox SOP Generator tool)'),
+            el('div',{style:{fontSize:11,color:'var(--text3)',marginBottom:6}},'Already ran a draft through the standalone SOP Generator? Upload the JSON it downloaded \u2014 this skips AI generation and takes you straight to review, saved exactly like any SOP created here.'),
+            el('label',{style:{display:'flex',alignItems:'center',gap:8,padding:'10px 14px',background:'var(--surface2)',border:'1px dashed var(--border)',borderRadius:'var(--rs)',cursor:'pointer',transition:'all .15s'},
+              onMouseEnter:ev=>{ev.currentTarget.style.borderColor='var(--accent)';},
+              onMouseLeave:ev=>{ev.currentTarget.style.borderColor='var(--border)';}},
+              el('input',{type:'file',accept:'.json',onChange:handleImportJSON,style:{display:'none'}}),
+              el('span',{style:{fontSize:18}},'\u2B07\uFE0F'),
+              el('div',null,
+                el('div',{style:{fontSize:13,fontWeight:600,color:'var(--text)'}},'Click to import a .json SOP file'),
+                el('div',{style:{fontSize:11,color:'var(--text3)'}},'Jumps straight to Review & Save'),
+              ),
+            ),
+          ),
+
+          error&&el('div',{style:{background:'rgba(239,68,68,.1)',border:'1px solid rgba(239,68,68,.3)',borderRadius:8,padding:'10px 14px',fontSize:13,color:'var(--red)',marginBottom:8}},error),
+
+          el('div',{className:'mf'},
+            el('button',{className:'btn b-ghost',onClick:onClose},'Cancel'),
+            el('button',{
+              onClick:generateSOP,
+              disabled:!title.trim(),
+              style:{background:title.trim()?'var(--accent)':'rgba(30,58,95,.15)',color:title.trim()?'#000000':'var(--text3)',border:'none',borderRadius:'var(--rs)',padding:'10px 24px',fontFamily:'inherit',fontSize:14,fontWeight:700,cursor:title.trim()?'pointer':'not-allowed',display:'flex',alignItems:'center',gap:8,transition:'all .2s'}
+            },
+              el('span',{style:{fontSize:16}},'\uD83E\uDD16'),
+              'Generate SOP with AI',
+            ),
+          ),
+        ),
+
+        // \u2500\u2500 STEP 2: GENERATING \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+        step===2&&el('div',{style:{textAlign:'center',padding:'60px 20px'}},
+          el('div',{style:{width:60,height:60,border:'4px solid var(--border)',borderTopColor:'var(--accent)',borderRadius:'50%',animation:'spin .8s linear infinite',margin:'0 auto 20px'}}),
+          el('div',{style:{fontSize:18,fontWeight:700,color:'var(--text)',marginBottom:8}},'AI is generating your SOP...'),
+          el('div',{style:{fontSize:13,color:'var(--text2)',lineHeight:1.6}},
+            'Analyzing '+state+' cannabis regulations,',el('br',null),
+            'applying '+regs.agency+' requirements,',el('br',null),
+            uploadedFileName?'processing your uploaded document, ':null,
+            'and writing your SOP...',
+          ),
+          el('div',{style:{marginTop:20,fontSize:11,color:'var(--text3)'}},'This usually takes 10-20 seconds'),
+        ),
+
+        // \u2500\u2500 STEP 3: REVIEW \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+        step===3&&generatedSOP&&el('div',null,
+
+          // VISIBILITY OVERRIDE \u2014 explicit control before saving
+          el('div',{style:{background:'rgba(139,92,246,.06)',border:'1px solid rgba(139,92,246,.25)',borderRadius:10,padding:'14px 16px',marginBottom:16}},
+            el('div',{style:{fontSize:11,fontWeight:700,color:'#c4b5fd',textTransform:'uppercase',letterSpacing:'.8px',marginBottom:10}},'\uD83D\uDD12 Who Can See & Acknowledge This SOP'),
+            el('div',{className:'g2'},
+              el('div',{className:'fg',style:{marginBottom:0}},
+                el('label',null,'License (locked from Setup)'),
+                el('div',{style:{padding:'9px 13px',background:'var(--surface2)',border:'1px solid var(--border)',borderRadius:'var(--rs)',fontSize:13,color:'var(--text)',fontWeight:600}},license.name),
+              ),
+              el('div',{className:'fg',style:{marginBottom:0}},
+                el('label',null,'Department(s) \u2014 applied to this SOP'),
+                el('div',{style:{display:'flex',flexWrap:'wrap',gap:5}},
+                  [...new Set([category.split(' \u2014 ')[1]||category.split(' \u2014 ')[0],'Michigan Production'])].map(d=>
+                    el('div',{key:d,style:{padding:'4px 10px',borderRadius:16,background:'rgba(139,92,246,.15)',color:'#c4b5fd',border:'1px solid rgba(139,92,246,.3)',fontSize:11,fontWeight:600}},d)
+                  )
+                ),
+              ),
+            ),
+            el('div',{style:{fontSize:11,color:'var(--text3)',marginTop:8}},
+              '\u26A0\uFE0F Only people with ',el('strong',{style:{color:'#c4b5fd'}},license.name),' assigned AND working in the department(s) above will see and be required to acknowledge this SOP.'
+            ),
+          ),
+
+          // SOP Header card
+          el('div',{style:{background:'rgba(30,58,95,.05)',border:'1px solid rgba(30,58,95,.15)',borderRadius:10,padding:'14px 16px',marginBottom:16}},
+            el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:8}},
+              el('div',null,
+                el('div',{style:{fontSize:11,fontWeight:700,color:'var(--accent)',textTransform:'uppercase',letterSpacing:'.8px',marginBottom:4}},editedSOP.sop_number||'SOP-XXX-001'),
+                el('div',{style:{fontSize:17,fontWeight:800,color:'var(--text)',marginBottom:4}},editedSOP.title),
+                el('div',{style:{display:'flex',gap:10,flexWrap:'wrap',marginTop:4}},
+                  el('span',{style:{fontSize:11,color:'var(--text3)'}},'Rev '+editedSOP.revision),
+                  el('span',{style:{fontSize:11,color:'var(--text3)'}},'Effective: '+editedSOP.effective_date),
+                  el('span',{style:{fontSize:11,color:'#93c5fd'}},'\uD83D\uDCCD '+editedSOP.state),
+                  el('span',{style:{fontSize:11,color:'var(--text2)'}},'\uD83C\uDFED '+editedSOP.license_name),
+                ),
+              ),
+              el('div',{style:{display:'flex',gap:6}},
+                el('button',{onClick:()=>setEditMode(!editMode),className:'btn b-ghost btn-sm'},editMode?'\uD83D\uDC41 Preview':'\u270F\uFE0F Edit JSON'),
+                el('button',{onClick:generateSOP,className:'btn b-ghost btn-sm'},'\uD83D\uDD04 Regenerate'),
+              ),
+            ),
+          ),
+
+          !editMode&&el('div',null,
+            // Regulatory references
+            (editedSOP.regulatory_references||[]).length>0&&el('div',{style:{marginBottom:14}},
+              el('div',{style:{fontSize:11,fontWeight:700,color:'#93c5fd',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:6}},'\uD83D\uDCDA Regulatory References'),
+              el('div',{style:{display:'flex',flexWrap:'wrap',gap:4}},
+                (editedSOP.regulatory_references||[]).map((r,i)=>el('div',{key:i,style:{background:'rgba(59,130,246,.08)',border:'1px solid rgba(59,130,246,.2)',borderRadius:4,padding:'2px 8px',fontSize:10,color:'#93c5fd'}},r))
+              ),
+            ),
+
+            // Purpose & Scope
+            [['Purpose',editedSOP.purpose],['Scope',editedSOP.scope],['Training Requirements',editedSOP.training_requirements],['Deviation Procedure',editedSOP.deviation_procedure]].filter(([,v])=>v).map(([label,val])=>
+              el('div',{key:label,style:{marginBottom:12}},
+                el('div',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:5}},label),
+                el('div',{style:{background:'var(--surface2)',borderRadius:8,padding:'10px 14px',fontSize:12,lineHeight:1.6,color:'var(--text2)'}},val),
+              )
+            ),
+
+            // Responsibilities
+            (editedSOP.responsibilities||[]).length>0&&el('div',{style:{marginBottom:12}},
+              el('div',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:6}},'Responsibilities'),
+              (editedSOP.responsibilities||[]).map((r,i)=>el('div',{key:i,style:{display:'flex',gap:8,background:'var(--surface2)',borderRadius:6,padding:'8px 12px',marginBottom:4}},
+                el('div',{style:{fontWeight:600,fontSize:12,color:'var(--accent)',minWidth:150}},r.role),
+                el('div',{style:{fontSize:12,color:'var(--text2)',lineHeight:1.5}},r.responsibility),
+              )),
+            ),
+
+            // Required Materials
+            (editedSOP.required_materials||[]).length>0&&el('div',{style:{marginBottom:12}},
+              el('div',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:6}},'Required Materials / PPE'),
+              el('div',{style:{display:'flex',flexWrap:'wrap',gap:4}},
+                (editedSOP.required_materials||[]).map((m,i)=>el('div',{key:i,style:{background:'var(--surface2)',border:'1px solid var(--border)',borderRadius:4,padding:'3px 10px',fontSize:11,color:'var(--text2)'}},m))
+              ),
+            ),
+
+            // Steps
+            (editedSOP.steps||[]).length>0&&el('div',{style:{marginBottom:12}},
+              el('div',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:8}},'Procedure Steps ('+( editedSOP.steps||[]).length+')'),
+              (editedSOP.steps||[]).map((step,i)=>el('div',{key:i,style:{display:'flex',gap:10,marginBottom:8,background:step.critical?'rgba(239,68,68,.04)':'var(--surface2)',border:'1px solid',borderColor:step.critical?'rgba(239,68,68,.2)':'var(--border)',borderLeft:'3px solid',borderLeftColor:step.critical?'var(--red)':'var(--accent)',borderRadius:8,padding:'10px 14px'}},
+                el('div',{style:{width:24,height:24,borderRadius:'50%',background:step.critical?'var(--red)':'var(--accent)',color:'#ffffff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:800,flexShrink:0}},step.step_number||i+1),
+                el('div',{style:{flex:1}},
+                  el('div',{style:{fontWeight:600,fontSize:12,marginBottom:3,color:'var(--text)'}},step.title||('Step '+(i+1))),
+                  el('div',{style:{fontSize:12,color:'var(--text2)',lineHeight:1.5,marginBottom:step.regulatory_note?4:0}},step.instruction||step),
+                  step.regulatory_note&&el('div',{style:{fontSize:10,color:'#93c5fd',fontStyle:'italic',marginTop:3}},'\uD83D\uDCCB '+step.regulatory_note),
+                  step.critical&&el('div',{style:{fontSize:10,color:'var(--red)',fontWeight:700,marginTop:3}},'\u26A0\uFE0F CRITICAL STEP'),
+                ),
+              )),
+            ),
+
+            // Quality checks & Documentation
+            el('div',{className:'g2',style:{marginBottom:12}},
+              (editedSOP.quality_checks||[]).length>0&&el('div',null,
+                el('div',{style:{fontSize:11,fontWeight:700,color:'var(--green)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:6}},'Quality Checks'),
+                (editedSOP.quality_checks||[]).map((q,i)=>el('div',{key:i,style:{fontSize:11,color:'var(--text2)',marginBottom:3}},'\u2713 '+q)),
+              ),
+              (editedSOP.documentation_required||[]).length>0&&el('div',null,
+                el('div',{style:{fontSize:11,fontWeight:700,color:'var(--blue)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:6}},'Documentation Required'),
+                (editedSOP.documentation_required||[]).map((d,i)=>el('div',{key:i,style:{fontSize:11,color:'var(--text2)',marginBottom:3}},'\uD83D\uDCCB '+d)),
+              ),
+            ),
+          ),
+
+          // Edit mode - JSON editor
+          editMode&&el('div',{className:'fg'},
+            el('label',null,'Edit Generated SOP (JSON)'),
+            el('textarea',{value:JSON.stringify(editedSOP,null,2),onChange:ev=>{try{setEditedSOP(JSON.parse(ev.target.value));}catch(e){}},style:{width:'100%',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:'10px',color:'var(--text)',fontFamily:'DM Mono, monospace',fontSize:11,outline:'none',minHeight:300,resize:'vertical'}}),
+          ),
+
+          el('div',{className:'mf',style:{justifyContent:'space-between'}},
+            el('div',{style:{fontSize:12,color:'var(--text3)'}},'Will be saved as Draft \u2014 you can edit and publish from SOPs'),
+            el('div',{style:{display:'flex',gap:8}},
+              el('button',{className:'btn b-ghost',onClick:()=>setStep(1)},'\u2190 Back'),
+              el('button',{
+                className:'btn b-ghost',
+                onClick:()=>exportSopPdf({...editedSOP,generated_content:JSON.stringify(editedSOP),title:editedSOP.title,version:editedSOP.revision,license_name:editedSOP.license_name,state:editedSOP.state,sop_number:editedSOP.sop_number,created_by:cu.name}),
+              },'\uD83D\uDCC4 Download PDF'),
+              el('button',{
+                onClick:saveSOP,
+                disabled:saving,
+                style:{background:'var(--accent)',color:'#ffffff',border:'none',borderRadius:'var(--rs)',padding:'10px 24px',fontFamily:'inherit',fontSize:14,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',gap:8}
+              },
+                saving?'Saving...':'\uD83D\uDCBE Save to SOP Library',
+              ),
+            ),
+          ),
+        ),
+      ),
+    )
+  );
+}
+
 function SOPs({sops,setSops,cu,users}){
   const[view,setView]=useState('list'); // list | detail
   const[sel,setSel]=useState(null);
