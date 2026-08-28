@@ -177,6 +177,12 @@ tr:hover td{background:rgba(30,58,95,.03);}
   .main{margin-left:0;padding:16px 14px 90px;}
   .update-banner{position:fixed;top:0;left:0;right:0;background:var(--accent);color:#000000;padding:12px 16px;text-align:center;font-size:13px;font-weight:700;z-index:9999;display:flex;justify-content:space-between;align-items:center;}
 }
+@media print{
+  body *{visibility:hidden;}
+  .badge-print-area,.badge-print-area *{visibility:visible;}
+  .badge-print-area{position:fixed;top:0;left:0;width:3.375in;height:2.125in;box-shadow:none!important;border:none!important;border-radius:0!important;margin:0!important;}
+  @page{size:3.375in 2.125in;margin:0;}
+}
 </style>
 </head>
 <body>
@@ -2777,6 +2783,183 @@ const PERM_COLORS_MAP={
   editor:{bg:'rgba(245,158,11,.12)',color:'#d97706'},
   admin:{bg:'rgba(16,122,85,.12)',color:'#10b981'},
 };
+// Simple two-tone mountain mark for Summit Solutions \u2014 used on printed
+// badges. Kept as inline SVG (not a raster file) so it always prints crisp
+// at any size and never depends on an external asset path.
+function SummitLogo({size=32}){
+  return el('svg',{width:size,height:size*0.86,viewBox:'0 0 100 86',xmlns:'http://www.w3.org/2000/svg',style:{flexShrink:0}},
+    el('polygon',{points:'50,6 92,80 8,80',fill:'#6ba022'}),
+    el('polygon',{points:'50,6 74,80 26,80',fill:'#8bc93f'}),
+    el('polygon',{points:'50,6 58,22 42,22',fill:'#f2f4f5'}),
+    el('polygon',{points:'50,30 62,80 38,80',fill:'#0b0c0d',opacity:0.12}),
+  );
+}
+
+// \u2500\u2500 BADGE CREATOR \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+// Prints on standard CR80 access-card stock (3.375in x 2.125in). The photo
+// is draggable within its frame and zoomable via the slider, matching what
+// most badge tools call "pan & scan" cropping. Photo + crop state persist
+// per-user (badge_photo/_zoom/_x/_y on pf_users) so it survives reloads and
+// doesn't need to be redone every time someone reprints a badge.
+function BadgeCreator({users,cu}){
+  const[selId,setSelId]=useState('');
+  const[search,setSearch]=useState('');
+  const[photo,setPhoto]=useState(null);
+  const[zoom,setZoom]=useState(1);
+  const[offX,setOffX]=useState(0);
+  const[offY,setOffY]=useState(0);
+  const[saving,setSaving]=useState(false);
+  const[msg,setMsg]=useState('');
+  const dragRef=useState({dragging:false,startX:0,startY:0,origX:0,origY:0})[0];
+  const frameRef=React.useRef(null);
+
+  const sel=users.find(u=>u.id===selId);
+  const filtered=users.filter(u=>!search||u.name.toLowerCase().includes(search.toLowerCase())).sort((a,b)=>a.name.localeCompare(b.name));
+
+  function selectUser(u){
+    setSelId(u.id);
+    setPhoto(u.badge_photo||null);
+    setZoom(u.badge_photo_zoom||1);
+    setOffX(u.badge_photo_x||0);
+    setOffY(u.badge_photo_y||0);
+    setMsg('');
+  }
+
+  function onFile(e){
+    const file=e.target.files&&e.target.files[0];
+    if(!file)return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const img=new Image();
+      img.onload=()=>{
+        // Downscale to a sane max so we're not storing multi-MB photos in
+        // the database \u2014 500px is plenty for a printed badge photo.
+        const MAX=500;
+        let w=img.width,h=img.height;
+        if(w>h&&w>MAX){h=Math.round(h*MAX/w);w=MAX;}
+        else if(h>=w&&h>MAX){w=Math.round(w*MAX/h);h=MAX;}
+        const canvas=document.createElement('canvas');
+        canvas.width=w;canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        setPhoto(canvas.toDataURL('image/jpeg',0.85));
+        setZoom(1);setOffX(0);setOffY(0);
+      };
+      img.src=ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function onDragStart(e){
+    if(!photo)return;
+    const point=e.touches?e.touches[0]:e;
+    dragRef.dragging=true;
+    dragRef.startX=point.clientX;dragRef.startY=point.clientY;
+    dragRef.origX=offX;dragRef.origY=offY;
+  }
+  function onDragMove(e){
+    if(!dragRef.dragging)return;
+    const point=e.touches?e.touches[0]:e;
+    const dx=point.clientX-dragRef.startX;
+    const dy=point.clientY-dragRef.startY;
+    setOffX(dragRef.origX+dx);
+    setOffY(dragRef.origY+dy);
+  }
+  function onDragEnd(){dragRef.dragging=false;}
+
+  async function save(){
+    if(!sel)return;
+    setSaving(true);setMsg('');
+    try{
+      await db.update('pf_users',sel.id,{badge_photo:photo,badge_photo_zoom:zoom,badge_photo_x:offX,badge_photo_y:offY});
+      setMsg('\u2713 Badge saved.');
+      setTimeout(()=>setMsg(''),2500);
+    }catch(e){setMsg('\u274C '+e.message);}
+    setSaving(false);
+  }
+
+  function printBadge(){window.print();}
+
+  const title=sel?(sel.position||roleLabels(sel)):'';
+  const qrData=sel?`${APP_URL}/?badge=${sel.id}`:'';
+
+  return el('div',{style:{padding:'0 0 48px'}},
+    el('div',{className:'badge-noprint'},
+      el('div',{style:{background:'#6ba022',borderRadius:14,padding:'20px 24px',marginBottom:24,color:'#fff'}},
+        el('div',{style:{fontSize:20,fontWeight:800,marginBottom:4}},'\uD83E\uDE6A Badge Creator'),
+        el('div',{style:{fontSize:12,opacity:.85}},'CR80 access-card size \u00B7 3.375in \u00D7 2.125in'),
+      ),
+
+      el('div',{style:{display:'flex',gap:24,flexWrap:'wrap',alignItems:'flex-start'}},
+
+        // Left: person picker
+        el('div',{style:{flex:'1 1 260px',maxWidth:320}},
+          el('input',{placeholder:'\uD83D\uDD0D Search people...',value:search,onChange:e=>setSearch(e.target.value),
+            style:{width:'100%',padding:'10px 12px',borderRadius:8,border:'1px solid var(--border)',background:'var(--surface2)',color:'var(--text)',fontFamily:'inherit',fontSize:13,marginBottom:10}}),
+          el('div',{style:{maxHeight:480,overflowY:'auto',border:'1px solid var(--border)',borderRadius:10,background:'var(--surface2)'}},
+            filtered.length===0&&el('div',{style:{padding:16,fontSize:12,color:'var(--text3)',textAlign:'center'}},'No people found.'),
+            filtered.map(u=>el('div',{key:u.id,onClick:()=>selectUser(u),
+              style:{padding:'10px 14px',cursor:'pointer',borderBottom:'1px solid var(--border)',background:selId===u.id?'var(--accent-dim)':'transparent',display:'flex',justifyContent:'space-between',alignItems:'center'}},
+              el('div',null,
+                el('div',{style:{fontSize:13,fontWeight:600}},u.name),
+                el('div',{style:{fontSize:11,color:'var(--text3)'}},u.position||roleLabels(u)),
+              ),
+              u.badge_photo&&el('span',{style:{fontSize:14}},'\u2713'),
+            )),
+          ),
+        ),
+
+        // Right: badge editor + preview
+        sel&&el('div',{style:{flex:'2 1 420px'}},
+          el('div',{style:{display:'flex',gap:24,flexWrap:'wrap',alignItems:'flex-start'}},
+
+            // Editor controls
+            el('div',{style:{flex:'1 1 240px',minWidth:220}},
+              el('div',{style:{fontSize:12,fontWeight:700,color:'var(--text3)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:8}},'Photo'),
+              el('label',{style:{display:'block',padding:'10px 14px',border:'1px dashed var(--border)',borderRadius:8,textAlign:'center',cursor:'pointer',fontSize:12,color:'var(--text2)',marginBottom:14,background:'var(--surface2)'}},
+                photo?'\uD83D\uDCF7 Replace Photo':'\uD83D\uDCF7 Upload Photo',
+                el('input',{type:'file',accept:'image/*',onChange:onFile,style:{display:'none'}}),
+              ),
+              photo&&el('div',{style:{marginBottom:14}},
+                el('div',{style:{fontSize:11,color:'var(--text3)',marginBottom:6}},'Zoom'),
+                el('input',{type:'range',min:1,max:3,step:0.05,value:zoom,onChange:e=>setZoom(parseFloat(e.target.value)),style:{width:'100%'}}),
+                el('div',{style:{fontSize:10,color:'var(--text3)',marginTop:4}},'Drag the photo in the preview to reposition it.'),
+              ),
+              el('div',{style:{display:'flex',gap:8,marginTop:16}},
+                el('button',{className:'btn-primary',disabled:saving,onClick:save,style:{flex:1}},saving?'Saving...':'\uD83D\uDCBE Save Badge'),
+                el('button',{className:'btn b-ghost',onClick:printBadge},'\uD83D\uDDA8\uFE0F Print'),
+              ),
+              msg&&el('div',{style:{marginTop:10,fontSize:12,color:msg.startsWith('\u2713')?'var(--green)':'var(--red)'}},msg),
+            ),
+
+            // Live badge preview
+            el('div',{style:{flex:'1 1 260px'}},
+              el('div',{className:'badge-print-area',
+                style:{width:324,height:204,background:'#ffffff',borderRadius:14,border:'1px solid var(--border)',boxShadow:'0 4px 16px rgba(0,0,0,.3)',padding:'14px 16px',display:'flex',flexDirection:'column',alignItems:'center',color:'#0f172a'}},
+                el('div',{style:{display:'flex',alignItems:'center',gap:6,alignSelf:'flex-start',marginBottom:6}},
+                  el(SummitLogo,{size:20}),
+                  el('div',{style:{fontSize:11,fontWeight:800,letterSpacing:'.3px'}},'SUMMIT SOLUTIONS'),
+                ),
+                el('div',{ref:frameRef,onMouseDown:onDragStart,onMouseMove:onDragMove,onMouseUp:onDragEnd,onMouseLeave:onDragEnd,
+                  onTouchStart:onDragStart,onTouchMove:onDragMove,onTouchEnd:onDragEnd,
+                  style:{width:96,height:96,borderRadius:'50%',overflow:'hidden',border:'3px solid #6ba022',background:'#f1f5f9',cursor:photo?'grab':'default',position:'relative',marginBottom:8}},
+                  photo?el('img',{src:photo,draggable:false,
+                    style:{width:'100%',height:'100%',objectFit:'cover',transform:`translate(${offX}px,${offY}px) scale(${zoom})`,transformOrigin:'center',userSelect:'none',pointerEvents:'none'}}):
+                    el('div',{style:{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:28,color:'#94a3b8'}},'\uD83D\uDC64'),
+                ),
+                el('div',{style:{fontSize:13,fontWeight:800,textAlign:'center'}},sel.name),
+                el('div',{style:{fontSize:10,color:'#64748b',textAlign:'center',marginBottom:6}},title),
+                el('img',{src:`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(qrData)}&bgcolor=ffffff&color=0f172a&margin=2`,alt:'Badge QR',style:{width:44,height:44}}),
+              ),
+              el('div',{style:{fontSize:10,color:'var(--text3)',textAlign:'center',marginTop:8}},'Preview \u2014 actual card prints at 3.375in \u00D7 2.125in'),
+            ),
+          ),
+        ),
+        !sel&&el('div',{style:{flex:'2 1 420px',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--text3)',fontSize:13,padding:40}},'Select a person on the left to create their badge.'),
+      ),
+    ),
+  );
+}
+
 function AccessControlMatrix({users,setUsers}){
   const[filter,setFilter]=useState('');
   const[draft,setDraft]=useState({});
@@ -13570,6 +13753,7 @@ function App(){
     {id:'mydocs',ico:'\uD83D\uDCC1',label:'My Documents'},
     canAccessSales&&{id:'sales',ico:'\uD83C\uDFEA',label:'Sales & Marketing'},
     isAdmin&&{id:'team',ico:'\uD83D\uDC65',label:'Team & Access',badge:pending||null},
+    isElevated&&{id:'badges',ico:'\uD83E\uDE6A',label:'Badge Creator'},
   ]).filter(Boolean);
 
   return el('div',{className:'app'},
@@ -13794,6 +13978,7 @@ function App(){
       }),
       page==='mydocs'&&el(MyDocuments,{cu,corrective:qmsCorrective,setCorrective:setQmsCorrective}),
       page==='team'&&isAdmin&&el(Team,{users,setUsers,cu}),
+      page==='badges'&&isElevated&&el(BadgeCreator,{users,cu}),
     )
   );
 }
