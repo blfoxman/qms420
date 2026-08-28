@@ -190,6 +190,7 @@ tr:hover td{background:rgba(30,58,95,.03);}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.js"></script>
 <script>
 const {useState,useEffect,useMemo,useCallback}=React;
 const el=React.createElement;
@@ -2955,6 +2956,21 @@ function BadgeCreator({users,cu}){
         !sel&&el('div',{style:{flex:'2 1 420px',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--text3)',fontSize:13,padding:40}},'Select a person on the left to create their badge.'),
       ),
     ),
+  );
+}
+
+// \u2500\u2500 BADGES & TIME CLOCK (grouped module: 2 tabs, 1 nav entry) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function BadgesAndTimeClock({users,cu}){
+  const[tab,setTab]=useState('badges');
+  const TABS=[{id:'badges',ico:'\uD83E\uDE6A',label:'Badge Creator'},{id:'signin',ico:'\uD83D\uDCCB',label:'Sign In Sheet'}];
+  return el('div',null,
+    el('div',{style:{display:'flex',gap:4,flexWrap:'wrap',marginBottom:20,background:'var(--surface)',border:'1px solid var(--border)',borderRadius:'var(--r)',padding:4}},
+      TABS.map(t=>el('button',{key:t.id,onClick:()=>setTab(t.id),style:{display:'flex',alignItems:'center',gap:6,padding:'8px 14px',borderRadius:8,border:'none',background:tab===t.id?'var(--accent)':'transparent',color:tab===t.id?'#000000':'var(--text2)',fontFamily:'inherit',fontSize:12,fontWeight:tab===t.id?700:500,cursor:'pointer',transition:'all .15s'}},
+        el('span',null,t.ico),t.label,
+      )),
+    ),
+    tab==='badges'&&el(BadgeCreator,{users,cu}),
+    tab==='signin'&&el(SignInSheet,null),
   );
 }
 
@@ -12944,6 +12960,220 @@ function usePullToRefresh(onRefresh){
 // ══════════════════════════════════════════════════════════════════════════════
 // SANITATION KIOSK — Standalone QR page: blfoxman.github.io/bfm/?kiosk=sanitation
 // ══════════════════════════════════════════════════════════════════════════════
+// \u2500\u2500 TIME CLOCK STATE MACHINE \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+// Fixed 8-step sequence per person per day. Break durations: 1st & 3rd = 15
+// min, 2nd = 30 min. A return later than the limit is flagged late=true so
+// management can review it (highlighted red in the Sign In Sheet).
+const TIME_CLOCK_SEQUENCE=['entry','break1_out','break1_in','break2_out','break2_in','break3_out','break3_in','clockout'];
+const TIME_CLOCK_LABELS={entry:'Clock In',break1_out:'1st Break \u2014 Out',break1_in:'1st Break \u2014 Back',break2_out:'2nd Break \u2014 Out',break2_in:'2nd Break \u2014 Back',break3_out:'3rd Break \u2014 Out',break3_in:'3rd Break \u2014 Back',clockout:'Clock Out'};
+const TIME_CLOCK_BREAK_LIMITS={break1_out:15,break2_out:30,break3_out:15};
+
+function getNextTimeClockEvent(todaysEvents){
+  if(!todaysEvents.length)return'entry';
+  const last=todaysEvents[todaysEvents.length-1].event_type;
+  const idx=TIME_CLOCK_SEQUENCE.indexOf(last);
+  if(idx===-1||idx===TIME_CLOCK_SEQUENCE.length-1)return null; // done for the day
+  return TIME_CLOCK_SEQUENCE[idx+1];
+}
+function computeTimeClockLateness(todaysEvents,newEventType){
+  const outMap={break1_in:'break1_out',break2_in:'break2_out',break3_in:'break3_out'};
+  const outType=outMap[newEventType];
+  if(!outType)return{late:false,lateMinutes:null};
+  const outEvent=[...todaysEvents].reverse().find(e=>e.event_type===outType);
+  if(!outEvent)return{late:false,lateMinutes:null};
+  const limit=TIME_CLOCK_BREAK_LIMITS[outType];
+  const elapsedMin=(Date.now()-new Date(outEvent.ts).getTime())/60000;
+  const late=elapsedMin>limit;
+  return{late,lateMinutes:late?Math.round(elapsedMin-limit):0};
+}
+
+// \u2500\u2500 TIME CLOCK KIOSK (front-door badge scanner) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+// Public, no login \u2014 runs on a shared tablet at the entrance. Employees hold
+// their badge up to the camera; jsQR reads it continuously in the background.
+// The badge QR encodes a link with ?badge=<id>, so decoding it is enough to
+// identify who's scanning without them touching the screen at all.
+function TimeClockKiosk(){
+  const videoRef=React.useRef(null);
+  const canvasRef=React.useRef(null);
+  const scanningRef=React.useRef(true);
+  const[status,setStatus]=React.useState('scanning'); // scanning | result | error
+  const[result,setResult]=React.useState(null);
+  const[cameraError,setCameraError]=React.useState('');
+  const rafRef=React.useRef(null);
+
+  React.useEffect(()=>{
+    let stream;
+    async function start(){
+      try{
+        stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
+        if(videoRef.current){videoRef.current.srcObject=stream;await videoRef.current.play();}
+        tick();
+      }catch(e){setCameraError('Camera not available on this device.');}
+    }
+    function tick(){
+      if(!scanningRef.current){rafRef.current=requestAnimationFrame(tick);return;}
+      const video=videoRef.current,canvas=canvasRef.current;
+      if(video&&canvas&&video.readyState===video.HAVE_ENOUGH_DATA){
+        canvas.width=video.videoWidth;canvas.height=video.videoHeight;
+        const ctx=canvas.getContext('2d');
+        ctx.drawImage(video,0,0,canvas.width,canvas.height);
+        const imgData=ctx.getImageData(0,0,canvas.width,canvas.height);
+        const code=window.jsQR&&window.jsQR(imgData.data,imgData.width,imgData.height);
+        if(code&&code.data){handleScan(code.data);}
+      }
+      rafRef.current=requestAnimationFrame(tick);
+    }
+    start();
+    return()=>{if(rafRef.current)cancelAnimationFrame(rafRef.current);if(stream)stream.getTracks().forEach(t=>t.stop());};
+  },[]);
+
+  async function handleScan(text){
+    let badgeId=null;
+    try{const u=new URL(text);badgeId=u.searchParams.get('badge');}catch{}
+    if(!badgeId)return; // not one of our badge QR codes, ignore and keep scanning
+    scanningRef.current=false;
+    setStatus('result');
+    try{
+      const users=await db.get('pf_users_safe',`id=eq.${encodeURIComponent(badgeId)}&select=id,name,position`);
+      const person=users&&users[0];
+      if(!person){setResult({error:'Badge not recognized.'});return scheduleReset();}
+      const today=new Date().toISOString().slice(0,10);
+      const todaysEvents=await db.get('pf_time_clock',`user_id=eq.${encodeURIComponent(badgeId)}&event_date=eq.${today}&order=ts.asc`);
+      const next=getNextTimeClockEvent(todaysEvents||[]);
+      if(!next){setResult({name:person.name,done:true});return scheduleReset();}
+      const{late,lateMinutes}=computeTimeClockLateness(todaysEvents||[],next);
+      const now=new Date();
+      await kioskWrite('pf_time_clock','insert',null,{
+        id:'tc-'+Date.now(),user_id:person.id,user_name:person.name,event_type:next,
+        ts:now.toISOString(),event_date:today,late,late_minutes:lateMinutes,
+      });
+      setResult({name:person.name,event:next,late,lateMinutes,time:now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})});
+    }catch(e){
+      setResult({error:'Could not log scan: '+e.message});
+    }
+    scheduleReset();
+  }
+  function scheduleReset(){
+    setTimeout(()=>{setStatus('scanning');setResult(null);scanningRef.current=true;},4000);
+  }
+
+  return el('div',{style:{minHeight:'100vh',background:'#0b0c0d',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',color:'#fff',fontFamily:'inherit',padding:20}},
+    el(SummitLogo,{size:64}),
+    el('div',{style:{fontSize:20,fontWeight:800,marginTop:12,marginBottom:24}},'Employee Time Clock'),
+    cameraError&&el('div',{style:{color:'#ef4444',fontSize:14}},cameraError),
+    !cameraError&&status==='scanning'&&el('div',{style:{width:'100%',maxWidth:420}},
+      el('video',{ref:videoRef,playsInline:true,muted:true,style:{width:'100%',borderRadius:16,border:'3px solid #6ba022'}}),
+      el('div',{style:{textAlign:'center',marginTop:16,fontSize:15,color:'#aab0b6'}},'Hold your badge up to the camera'),
+    ),
+    status==='result'&&result&&el('div',{style:{width:'100%',maxWidth:420,background:result.error?'#2a1414':(result.late?'#2a1a14':'#14231a'),border:'2px solid '+(result.error?'#ef4444':(result.late?'#f59e0b':'#6ba022')),borderRadius:16,padding:'32px 24px',textAlign:'center'}},
+      result.error?el('div',{style:{fontSize:18,color:'#ef4444',fontWeight:700}},result.error):
+      result.done?el(React.Fragment,null,
+        el('div',{style:{fontSize:22,fontWeight:800}},result.name),
+        el('div',{style:{fontSize:14,color:'#aab0b6',marginTop:8}},'Already clocked out for today.'),
+      ):el(React.Fragment,null,
+        el('div',{style:{fontSize:22,fontWeight:800}},result.name),
+        el('div',{style:{fontSize:18,fontWeight:700,marginTop:10,color:result.late?'#f59e0b':'#8bc93f'}},TIME_CLOCK_LABELS[result.event]),
+        el('div',{style:{fontSize:14,color:'#aab0b6',marginTop:4}},result.time),
+        result.late&&el('div',{style:{fontSize:13,color:'#f59e0b',marginTop:10,fontWeight:700}},'\u26A0\uFE0F '+result.lateMinutes+' min late \u2014 flagged for review'),
+      ),
+    ),
+    el('canvas',{ref:canvasRef,style:{display:'none'}}),
+  );
+}
+
+// \u2500\u2500 SIGN IN SHEET (management review) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+// One row per employee per day, every event in one line so a late return
+// jumps out immediately \u2014 that cell renders red instead of the normal color.
+function SignInSheet(){
+  const[date,setDate]=useState(new Date().toISOString().slice(0,10));
+  const[rows,setRows]=useState([]);
+  const[loading,setLoading]=useState(true);
+
+  useEffect(()=>{load();},[date]);
+  async function load(){
+    setLoading(true);
+    try{
+      const events=await db.get('pf_time_clock',`event_date=eq.${date}&order=ts.asc`);
+      const byUser={};
+      (events||[]).forEach(e=>{
+        byUser[e.user_id]=byUser[e.user_id]||{user_name:e.user_name,events:{}};
+        byUser[e.user_id].events[e.event_type]=e;
+      });
+      setRows(Object.values(byUser).sort((a,b)=>a.user_name.localeCompare(b.user_name)));
+    }catch(e){console.error(e);}
+    setLoading(false);
+  }
+
+  const cell=(row,type)=>{
+    const ev=row.events[type];
+    if(!ev)return el('span',{style:{color:'var(--text3)'}},'\u2014');
+    const t=new Date(ev.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    return el('span',{style:ev.late?{color:'#ef4444',fontWeight:800}:{}},t,ev.late?' \u26A0\uFE0F':'');
+  };
+
+  return el('div',{style:{padding:'0 0 48px'}},
+    el('div',{style:{background:'#6ba022',borderRadius:14,padding:'20px 24px',marginBottom:24,color:'#fff'}},
+      el('div',{style:{fontSize:20,fontWeight:800,marginBottom:4}},'\uD83D\uDCCB Sign In Sheet'),
+      el('div',{style:{fontSize:12,opacity:.85}},'Badge-scan attendance \u2014 late breaks flagged red for review'),
+    ),
+    el('div',{style:{display:'flex',alignItems:'center',gap:10,marginBottom:16}},
+      el('input',{type:'date',value:date,onChange:e=>setDate(e.target.value),
+        style:{padding:'8px 12px',borderRadius:8,border:'1px solid var(--border)',background:'var(--surface2)',color:'var(--text)',fontFamily:'inherit',fontSize:13}}),
+      el('span',{style:{fontSize:12,color:'var(--text3)'}},'1st & 3rd break limit: 15 min \u00B7 2nd break limit: 30 min'),
+    ),
+    loading&&el('div',{style:{padding:20,color:'var(--text3)'}},'Loading...'),
+    !loading&&rows.length===0&&el('div',{style:{padding:20,color:'var(--text3)',textAlign:'center'}},'No scans recorded for this date.'),
+    !loading&&rows.length>0&&el('div',{style:{overflowX:'auto',border:'1px solid var(--border)',borderRadius:10}},
+      el('table',{style:{width:'100%',borderCollapse:'collapse',fontSize:12}},
+        el('thead',null,
+          el('tr',{style:{background:'var(--surface2)'}},
+            ['Employee','Clock In','1st Out','1st Back','2nd Out','2nd Back','3rd Out','3rd Back','Clock Out'].map(h=>
+              el('th',{key:h,style:{padding:'10px 12px',textAlign:'left',borderBottom:'1px solid var(--border)',whiteSpace:'nowrap'}},h)),
+          ),
+        ),
+        el('tbody',null,
+          rows.map(row=>el('tr',{key:row.user_name,style:{borderBottom:'1px solid var(--border)'}},
+            el('td',{style:{padding:'10px 12px',fontWeight:700,whiteSpace:'nowrap'}},row.user_name),
+            el('td',{style:{padding:'10px 12px'}},cell(row,'entry')),
+            el('td',{style:{padding:'10px 12px'}},cell(row,'break1_out')),
+            el('td',{style:{padding:'10px 12px'}},cell(row,'break1_in')),
+            el('td',{style:{padding:'10px 12px'}},cell(row,'break2_out')),
+            el('td',{style:{padding:'10px 12px'}},cell(row,'break2_in')),
+            el('td',{style:{padding:'10px 12px'}},cell(row,'break3_out')),
+            el('td',{style:{padding:'10px 12px'}},cell(row,'break3_in')),
+            el('td',{style:{padding:'10px 12px'}},cell(row,'clockout')),
+          )),
+        ),
+      ),
+    ),
+  );
+}
+
+// \u2500\u2500 BADGE VERIFICATION (opened when someone scans a badge with their OWN
+// phone, rather than the front-door kiosk) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+// Public, read-only, no login required \u2014 just confirms who a badge belongs
+// to. Deliberately shows only name/title/photo, nothing sensitive.
+function BadgeLookup({badgeId}){
+  const[person,setPerson]=useState(null);
+  const[error,setError]=useState('');
+  useEffect(()=>{
+    db.get('pf_users_safe',`id=eq.${encodeURIComponent(badgeId)}&select=id,name,position,badge_photo`)
+      .then(rows=>{if(rows&&rows[0])setPerson(rows[0]);else setError('Badge not recognized.');})
+      .catch(e=>setError(e.message));
+  },[badgeId]);
+
+  return el('div',{style:{minHeight:'100vh',background:'#0b0c0d',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',color:'#fff',fontFamily:'inherit',padding:20}},
+    el(SummitLogo,{size:64}),
+    error&&el('div',{style:{color:'#ef4444',marginTop:20,fontSize:15}},error),
+    person&&el('div',{style:{marginTop:24,textAlign:'center'}},
+      person.badge_photo?el('img',{src:person.badge_photo,style:{width:110,height:130,objectFit:'cover',borderRadius:8,border:'2px solid #fff',marginBottom:14}}):null,
+      el('div',{style:{fontSize:22,fontWeight:800,textTransform:'uppercase'}},person.name),
+      el('div',{style:{fontSize:13,color:'#aab0b6',textTransform:'uppercase',marginTop:4}},person.position||''),
+      el('div',{style:{fontSize:12,color:'#6ba022',marginTop:16,fontWeight:700}},'\u2713 Verified Summit Solutions badge'),
+    ),
+  );
+}
+
 function SanitationKiosk(){
   const fields=LOG_TYPES.sanitation.fields;
   const init=()=>{
@@ -13756,7 +13986,7 @@ function App(){
     {id:'mydocs',ico:'\uD83D\uDCC1',label:'My Documents'},
     canAccessSales&&{id:'sales',ico:'\uD83C\uDFEA',label:'Sales & Marketing'},
     isAdmin&&{id:'team',ico:'\uD83D\uDC65',label:'Team & Access',badge:pending||null},
-    isElevated&&{id:'badges',ico:'\uD83E\uDE6A',label:'Badge Creator'},
+    isElevated&&{id:'badges',ico:'\uD83E\uDE6A',label:'Badges & Time Clock'},
   ]).filter(Boolean);
 
   return el('div',{className:'app'},
@@ -13981,13 +14211,15 @@ function App(){
       }),
       page==='mydocs'&&el(MyDocuments,{cu,corrective:qmsCorrective,setCorrective:setQmsCorrective}),
       page==='team'&&isAdmin&&el(Team,{users,setUsers,cu}),
-      page==='badges'&&isElevated&&el(BadgeCreator,{users,cu}),
+      page==='badges'&&isElevated&&el(BadgesAndTimeClock,{users,cu}),
     )
   );
 }
 
 (function(){
   const p=new URLSearchParams(window.location.search);
+  const badgeId=p.get('badge');
+  if(badgeId){ReactDOM.createRoot(document.getElementById('root')).render(el(BadgeLookup,{badgeId}));return;}
   const k=p.get('kiosk');
   const C=k==='visitor'?VisitorKiosk
     :k==='sanitation'?SanitationKiosk
@@ -13996,6 +14228,7 @@ function App(){
     :k==='equipment'?EquipmentKiosk
     :k==='temperature'?TemperatureKiosk
     :k==='security'?SecurityKiosk
+    :k==='timeclock'?TimeClockKiosk
     :App;
   ReactDOM.createRoot(document.getElementById('root')).render(el(C));
 })();
