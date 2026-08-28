@@ -180,8 +180,8 @@ tr:hover td{background:rgba(30,58,95,.03);}
 @media print{
   body *{visibility:hidden;}
   .badge-print-area,.badge-print-area *{visibility:visible;}
-  .badge-print-area{position:fixed;top:0;left:0;width:3.375in;height:2.125in;box-shadow:none!important;border:none!important;border-radius:0!important;margin:0!important;}
-  @page{size:3.375in 2.125in;margin:0;}
+  .badge-print-area{position:fixed;top:0;left:0;width:2.125in;height:3.375in;box-shadow:none!important;border:none!important;border-radius:0!important;margin:0!important;}
+  @page{size:2.125in 3.375in;margin:0;}
 }
 </style>
 </head>
@@ -2884,7 +2884,7 @@ function BadgeCreator({users,cu}){
     el('div',{className:'badge-noprint'},
       el('div',{style:{background:'#6ba022',borderRadius:14,padding:'20px 24px',marginBottom:24,color:'#fff'}},
         el('div',{style:{fontSize:20,fontWeight:800,marginBottom:4}},'\uD83E\uDE6A Badge Creator'),
-        el('div',{style:{fontSize:12,opacity:.85}},'CR80 access-card size \u00B7 3.375in \u00D7 2.125in'),
+        el('div',{style:{fontSize:12,opacity:.85}},'CR80 access-card size \u00B7 2.125in \u00D7 3.375in'),
       ),
 
       el('div',{style:{display:'flex',gap:24,flexWrap:'wrap',alignItems:'flex-start'}},
@@ -2935,20 +2935,20 @@ function BadgeCreator({users,cu}){
             // number \u2014 the QR code itself is the unique identifier.
             el('div',{style:{flex:'1 1 260px'}},
               el('div',{className:'badge-print-area',
-                style:{width:324,height:204,background:'#0b0c0d',borderRadius:14,border:'1px solid #2f3234',boxShadow:'0 4px 16px rgba(0,0,0,.5)',padding:'12px 16px',display:'flex',flexDirection:'column',alignItems:'center',color:'#ffffff'}},
-                el(SummitLogo,{size:52}),
+                style:{width:204,height:324,background:'#0b0c0d',borderRadius:14,border:'1px solid #2f3234',boxShadow:'0 4px 16px rgba(0,0,0,.5)',padding:'18px 16px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'flex-start',color:'#ffffff'}},
+                el(SummitLogo,{size:68}),
                 el('div',{ref:frameRef,onMouseDown:onDragStart,onMouseMove:onDragMove,onMouseUp:onDragEnd,onMouseLeave:onDragEnd,
                   onTouchStart:onDragStart,onTouchMove:onDragMove,onTouchEnd:onDragEnd,
-                  style:{width:76,height:88,borderRadius:8,overflow:'hidden',border:'2px solid #ffffff',background:'#1e2022',cursor:photo?'grab':'default',position:'relative',margin:'6px 0'}},
+                  style:{width:112,height:130,borderRadius:8,overflow:'hidden',border:'2px solid #ffffff',background:'#1e2022',cursor:photo?'grab':'default',position:'relative',margin:'14px 0 12px'}},
                   photo?el('img',{src:photo,draggable:false,
                     style:{width:'100%',height:'100%',objectFit:'cover',transform:`translate(${offX}px,${offY}px) scale(${zoom})`,transformOrigin:'center',userSelect:'none',pointerEvents:'none'}}):
-                    el('div',{style:{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:24,color:'#6f767c'}},'\uD83D\uDC64'),
+                    el('div',{style:{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:34,color:'#6f767c'}},'\uD83D\uDC64'),
                 ),
-                el('div',{style:{fontSize:14,fontWeight:800,textAlign:'center',textTransform:'uppercase',letterSpacing:'.3px'}},sel.name),
-                el('div',{style:{fontSize:10,color:'#aab0b6',textAlign:'center',marginBottom:6,textTransform:'uppercase',letterSpacing:'.3px'}},title),
-                el('img',{src:`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(qrData)}&bgcolor=ffffff&color=0f172a&margin=2`,alt:'Badge QR',style:{width:42,height:42,borderRadius:4}}),
+                el('div',{style:{fontSize:16,fontWeight:800,textAlign:'center',textTransform:'uppercase',letterSpacing:'.3px'}},sel.name),
+                el('div',{style:{fontSize:11,color:'#aab0b6',textAlign:'center',marginBottom:16,textTransform:'uppercase',letterSpacing:'.3px'}},title),
+                el('img',{src:`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(qrData)}&bgcolor=ffffff&color=0f172a&margin=2`,alt:'Badge QR',style:{width:64,height:64,borderRadius:4,marginTop:'auto'}}),
               ),
-              el('div',{style:{fontSize:10,color:'var(--text3)',textAlign:'center',marginTop:8}},'Preview \u2014 actual card prints at 3.375in \u00D7 2.125in'),
+              el('div',{style:{fontSize:10,color:'var(--text3)',textAlign:'center',marginTop:8}},'Preview \u2014 actual card prints at 2.125in \u00D7 3.375in'),
             ),
           ),
         ),
