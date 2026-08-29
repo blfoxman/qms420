@@ -1952,7 +1952,7 @@ function ComplianceSummaryWidget({cu,setPage,SUPA_URL,SUPA_KEY,H}){
   const overall=Object.values(data).length?Math.round(Object.values(data).reduce((a,b)=>a+b.pct,0)/Object.values(data).length):0;
   const totalGaps=Object.values(data).reduce((a,b)=>a+(b.gap||0),0);
 
-  return el('div',{style:{background:'#ffffff',border:'1px solid var(--border)',borderRadius:12,padding:'18px 20px',marginBottom:20,boxShadow:'0 1px 4px rgba(15,23,42,.06)'}},
+  return el('div',{style:{background:'var(--surface2)',border:'1px solid var(--border)',borderRadius:12,padding:'18px 20px',marginBottom:20,boxShadow:'0 1px 4px rgba(15,23,42,.06)'}},
     el('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:14,flexWrap:'wrap',gap:8}},
       el('div',{style:{display:'flex',alignItems:'center',gap:10}},
         el('div',{style:{fontSize:20}},'\u2705'),
@@ -4095,7 +4095,6 @@ const LOG_TYPES={
     {key:'date',label:'Date of Waste Generation *',type:'date'},
     {key:'time',label:'Time of Waste Generation',type:'time'},
     {key:'personnel_involved',label:'Personnel Involved *',type:'text',placeholder:'Names of all staff involved'},
-    {key:'agent_ids',label:'Agent ID(s) *',type:'text',placeholder:'CRA agent ID numbers'},
     {key:'category',label:'Category *',type:'select',options:['Concentrate','Flower','Vape Cartridges','Edibles','Infused Pre-Rolls']},
     {key:'strain',label:'Strain / Flavor',type:'text',placeholder:'Strain or flavor name'},
     {key:'waste_metrc_tags',label:'METRC Tag(s) *',type:'text',prefix:'1A40C03000060E100'},
@@ -4182,7 +4181,6 @@ const LOG_TYPES={
     {key:'date',label:'Date *',type:'date'},{key:'time_in',label:'Time In *',type:'time'},{key:'time_out',label:'Time Out',type:'time'},
     {key:'visitor_name',label:'Visitor Full Name *',type:'text',placeholder:''},
     {key:'visitor_company',label:'Company / Organization',type:'text',placeholder:''},
-    {key:'visitor_id',label:'ID Type & Number',type:'text',placeholder:'e.g. MO DL A123456789'},
     {key:'purpose',label:'Purpose of Visit *',type:'select',options:['Regulatory inspection (CRA)','Regulatory inspection (other)','Vendor / delivery','Testing','Maintenance / repair','Audit','Business meeting','Other']},
     {key:'areas_accessed',label:'Areas Accessed *',type:'textarea',placeholder:'List all areas visitor entered'},
     {key:'escorted_by',label:'Escorted By *',type:'text',placeholder:'Employee who supervised visitor'},
@@ -5238,7 +5236,7 @@ function SecurityInspectionForm({cu,onSave,onClose,editData,SUPA_URL,SUPA_KEY,H}
             el('div',{style:{display:'grid',gridTemplateColumns:'1fr 100px 120px',background:'#6ba022',color:'#fff',padding:'8px 12px',fontSize:11,fontWeight:700}},
               el('span',null,'CAMERA NAME'),el('span',{style:{textAlign:'center'}},'CAMERA VIEW'),el('span',{style:{textAlign:'center'}},'FUNCTIONALITY'),
             ),
-            lt.cameras.map((cam,i)=>el('div',{key:cam,style:{display:'grid',gridTemplateColumns:'1fr 100px 120px',padding:'7px 12px',background:i%2===0?'#ffffff':'var(--surface2)',borderBottom:'1px solid var(--border)',alignItems:'center',gap:8}},
+            lt.cameras.map((cam,i)=>el('div',{key:cam,style:{display:'grid',gridTemplateColumns:'1fr 100px 120px',padding:'7px 12px',background:i%2===0?'var(--surface)':'var(--surface2)',borderBottom:'1px solid var(--border)',alignItems:'center',gap:8}},
               el('span',{style:{fontSize:12,fontWeight:600,color:'var(--text)'}},' '+cam),
               el('select',{value:form['cam_view_'+slug(cam)]||'',onChange:ev=>setF('cam_view_'+slug(cam),ev.target.value),style:{fontSize:11,padding:'3px 4px',borderRadius:6,border:'1px solid var(--border)',background:'var(--bg)',color:'var(--text)',fontFamily:'inherit',width:'100%'}},
                 el('option',{value:''},'--'),
@@ -5255,7 +5253,7 @@ function SecurityInspectionForm({cu,onSave,onClose,editData,SUPA_URL,SUPA_KEY,H}
             el('div',{style:{display:'grid',gridTemplateColumns:'1fr 110px 120px',background:'#6ba022',color:'#fff',padding:'8px 12px',fontSize:11,fontWeight:700}},
               el('span',null,'DOOR NAME'),el('span',{style:{textAlign:'center'}},'BATTERY LEVEL'),el('span',{style:{textAlign:'center'}},'FUNCTIONALITY'),
             ),
-            lt.door_locks.map((door,i)=>el('div',{key:door,style:{display:'grid',gridTemplateColumns:'1fr 110px 120px',padding:'7px 12px',background:i%2===0?'#ffffff':'var(--surface2)',borderBottom:'1px solid var(--border)',alignItems:'center',gap:8}},
+            lt.door_locks.map((door,i)=>el('div',{key:door,style:{display:'grid',gridTemplateColumns:'1fr 110px 120px',padding:'7px 12px',background:i%2===0?'var(--surface)':'var(--surface2)',borderBottom:'1px solid var(--border)',alignItems:'center',gap:8}},
               el('span',{style:{fontSize:12,fontWeight:600,color:'var(--text)'}},' '+door),
               el('select',{value:form['door_batt_'+slug(door)]||'',onChange:ev=>setF('door_batt_'+slug(door),ev.target.value),style:{fontSize:11,padding:'3px 4px',borderRadius:6,border:'1px solid var(--border)',background:'var(--bg)',color:'var(--text)',fontFamily:'inherit',width:'100%'}},
                 el('option',{value:''},'--'),
@@ -5272,7 +5270,7 @@ function SecurityInspectionForm({cu,onSave,onClose,editData,SUPA_URL,SUPA_KEY,H}
             el('div',{style:{display:'grid',gridTemplateColumns:'1fr 110px 120px',background:'#6ba022',color:'#fff',padding:'8px 12px',fontSize:11,fontWeight:700}},
               el('span',null,'COMPONENT NAME'),el('span',{style:{textAlign:'center'}},'BATTERY LEVEL'),el('span',{style:{textAlign:'center'}},'FUNCTIONALITY'),
             ),
-            lt.alarms.map((alarm,i)=>el('div',{key:alarm,style:{display:'grid',gridTemplateColumns:'1fr 110px 120px',padding:'7px 12px',background:i%2===0?'#ffffff':'var(--surface2)',borderBottom:'1px solid var(--border)',alignItems:'center',gap:8}},
+            lt.alarms.map((alarm,i)=>el('div',{key:alarm,style:{display:'grid',gridTemplateColumns:'1fr 110px 120px',padding:'7px 12px',background:i%2===0?'var(--surface)':'var(--surface2)',borderBottom:'1px solid var(--border)',alignItems:'center',gap:8}},
               el('span',{style:{fontSize:12,fontWeight:600,color:'var(--text)'}},' '+alarm),
               el('select',{value:form['alarm_batt_'+slug(alarm)]||'',onChange:ev=>setF('alarm_batt_'+slug(alarm),ev.target.value),style:{fontSize:11,padding:'3px 4px',borderRadius:6,border:'1px solid var(--border)',background:'var(--bg)',color:'var(--text)',fontFamily:'inherit',width:'100%'}},
                 el('option',{value:''},'--'),
@@ -5380,7 +5378,7 @@ function FacilityLogs({cu,isElevated,isAdmin,SUPA_URL,SUPA_KEY,H}){
         ),
       ),
     ),
-    showQR&&activeLog==='visitor'&&el('div',{style:{background:'#ffffff',border:'1px solid var(--border)',borderRadius:14,padding:'24px',marginBottom:20,display:'flex',gap:24,alignItems:'center',flexWrap:'wrap'}},
+    showQR&&activeLog==='visitor'&&el('div',{style:{background:'var(--surface2)',border:'1px solid var(--border)',borderRadius:14,padding:'24px',marginBottom:20,display:'flex',gap:24,alignItems:'center',flexWrap:'wrap'}},
       el('div',{style:{flex:1,minWidth:200}},
         el('div',{style:{fontSize:16,fontWeight:800,color:'var(--text)',marginBottom:8}},'\uD83D\uDCF1 Visitor Self-Service Kiosk'),
         el('div',{style:{fontSize:13,color:'var(--text2)',lineHeight:1.7,marginBottom:12}},
@@ -5417,7 +5415,7 @@ function FacilityLogs({cu,isElevated,isAdmin,SUPA_URL,SUPA_KEY,H}){
         el('button',{onClick:()=>{if(activeLog==='security_inspection'){setShowSecInsp(true);setEditSecInsp(null);}else setShowForm(true);},style:{background:lt.color,color:'#fff',border:'none',borderRadius:8,padding:'10px 24px',fontFamily:'inherit',fontSize:13,fontWeight:700,cursor:'pointer',marginTop:8}},'+ New Entry'),
       )
     :el('div',{style:{display:'flex',flexDirection:'column',gap:8}},
-        filtered.map((entry,i)=>el('div',{key:entry.id||i,style:{background:'#ffffff',border:'1px solid var(--border)',borderRadius:12,padding:'14px 16px',boxShadow:'0 1px 3px rgba(15,23,42,.04)'}},
+        filtered.map((entry,i)=>el('div',{key:entry.id||i,style:{background:'var(--surface2)',border:'1px solid var(--border)',borderRadius:12,padding:'14px 16px',boxShadow:'0 1px 3px rgba(15,23,42,.04)'}},
           el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:8,flexWrap:'wrap'}},
             el('div',{style:{flex:1}},
               el('div',{style:{display:'flex',gap:8,marginBottom:6,flexWrap:'wrap',alignItems:'center'}},
@@ -5563,7 +5561,7 @@ function BatchTracker({cu,isElevated,isAdmin,SUPA_URL,SUPA_KEY,H,restricted,mpFn
         el('button',{onClick:()=>{setEditEntry(null);setShowForm(true);},style:{background:lt.color,color:'#fff',border:'none',borderRadius:8,padding:'10px 24px',fontFamily:'inherit',fontSize:13,fontWeight:700,cursor:'pointer',marginTop:8}},'+ New Batch'),
       )
     :el('div',{style:{display:'flex',flexDirection:'column',gap:8}},
-        filtered.map((entry,i)=>el('div',{key:entry.id||i,style:{background:'#ffffff',border:'1px solid var(--border)',borderRadius:12,padding:'14px 16px',boxShadow:'0 1px 3px rgba(15,23,42,.04)'}},
+        filtered.map((entry,i)=>el('div',{key:entry.id||i,style:{background:'var(--surface2)',border:'1px solid var(--border)',borderRadius:12,padding:'14px 16px',boxShadow:'0 1px 3px rgba(15,23,42,.04)'}},
           el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:8,flexWrap:'wrap'}},
             el('div',{style:{flex:1}},
               el('div',{style:{display:'flex',gap:8,marginBottom:6,flexWrap:'wrap',alignItems:'center'}},
@@ -7340,7 +7338,7 @@ function ComplianceModule({cu,isElevated,isAdmin,LICENSES,SUPA_URL,SUPA_KEY,H,db
         const stale=isStale(clause.id);
         const lastVerified=verifiedAt[clause.id];
 
-        return el('div',{key:clause.id,style:{background:'#ffffff',border:'1px solid '+(stale?'#f59e0b':'var(--border)'),borderRadius:12,overflow:'hidden',boxShadow:isOpen?'0 2px 12px rgba(15,23,42,.08)':'0 1px 3px rgba(15,23,42,.04)',transition:'box-shadow .2s'}},
+        return el('div',{key:clause.id,style:{background:'var(--surface2)',border:'1px solid '+(stale?'#f59e0b':'var(--border)'),borderRadius:12,overflow:'hidden',boxShadow:isOpen?'0 2px 12px rgba(15,23,42,.08)':'0 1px 3px rgba(15,23,42,.04)',transition:'box-shadow .2s'}},
           // Header row
           el('div',{onClick:()=>setExpanded(p=>({...p,[clause.id]:!p[clause.id]})),
             style:{display:'flex',alignItems:'center',gap:12,padding:'14px 16px',cursor:'pointer',userSelect:'none',background:isOpen?'rgba(30,58,95,.03)':'transparent'},
@@ -9839,7 +9837,7 @@ function exportSopPdf(sop){
     doc.rect(margin,y,W-margin*2,28,'F');
     doc.setFillColor(...NAVY);
     doc.rect(margin,y,4,28,'F');
-    doc.setTextColor(...NAVY);
+    doc.setTextColor(...TEXT);
     doc.setFont('helvetica','bold');
     doc.setFontSize(11);
     doc.text(txt.toUpperCase(),margin+12,y+19);
@@ -13681,7 +13679,6 @@ function VisitorKiosk(){
       [
         {k:'visitor_name',l:'Full Name *',ph:'Your full name',t:'text'},
         {k:'visitor_company',l:'Company / Organization',ph:'Who do you represent?',t:'text'},
-        {k:'visitor_id',l:'ID Number',ph:'Driver\'s license or ID number',t:'text'},
         {k:'escorted_by',l:'Escorted By',ph:'Employee meeting you',t:'text'},
         {k:'areas_accessed',l:'Areas You Will Visit',ph:'e.g. Reception, Production Floor',t:'text'},
         {k:'notes',l:'Notes',ph:'Reason for visit or additional info',t:'textarea'},
@@ -14260,5 +14257,3 @@ window.addEventListener('beforeinstallprompt', e => {
 </script>
 </body>
 </html>
-
-  
