@@ -9744,6 +9744,8 @@ SOP DETAILS:
 - Title: ${title}
 - Category: ${category}
 
+IMPORTANT: Never use specific employee names anywhere in this SOP. Refer to people only by job title/role (e.g. "Production Manager", "Compliance Officer") in responsibilities, training requirements, revision history, and every other field \u2014 SOPs describe roles, not individuals.
+
 KEY ${state.toUpperCase()} REGULATORY REQUIREMENTS TO INCORPORATE:
 ${STATE_REGS[state].key_rules.map((r,i)=>`${i+1}. ${r}`).join('\n')}
 
@@ -11510,6 +11512,7 @@ SOP Title: ${title}
 Category: ${category}
 ${refText?'Reference material: '+refText:''}
 ${customInstructions.trim()?'\nIMPORTANT \u2014 follow these instructions from the facility, they take priority over your own judgment on formatting/content choices:\n'+customInstructions.trim()+'\n':''}
+IMPORTANT: Never use specific employee names \u2014 refer to people only by job title/role (e.g. "Production Manager") in responsibilities, training requirements, and every other field.
 
 Respond with ONLY this JSON (no markdown, be concise):
 {
@@ -11545,7 +11548,7 @@ Department: ${metaParsed.department}
 ${refText?'Reference material: '+refText:''}
 ${customInstructions.trim()?'\nIMPORTANT \u2014 follow these instructions from the facility, they take priority over your own judgment:\n'+customInstructions.trim()+'\n':''}
 
-Write 6-10 clear procedure steps. Keep each instruction to 1-2 sentences. Flag CRITICAL steps where a regulatory violation or product risk exists.
+Write 6-10 clear procedure steps. Keep each instruction to 1-2 sentences. Flag CRITICAL steps where a regulatory violation or product risk exists. Refer to people only by job title/role, never by specific employee name.
 
 Respond with ONLY this JSON (no markdown, be concise, this must NOT be truncated so keep instructions short):
 {
