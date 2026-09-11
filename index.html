@@ -10035,7 +10035,7 @@ function exportSopPdf(sop){
       doc.setFont('helvetica','normal');
       doc.setFontSize(9);
       doc.setTextColor(...SUBTEXT);
-      doc.text((ack.role||'')+' \u00B7 Signed: '+(ack.at?.slice(0,10)||''),margin,y+14);
+      doc.text((ack.role||'')+' \u00B7 Signed: '+(ack.at?.slice(0,10)||'')+' \u00B7 Renewal due: '+ack.renewal_due?.slice(0,10)||'(6 months from signing)',margin,y+14);
       y+=22;
       if(ack.signature_image){
         try{
@@ -11281,8 +11281,11 @@ Return a REVISED version as JSON only (no markdown). Increment revision to "${ne
       status:'published', // auto-publish on approval
       generated_content:JSON.stringify(editedSOP),
       regulatory_references:editedSOP.regulatory_references||[],
-      // Reset acknowledgements \u2014 everyone must re-read and re-sign the revised SOP
-      acknowledgements:[],
+      // Preserve existing signatures — the last_revision_at timestamp triggers
+      // re-sign detection. Anyone whose signature pre-dates this revision will
+      // be prompted to re-acknowledge via the normal 6-month / revision flow.
+      // We do NOT clear the acknowledgements array so historical sigs are kept.
+      last_revision_at:new Date().toISOString(),
       published_at:new Date().toISOString(),
       updated_at:new Date().toISOString(),
       updated_by:cu.name,
@@ -11922,6 +11925,35 @@ Respond with ONLY this JSON (no markdown, be concise, this must NOT be truncated
   );
 }
 
+
+// ── SOP 6-MONTH ACKNOWLEDGEMENT RENEWAL HELPERS ──────────────────────────
+const ACK_RENEWAL_MONTHS = 6;
+
+// Returns the most recent ack log entry for a given user+sop combo
+function getLatestAck(ackLog, sopId, userId) {
+  return [...(ackLog||[])].filter(a=>a.sop_id===sopId&&a.user_id===userId)
+    .sort((a,b)=>new Date(b.signed_at)-new Date(a.signed_at))[0]||null;
+}
+
+// True if user still has a VALID (non-expired) signature for this SOP version
+function isAckValid(ackLog, sopId, userId, sopVersion) {
+  const entry = getLatestAck(ackLog, sopId, userId);
+  if(!entry) return false;
+  const due = new Date(entry.renewal_due_at);
+  return due > new Date();
+}
+
+// True if user needs to sign (never signed, expired, or SOP revised since last sig)
+function sopNeedsUserAck(ackLog, sop, userId) {
+  if(sop.status !== 'published') return false;
+  const entry = getLatestAck(ackLog, sop.id, userId);
+  if(!entry) return true;
+  const due = new Date(entry.renewal_due_at);
+  if(due <= new Date()) return true;  // expired
+  // If the SOP was revised AFTER their last signature, they must re-sign
+  if(sop.last_revision_at && new Date(sop.last_revision_at) > new Date(entry.signed_at)) return true;
+  return false;
+}
 function SOPs({sops,setSops,cu,users}){
   const[view,setView]=useState('list'); // list | detail
   const[sel,setSel]=useState(null);
@@ -11941,7 +11973,16 @@ function SOPs({sops,setSops,cu,users}){
     return ul.length===1?ul[0]:'all';
   });
   const[saving,setSaving]=useState(false);
+  const[ackLog,setAckLog]=useState([]);
   const[ackMsg,setAckMsg]=useState('');
+
+  // Load ack log on mount and refresh every 5 minutes
+  useEffect(()=>{
+    function loadAcks(){db.get('pf_sop_ack_log','order=signed_at.desc').then(r=>setAckLog(r||[])).catch(()=>{});}
+    loadAcks();
+    const t=setInterval(loadAcks,5*60*1000);
+    return()=>clearInterval(t);
+  },[]);
   const[f,setF]=useState({
     title:'',folder:'General',description:'',
     steps:[{id:'s1',text:''}],
@@ -12048,8 +12089,17 @@ function SOPs({sops,setSops,cu,users}){
   const folderTabs=['All',...SOP_FOLDERS,'Archived'];
 
   // Stats
-  const myAcks=sops.filter(s=>(s.acknowledgements||[]).some(a=>a.id===cu.id));
-  const needsAck=visibleSops.filter(s=>s.status==='published'&&!(s.acknowledgements||[]).some(a=>a.id===cu.id));
+  // Ack status uses the log table: checks recency, not just presence
+  const myAcks=sops.filter(s=>getLatestAck(ackLog,s.id,cu.id)!==null);
+  const needsAck=visibleSops.filter(s=>sopNeedsUserAck(ackLog,s,cu.id));
+  // Show renewal banner if any are due to expire within 14 days
+  const renewingSoon=visibleSops.filter(s=>{
+    const e=getLatestAck(ackLog,s.id,cu.id);
+    if(!e)return false;
+    const due=new Date(e.renewal_due_at);
+    const daysLeft=(due-new Date())/(1000*60*60*24);
+    return daysLeft>0&&daysLeft<=14;
+  });
 
   async function createSOP(){
     if(!f.title) return;
@@ -12127,8 +12177,8 @@ function SOPs({sops,setSops,cu,users}){
   const[sopSigName,setSopSigName]=useState('');
 
   function acknowledgeSOP(sop){
-    const already=(sop.acknowledgements||[]).some(a=>a.id===cu.id);
-    if(already) return;
+    const already=!sopNeedsUserAck(ackLog,sop,cu.id);
+    if(already){setAckMsg('\u2713 Already signed and current — no renewal needed yet.');setTimeout(()=>setAckMsg(''),3000);return;}
     setSopToSign(sop);
     setSopSigName('');
     window._sopSigData=null;
@@ -12137,17 +12187,43 @@ function SOPs({sops,setSops,cu,users}){
 
   async function submitSopAck(){
     if(!sopToSign) return;
-    const ack={id:cu.id,name:cu.name,role:cu.role,at:new Date().toISOString(),signature_name:sopSigName,signature_image:window._sopSigData||null};
-    const acknowledgements=[...(sopToSign.acknowledgements||[]),ack];
+    const now=new Date();
+    const renewalDue=new Date(now);
+    renewalDue.setMonth(renewalDue.getMonth()+ACK_RENEWAL_MONTHS);
+    const prevEntry=getLatestAck(ackLog,sopToSign.id,cu.id);
+    const reason=prevEntry
+      ? (sopToSign.last_revision_at&&new Date(sopToSign.last_revision_at)>new Date(prevEntry.signed_at)?'revision':'renewal')
+      : 'initial';
+    const logEntry={
+      id:'ack-'+Date.now()+'-'+cu.id,
+      sop_id:sopToSign.id,
+      sop_version:sopToSign.version||sopToSign.revision||'1.0',
+      user_id:cu.id,
+      user_name:cu.name,
+      user_role:cu.role||'',
+      signed_at:now.toISOString(),
+      signature_name:sopSigName,
+      signature_image:window._sopSigData||null,
+      renewal_due_at:renewalDue.toISOString(),
+      reason,
+      loc:'Michigan',
+    };
+    // Also keep the legacy acknowledgements array on the SOP for backwards compat
+    const ack={id:cu.id,name:cu.name,role:cu.role,at:now.toISOString(),signature_name:sopSigName,signature_image:window._sopSigData||null};
+    const acknowledgements=[...(sopToSign.acknowledgements||[]).filter(a=>a.id!==cu.id),ack];
     try{
-      await db.update('pf_sops',sopToSign.id,{acknowledgements,updated_at:new Date().toISOString(),updated_by:cu.name});
+      await Promise.all([
+        db.insert('pf_sop_ack_log',logEntry),
+        db.update('pf_sops',sopToSign.id,{acknowledgements,updated_at:now.toISOString(),updated_by:cu.name}),
+      ]);
+      setAckLog(p=>[logEntry,...p]);
       setSops(p=>p.map(s=>s.id===sopToSign.id?{...s,acknowledgements}:s));
       setSel(s=>s?{...s,acknowledgements}:null);
       setShowSopSigModal(false);
       setSopToSign(null);
       setSopSigName('');
       window._sopSigData=null;
-      setAckMsg('\u2713 Signed & Acknowledged!');
+      setAckMsg('\u2713 Signed & Acknowledged! Next renewal due '+renewalDue.toLocaleDateString());
       setTimeout(()=>setAckMsg(''),3000);
     }catch(e){console.error(e);alert('Failed: '+e.message);}
   }
@@ -12219,7 +12295,15 @@ function SOPs({sops,setSops,cu,users}){
       el('span',{style:{fontSize:18}},'\u26A0\uFE0F'),
       el('div',null,
         el('div',{style:{fontWeight:700,marginBottom:4}},'Action Required'),
-        el('div',{style:{fontSize:13}},`You have ${needsAck.length} SOP${needsAck.length>1?'s':''} waiting for your acknowledgement.`),
+        el('div',{style:{fontSize:13}},`You have ${needsAck.length} SOP${needsAck.length>1?'s':''} waiting for your signature or renewal.`),
+        el('div',{style:{fontSize:11,marginTop:4,opacity:.8}},'SOPs must be re-acknowledged every 6 months or when revised.'),
+      ),
+    ),
+    renewingSoon.length>0&&el('div',{className:'alert al-yellow',style:{marginBottom:16,background:'rgba(245,158,11,.06)',border:'1px solid rgba(245,158,11,.25)'}},
+      el('span',{style:{fontSize:18}},'\uD83D\uDD51'),
+      el('div',null,
+        el('div',{style:{fontWeight:700,marginBottom:4}},'Renewal Due Soon'),
+        el('div',{style:{fontSize:13}},`${renewingSoon.length} SOP${renewingSoon.length>1?'s':''} will require re-acknowledgement within 14 days.`),
       ),
     ),
 
