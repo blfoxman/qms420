@@ -84,7 +84,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .btn-sm{padding:5px 11px;font-size:12px;}
 .btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important;}
 .mo{position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(4px);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px;}
-.md{background:#f8fbff;border:1px solid var(--border);border-radius:20px;width:600px;max-width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 24px 60px rgba(15,23,42,.18),var(--glow);}
+.md{background:var(--surface2);border:1px solid var(--border);border-radius:20px;width:600px;max-width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 24px 60px rgba(15,23,42,.18),var(--glow);}
 .mh{padding:22px 26px 15px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px;}
 .mt2{font-size:16px;font-weight:700;color:var(--text);}
 .mc{background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px;line-height:1;transition:color .15s;}
@@ -92,7 +92,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 .mbd{padding:22px 26px;}
 .mf{padding:14px 26px 22px;display:flex;gap:9px;justify-content:flex-end;border-top:1px solid var(--border);}
 .board{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;align-items:start;}
-.col{background:#f8fbff;border:1px solid var(--border);border-radius:var(--r);padding:16px;transition:border-color .2s;box-shadow:0 1px 3px rgba(15,23,42,.05);}
+.col{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:16px;transition:border-color .2s;box-shadow:0 1px 3px rgba(15,23,42,.05);}
 .col-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border);}
 .col-title{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;}
 .col-dot{width:8px;height:8px;border-radius:50%;}
@@ -154,7 +154,7 @@ tr:hover td{background:rgba(30,58,95,.03);}
 .stat:hover{border-color:rgba(30,58,95,.25);transform:translateY(-1px);}
 .sl{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:9px;}
 .sv{font-size:28px;font-weight:800;letter-spacing:-.5px;}
-.card{background:#f8fbff;border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:0 1px 4px rgba(15,23,42,.06);}
+.card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.2);color:var(--text);}
 .perm-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:5px;}
 .perm-item{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border-radius:8px;padding:9px 12px;}
 .perm-label{font-size:12px;font-weight:500;}
@@ -183,6 +183,17 @@ tr:hover td{background:rgba(30,58,95,.03);}
   .badge-print-area{position:fixed;top:0;left:0;width:2.125in;height:3.375in;box-shadow:none!important;border:none!important;border-radius:0!important;margin:0!important;}
   @page{size:2.125in 3.375in;margin:0;}
 }
+/* ── LIGHT CONTENT CARDS ─────────────────────────────────────────────────
+   Any card/panel rendered on a light or white background needs this class.
+   Forces all descendant text to near-black regardless of the dark-theme CSS
+   variables, so content is readable on both surfaces. Kiosks and badge pages
+   manage their own colors and never use this class.
+*/
+.lc, .lc *{color:#0f172a !important;}
+.lc input,.lc select,.lc textarea{background:#ffffff !important;color:#0f172a !important;border-color:#cbd5e1 !important;}
+.lc .text-muted{color:#64748b !important;}
+/* QMS module content area — all detail cards rendered inside */
+.qms-content,.qms-content *:not(button):not(.btn-primary):not([class*="btn"]){color:#0f172a;}
 </style>
 </head>
 <body>
@@ -8480,8 +8491,8 @@ function SupplierTab({cu,isElevated,suppliers,setSuppliers,filterByLic,handleSav
           el('div',{style:{display:'flex',gap:6,marginBottom:8}},
             el('span',{style:{background:sel.status==='approved'?'rgba(16,185,129,.1)':'rgba(245,158,11,.1)',color:sel.status==='approved'?'var(--green)':'var(--accent)',borderRadius:4,padding:'2px 8px',fontSize:11,fontWeight:700}},sel.status==='approved'?'\u2705 Approved':'\u23F3 Pending'),
           ),
-          el('div',{style:{fontSize:18,fontWeight:700}},sel.name),
-          el('div',{style:{fontSize:12,color:'var(--text3)',marginTop:4}},sel.category),
+          el('div',{style:{fontSize:18,fontWeight:700,color:'#0f172a'}},sel.name),
+          el('div',{style:{fontSize:12,color:'#64748b',marginTop:4}},sel.category),
         ),
         el('div',{style:{display:'flex',gap:6,flexWrap:'wrap'}},
           isElevated&&!editMode&&el('button',{className:'btn b-ghost btn-sm',onClick:()=>{setEditMode(true);}},'\u270F\uFE0F Edit'),
@@ -11996,7 +12007,6 @@ function SOPs({sops,setSops,cu,users}){
   const isAdmin=cu.role==='admin';
   const isElevated=isAdmin||hasAnyRole(cu,['general_manager','assistant_general_manager','compliance_officer','security_manager']);
   const canCreate=isElevated||hasAnyRole(cu,MID_MANAGERS);
-  const canAiSop=isAdmin||hasAnyRole(cu,['general_manager','assistant_general_manager','compliance_officer','security_manager']);
   // Non-elevated users are locked to their assigned licenses only
   const userLicenses=cu.licenses||[];
   const allowedLicenses=isElevated?LICENSES:LICENSES.filter(l=>userLicenses.includes(l.id));
@@ -12258,10 +12268,7 @@ function SOPs({sops,setSops,cu,users}){
       ),
       el('div',{style:{display:'flex',gap:8,alignItems:'center'}},
         el('input',{placeholder:'Search SOPs...',value:search,onChange:ev=>setSearch(ev.target.value),style:{background:'var(--surface2)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:'8px 14px',color:'var(--text)',fontFamily:'inherit',fontSize:13,outline:'none',width:200}}),
-        canAiSop&&el('button',{
-            onClick:()=>setShowGenerator(true),
-            style:{background:'linear-gradient(135deg,#667eea,#764ba2)',color:'#fff',border:'none',borderRadius:'var(--rs)',padding:'9px 16px',fontFamily:'inherit',fontSize:13,fontWeight:700,cursor:'pointer',display:'flex',alignItems:'center',gap:6,transition:'all .15s'}
-          },'\uD83E\uDD16 AI Generate SOP'),
+
         canCreate&&el('button',{className:'btn b-blue',onClick:()=>setNew(true)},'+ Manual SOP'),
       ),
     ),
@@ -12419,11 +12426,7 @@ function SOPs({sops,setSops,cu,users}){
       )
     ),
 
-    showGenerator&&canAiSop&&el(SOPGenerator,{
-      cu,
-      onClose:()=>setShowGenerator(false),
-      onSave:(sop)=>{setSops(p=>[sop,...p]);setShowGenerator(false);setSel(sop);},
-    }),
+    showGenerator&&canAiSop&&el(SOPGenerator,{cu,onClose:()=>setShowGenerator(false),onSave:(sop)=>{setSops(p=>[sop,...p]);setShowGenerator(false);setSel(sop);}}),
     showEditSop&&sel&&el(SOPEditModal,{
       sop:sel,cu,users,
       onClose:()=>setShowEditSop(false),
