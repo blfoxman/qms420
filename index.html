@@ -13898,6 +13898,8 @@ function App(){
     }
   },[cu]);
   const[locFilter,setLocFilter]=useState('Michigan');
+  const[openDrop,setOpenDrop]=useState(null);
+  function toggleDrop(name){setOpenDrop(p=>p===name?null:name);}
 
   // FIX 2: doRefresh with correct destructuring
   const doRefresh=useCallback(()=>{
