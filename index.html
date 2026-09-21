@@ -2842,15 +2842,24 @@ function BadgeCreator({users,cu}){
     reader.onload=ev=>{
       const img=new Image();
       img.onload=()=>{
-        // Downscale to a sane max so we're not storing multi-MB photos in
-        // the database \u2014 500px is plenty for a printed badge photo.
-        const MAX=500;
-        let w=img.width,h=img.height;
-        if(w>h&&w>MAX){h=Math.round(h*MAX/w);w=MAX;}
-        else if(h>=w&&h>MAX){w=Math.round(w*MAX/h);h=MAX;}
+        // Force a square canvas at 500px with a black background.
+        // The image is centered inside the square — portrait shots get black
+        // bars on the sides, landscape gets bars top/bottom. This ensures
+        // every badge photo is perfectly square regardless of source aspect ratio.
+        const SIZE=500;
         const canvas=document.createElement('canvas');
-        canvas.width=w;canvas.height=h;
-        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        canvas.width=SIZE;canvas.height=SIZE;
+        const ctx=canvas.getContext('2d');
+        // Black background
+        ctx.fillStyle='#000000';
+        ctx.fillRect(0,0,SIZE,SIZE);
+        // Scale image to fit inside the square while preserving aspect ratio
+        const scale=Math.min(SIZE/img.width,SIZE/img.height);
+        const sw=Math.round(img.width*scale);
+        const sh=Math.round(img.height*scale);
+        const sx=Math.round((SIZE-sw)/2);
+        const sy=Math.round((SIZE-sh)/2);
+        ctx.drawImage(img,sx,sy,sw,sh);
         setPhoto(canvas.toDataURL('image/jpeg',0.85));
         setZoom(1);setOffX(0);setOffY(0);
       };
@@ -2941,28 +2950,68 @@ function BadgeCreator({users,cu}){
               msg&&el('div',{style:{marginTop:10,fontSize:12,color:msg.startsWith('\u2713')?'var(--green)':'var(--red)'}},msg),
             ),
 
-            // Live badge preview \u2014 styled after a standard state-issued
-            // cannabis agent ID card: black field, white ink, logo banner,
-            // rectangular photo, name + title, QR at the bottom. No agent ID
-            // number \u2014 the QR code itself is the unique identifier.
+            // Live badge preview — Keystone Manufacturing luxury template
             el('div',{style:{flex:'1 1 260px'}},
-              el('div',{className:'badge-print-area',
-                style:{width:204,height:324,background:'#ffffff',borderRadius:14,border:'1px solid #d4d4d4',boxShadow:'0 4px 16px rgba(0,0,0,.18)',padding:'18px 16px',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'flex-start',color:'#000000'}},
-                el(SummitLogo,{size:68}),
-                el('div',{ref:frameRef,onMouseDown:onDragStart,onMouseMove:onDragMove,onMouseUp:onDragEnd,onMouseLeave:onDragEnd,
-                  onTouchStart:onDragStart,onTouchMove:onDragMove,onTouchEnd:onDragEnd,
-                  style:{width:112,height:130,borderRadius:8,overflow:'hidden',border:'2px solid #000000',background:'#f1f1f1',cursor:photo?'grab':'default',position:'relative',margin:'14px 0 12px'}},
-                  photo?el('img',{src:photo,draggable:false,
-                    style:{width:'100%',height:'100%',objectFit:'cover',transform:`translate(${offX}px,${offY}px) scale(${zoom})`,transformOrigin:'center',userSelect:'none',pointerEvents:'none'}}):
-                    el('div',{style:{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',fontSize:34,color:'#9a9a9a'}},'\uD83D\uDC64'),
+              el('div',{className:'badge-print-area',style:{
+                width:204,height:324,background:'#0a0a0a',borderRadius:14,
+                boxShadow:'0 8px 32px rgba(0,0,0,.6)',
+                position:'relative',overflow:'hidden',
+                display:'flex',flexDirection:'column',alignItems:'center',
+              }},
+                el('svg',{style:{position:'absolute',top:0,left:0,width:'100%',height:'100%',pointerEvents:'none'},viewBox:'0 0 204 324'},
+                  el('polygon',{points:'0,0 70,0 0,70',fill:'#c9a84c',opacity:'0.2'}),
+                  el('line',{x1:'0',y1:'0',x2:'65',y2:'65',stroke:'#c9a84c',strokeWidth:'1.5',opacity:'0.7'}),
+                  el('line',{x1:'0',y1:'15',x2:'50',y2:'65',stroke:'#c9a84c',strokeWidth:'0.8',opacity:'0.4'}),
+                  el('polygon',{points:'204,0 134,0 204,70',fill:'#c9a84c',opacity:'0.2'}),
+                  el('line',{x1:'204',y1:'0',x2:'139',y2:'65',stroke:'#c9a84c',strokeWidth:'1.5',opacity:'0.7'}),
+                  el('line',{x1:'204',y1:'15',x2:'154',y2:'65',stroke:'#c9a84c',strokeWidth:'0.8',opacity:'0.4'}),
+                  el('polygon',{points:'0,324 70,324 0,254',fill:'#c9a84c',opacity:'0.2'}),
+                  el('line',{x1:'0',y1:'324',x2:'65',y2:'259',stroke:'#c9a84c',strokeWidth:'1.5',opacity:'0.7'}),
+                  el('polygon',{points:'204,324 134,324 204,254',fill:'#c9a84c',opacity:'0.2'}),
+                  el('line',{x1:'204',y1:'324',x2:'139',y2:'259',stroke:'#c9a84c',strokeWidth:'1.5',opacity:'0.7'}),
                 ),
-                el('div',{style:{fontSize:16,fontWeight:800,textAlign:'center',textTransform:'uppercase',letterSpacing:'.3px',color:'#000000'}},sel.name),
-                el('div',{style:{fontSize:11,color:'#3a3a3a',textAlign:'center',marginBottom:16,textTransform:'uppercase',letterSpacing:'.3px'}},title),
-                el('img',{src:`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(qrData)}&bgcolor=ffffff&color=0f172a&margin=2`,alt:'Badge QR',style:{width:64,height:64,borderRadius:4,marginTop:'auto'}}),
+                el('div',{style:{marginTop:16,zIndex:1}},el(SummitLogo,{size:54})),
+                el('div',{style:{fontSize:5.5,letterSpacing:'2px',color:'#c9a84c',opacity:.6,marginTop:2,textTransform:'uppercase',zIndex:1}},'HIGHER STANDARDS. DEEPER ROOTS.'),
+                el('div',{style:{width:110,height:1,background:'linear-gradient(90deg,transparent,#c9a84c,transparent)',margin:'7px 0',zIndex:1}}),
+                el('div',{style:{position:'relative',zIndex:1,margin:'0 0 5px'}},
+                  el('div',{style:{width:90,height:90,borderRadius:'50%',background:'linear-gradient(135deg,#a07830,#f5d78e,#c9a84c,#a07830)',padding:3,boxShadow:'0 0 16px rgba(201,168,76,.6)'}},
+                    el('div',{ref:frameRef,onMouseDown:onDragStart,onMouseMove:onDragMove,onMouseUp:onDragEnd,onMouseLeave:onDragEnd,
+                      onTouchStart:onDragStart,onTouchMove:onDragMove,onTouchEnd:onDragEnd,
+                      style:{width:'100%',height:'100%',borderRadius:'50%',overflow:'hidden',background:'#1a1a1a',cursor:photo?'grab':'default',position:'relative'}},
+                      photo?el('img',{src:photo,draggable:false,
+                        style:{width:'100%',height:'100%',objectFit:'cover',transform:`translate(${offX}px,${offY}px) scale(${zoom})`,transformOrigin:'center',userSelect:'none',pointerEvents:'none'}}):
+                        el('div',{style:{width:'100%',height:'100%',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center'}},
+                          el('div',{style:{fontSize:22,marginBottom:2}},'\uD83D\uDC64'),
+                          el('div',{style:{fontSize:5,color:'#c9a84c',letterSpacing:'1px'}},'YOUR PHOTO'),
+                          el('div',{style:{fontSize:5,color:'#c9a84c',letterSpacing:'1px'}},'HERE'),
+                        ),
+                    ),
+                    ),
+                  ),
+                ),
+                el('div',{style:{fontSize:12,fontWeight:900,textTransform:'uppercase',letterSpacing:'1.5px',color:'#c9a84c',textAlign:'center',zIndex:1,textShadow:'0 0 10px rgba(201,168,76,.5)',paddingLeft:16,paddingRight:16}},sel.name),
+                el('div',{style:{fontSize:8,color:'#c9a84c',margin:'1px 0',zIndex:1,opacity:.8}},'\u25C6'),
+                el('div',{style:{fontSize:7,letterSpacing:'2px',color:'#c9a84c',opacity:.75,textTransform:'uppercase',textAlign:'center',zIndex:1}},title),
+                el('div',{style:{width:'100%',padding:'5px 12px 0',zIndex:1,marginTop:'auto'}},
+                  el('div',{style:{display:'flex',alignItems:'center',gap:6,marginBottom:3}},
+                    el('div',{style:{fontSize:6.5,color:'#c9a84c',letterSpacing:'1px',opacity:.7}},'ID NO.'),
+                    el('div',{style:{fontSize:9,fontWeight:700,color:'#c9a84c',letterSpacing:'3px',border:'1px solid rgba(201,168,76,.5)',borderRadius:3,padding:'1px 7px'}},
+                      String(Math.abs(sel.id.split('').reduce((a,c)=>a*31+c.charCodeAt(0)|0,0))%9000+1000)
+                    ),
+                  ),
+                  el('img',{
+                    src:`https://api.qrserver.com/v1/create-qr-code/?size=1x40&ecc=L&data=${encodeURIComponent(qrData)}&bgcolor=0a0a0a&color=c9a84c&margin=1`,
+                    alt:'Barcode',style:{width:'100%',height:20,imageRendering:'pixelated',borderRadius:2,border:'1px solid rgba(201,168,76,.2)',display:'block',marginBottom:4},
+                  }),
+                  el('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between'}},
+                    el('img',{src:`https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(qrData)}&bgcolor=0a0a0a&color=c9a84c&margin=2`,alt:'QR',style:{width:38,height:38,borderRadius:3,border:'1px solid rgba(201,168,76,.3)'}}),
+                    el('div',{style:{fontSize:5.5,color:'#c9a84c',opacity:.55,letterSpacing:'1.5px',textAlign:'right',textTransform:'uppercase',lineHeight:2}},'INTEGRITY | PEOPLE | PROGRESS'),
+                  ),
+                ),
+                el('div',{style:{width:70,height:1,background:'linear-gradient(90deg,transparent,#c9a84c,transparent)',margin:'4px 0 6px',zIndex:1}}),
               ),
-              el('div',{style:{fontSize:10,color:'var(--text3)',textAlign:'center',marginTop:8}},'Preview \u2014 actual card prints at 2.125in \u00D7 3.375in'),
+              el('div',{style:{fontSize:10,color:'var(--text3)',textAlign:'center',marginTop:8}},'Preview — actual card prints at 2.125in × 3.375in'),
             ),
-          ),
         ),
         !sel&&el('div',{style:{flex:'2 1 420px',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--text3)',fontSize:13,padding:40}},'Select a person on the left to create their badge.'),
       ),
