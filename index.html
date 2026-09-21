@@ -2957,7 +2957,6 @@ function BadgeCreator({users,cu}){
                 position:'relative',overflow:'hidden',flexShrink:0,
                 boxShadow:'0 8px 32px rgba(0,0,0,.7)',
               }},
-                // SVG corner accents
                 el('svg',{style:{position:'absolute',top:0,left:0,width:'100%',height:'100%',pointerEvents:'none'},viewBox:'0 0 204 324',preserveAspectRatio:'none'},
                   el('polygon',{points:'0,0 72,0 0,72',fill:'#c9a84c',opacity:'0.22'}),
                   el('line',{x1:'0',y1:'0',x2:'68',y2:'68',stroke:'#c9a84c',strokeWidth:'2',opacity:'0.75'}),
@@ -2974,63 +2973,59 @@ function BadgeCreator({users,cu}){
                   el('line',{x1:'204',y1:'324',x2:'136',y2:'256',stroke:'#c9a84c',strokeWidth:'2',opacity:'0.75'}),
                   el('line',{x1:'204',y1:'310',x2:'150',y2:'256',stroke:'#c9a84c',strokeWidth:'1',opacity:'0.45'}),
                 ),
-                // All content absolutely positioned inside the fixed card
-                el('div',{style:{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',padding:'16px 14px 10px',boxSizing:'border-box'}},
-                  // Logo
-                  el('img',{src:'data:image/png;base64,'+SUMMIT_LOGO_B64,style:{width:52,height:52,objectFit:'contain',flexShrink:0}}),
-                  // Tagline
-                  el('div',{style:{fontSize:5,letterSpacing:'2px',color:'#c9a84c',opacity:.6,marginTop:1,textTransform:'uppercase',textAlign:'center'}},'HIGHER STANDARDS. DEEPER ROOTS.'),
-                  // Gold separator
-                  el('div',{style:{width:100,height:1,background:'linear-gradient(90deg,transparent,#c9a84c,transparent)',margin:'5px 0',flexShrink:0}}),
-                  // Circular photo with gold gradient ring
-                  el('div',{style:{width:86,height:86,borderRadius:'50%',background:'linear-gradient(135deg,#8a6420,#f5d78e,#c9a84c,#8a6420)',padding:3,boxShadow:'0 0 20px rgba(201,168,76,.6)',flexShrink:0}},
+                el('div',{style:{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',padding:'14px 12px 8px',boxSizing:'border-box'}},
+                  // Circular photo with gold ring - NO logo, template already has it printed on the card
+                  el('div',{style:{width:92,height:92,borderRadius:'50%',background:'linear-gradient(135deg,#8a6420,#f5d78e,#c9a84c,#8a6420)',padding:3,boxShadow:'0 0 20px rgba(201,168,76,.6)',flexShrink:0}},
                     el('div',{ref:frameRef,onMouseDown:onDragStart,onMouseMove:onDragMove,onMouseUp:onDragEnd,onMouseLeave:onDragEnd,onTouchStart:onDragStart,onTouchMove:onDragMove,onTouchEnd:onDragEnd,style:{width:'100%',height:'100%',borderRadius:'50%',overflow:'hidden',background:'#1c1c1c',cursor:photo?'grab':'default'}},
                       photo?el('img',{src:photo,draggable:false,style:{width:'100%',height:'100%',objectFit:'cover',transform:`translate(${offX}px,${offY}px) scale(${zoom})`,transformOrigin:'center',userSelect:'none',pointerEvents:'none'}}):
                         el('div',{style:{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:2}},
-                          el('div',{style:{fontSize:20,opacity:.6}},'\uD83D\uDC64'),
+                          el('div',{style:{fontSize:22,opacity:.5}},'\uD83D\uDC64'),
                           el('div',{style:{fontSize:4.5,color:'#c9a84c',letterSpacing:'.8px',opacity:.7}},'YOUR PHOTO HERE'),
                         ),
                     ),
                   ),
                   // Name
                   el('div',{style:{fontSize:11,fontWeight:900,textTransform:'uppercase',letterSpacing:'2px',color:'#c9a84c',textAlign:'center',marginTop:8,textShadow:'0 0 12px rgba(201,168,76,.5)',lineHeight:1.2,flexShrink:0}},sel.name),
-                  // Diamond line separator
-                  el('div',{style:{display:'flex',alignItems:'center',gap:6,margin:'4px 0',flexShrink:0}},
+                  // Diamond + lines
+                  el('div',{style:{display:'flex',alignItems:'center',gap:6,margin:'4px 0',flexShrink:0,width:'100%'}},
                     el('div',{style:{flex:1,height:1,background:'linear-gradient(90deg,transparent,rgba(201,168,76,.5))'}}),
-                    el('div',{style:{fontSize:7,color:'#c9a84c',opacity:.9}},'\u25C6'),
+                    el('div',{style:{fontSize:7,color:'#c9a84c'}},'\u25C6'),
                     el('div',{style:{flex:1,height:1,background:'linear-gradient(90deg,rgba(201,168,76,.5),transparent)'}}),
                   ),
                   // Title
                   el('div',{style:{fontSize:7,letterSpacing:'2.5px',color:'#c9a84c',opacity:.85,textTransform:'uppercase',textAlign:'center',flexShrink:0}},title),
-                  // Spacer
                   el('div',{style:{flex:1,minHeight:2}}),
-                  // ID row
+                  // Bottom section
                   el('div',{style:{width:'100%',flexShrink:0}},
-                    el('div',{style:{display:'flex',alignItems:'flex-start',gap:10,marginBottom:6}},
+                    // ID row with divider
+                    el('div',{style:{display:'flex',alignItems:'flex-start',gap:8,marginBottom:5}},
                       el('div',null,
-                        el('div',{style:{fontSize:6,color:'#c9a84c',letterSpacing:'1px',opacity:.7,marginBottom:3}},'ID NO.'),
-                        el('div',{style:{border:'1px solid rgba(201,168,76,.5)',borderRadius:3,padding:'3px 10px',minWidth:60,fontSize:9,fontWeight:700,color:'#c9a84c',letterSpacing:'3px',textAlign:'center'}},
+                        el('div',{style:{fontSize:5.5,color:'#c9a84c',letterSpacing:'1px',opacity:.7,marginBottom:2}},'ID NO.'),
+                        el('div',{style:{border:'1px solid rgba(201,168,76,.5)',borderRadius:3,padding:'3px 10px',fontSize:9,fontWeight:700,color:'#c9a84c',letterSpacing:'3px',textAlign:'center'}},
                           String(Math.abs(sel.id.split('').reduce((a,c)=>a*31+c.charCodeAt(0)|0,0))%9000+1000)
                         ),
                       ),
-                      el('div',{style:{width:1,height:40,background:'rgba(201,168,76,.3)',flexShrink:0}}),
-                      el('div',{style:{fontSize:5.5,color:'#c9a84c',opacity:.5,letterSpacing:'1px',textTransform:'uppercase',lineHeight:1.9,paddingTop:2}},'A BRIGHTER\nTOMORROW\nTOGETHER'),
+                      el('div',{style:{width:1,height:38,background:'rgba(201,168,76,.35)',flexShrink:0,marginLeft:2}}),
+                      el('div',{style:{fontSize:5,color:'#c9a84c',opacity:.5,letterSpacing:'.8px',textTransform:'uppercase',lineHeight:1.9,paddingTop:2}},'A BRIGHTER\nTOMORROW\nTOGETHER'),
                     ),
-                    // Barcode
-                    el('div',{style:{border:'1px solid rgba(201,168,76,.4)',borderRadius:3,padding:'4px 6px',marginBottom:5}},
-                      el('img',{src:`https://api.qrserver.com/v1/create-qr-code/?size=1x60&ecc=L&data=${encodeURIComponent(qrData)}&bgcolor=0a0a0a&color=c9a84c&margin=0`,alt:'Barcode',style:{width:'100%',height:20,imageRendering:'pixelated',display:'block'}}),
+                    // Barcode (Code 128 style via qrserver with size 1xH = linear barcode)
+                    el('div',{style:{border:'1px solid rgba(201,168,76,.4)',borderRadius:3,padding:'3px 4px',marginBottom:5,background:'rgba(0,0,0,.3)'}},
+                      el('img',{src:`https://barcode.tec-it.com/barcode.ashx?data=${encodeURIComponent(sel.id.slice(0,12))}&code=Code128&dpi=96&unit=Fit&color=c9a84c&bgcolor=0a0a0a&qzone=0`,
+                        alt:'Barcode',
+                        onError:(e)=>{e.target.src=`https://api.qrserver.com/v1/create-qr-code/?size=160x30&ecc=L&data=${encodeURIComponent(qrData)}&bgcolor=0a0a0a&color=c9a84c&margin=0&qzone=0`;},
+                        style:{width:'100%',height:24,imageRendering:'pixelated',display:'block'}}),
                     ),
-                    // QR + tagline
-                    el('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between'}},
-                      el('div',{style:{border:'1px solid rgba(201,168,76,.4)',borderRadius:3,padding:2}},
-                        el('img',{src:`https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(qrData)}&bgcolor=0a0a0a&color=c9a84c&margin=2`,alt:'QR',style:{width:36,height:36,display:'block'}}),
+                    // QR code + tagline
+                    el('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',gap:6}},
+                      el('div',{style:{border:'1px solid rgba(201,168,76,.4)',borderRadius:3,padding:2,background:'rgba(0,0,0,.3)'}},
+                        el('img',{src:`https://api.qrserver.com/v1/create-qr-code/?size=80x80&data=${encodeURIComponent(qrData)}&bgcolor=0a0a0a&color=c9a84c&margin=2`,alt:'QR',style:{width:38,height:38,display:'block'}}),
                       ),
-                      el('div',{style:{fontSize:5.5,color:'#c9a84c',opacity:.55,letterSpacing:'1.5px',textAlign:'center',textTransform:'uppercase',lineHeight:1.8}},'INTEGRITY | PEOPLE | PROGRESS'),
+                      el('div',{style:{fontSize:5,color:'#c9a84c',opacity:.55,letterSpacing:'1px',textAlign:'center',textTransform:'uppercase',lineHeight:1.9}},'INTEGRITY\nPEOPLE\nPROGRESS'),
                     ),
                   ),
                 ),
               ),
-              el('div',{style:{fontSize:10,color:'var(--text3)',textAlign:'center',marginTop:8}},'— actual card prints at 2.125in × 3.375in'),
+              el('div',{style:{fontSize:10,color:'var(--text3)',textAlign:'center',marginTop:8}},'Preview — actual card prints at 2.125in × 3.375in'),
             ),
           ),
         ),
