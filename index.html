@@ -6981,7 +6981,7 @@ function CogsLibraryManager({library,onSave,onDelete}){
   const[f,setF]=useState({category:'raw_material',name:'',unit:'',cost_per_unit:'',product_types:[]});
   const[editing,setEditing]=useState(null);
 
-  function startEdit(item){setEditing(item.id);setF({...item,product_types:item.product_types||[]});setShowAdd(true);}
+  function startEdit(item){setShowAdd(false);setTimeout(()=>{setEditing(item.id);setF({...item,product_types:item.product_types||[]});setShowAdd(true);},0);}
   function startNew(){setEditing(null);setF({category:'raw_material',name:'',unit:'',cost_per_unit:'',product_types:[]});setShowAdd(true);}
   async function submit(){
     if(!f.name.trim()){alert('Enter a name.');return;}
