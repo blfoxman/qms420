@@ -13378,9 +13378,14 @@ function BadgeScanKiosk(){
         video:{facingMode:'user',width:{ideal:1280},height:{ideal:720}},audio:false
       });
       streamRef.current=stream;
-      if(videoRef.current){videoRef.current.srcObject=stream;await videoRef.current.play();}
+      if(videoRef.current){
+        videoRef.current.srcObject=stream;
+        videoRef.current.setAttribute('autoplay','');
+        videoRef.current.muted=true;
+        try{await videoRef.current.play();}catch(e){console.warn('play():',e);}
+      }
       faceConsecutive.current=0;
-      startTick();
+      setTimeout(()=>startTick(),100);
     }catch(e){setCameraErr('Camera unavailable: '+e.message);}
   }
 
@@ -13391,17 +13396,32 @@ function BadgeScanKiosk(){
     setState('switching');
     try{
       let stream;
-      try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{exact:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false});}
-      catch{stream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});}
+      const constraints=[
+        {video:{facingMode:{exact:'environment'},width:{ideal:1280},height:{ideal:720}}},
+        {video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}}},
+        {video:{facingMode:'user',width:{ideal:1280},height:{ideal:720}}},
+        {video:true},
+      ];
+      for(const c of constraints){
+        try{stream=await navigator.mediaDevices.getUserMedia({...c,audio:false});break;}catch{}
+      }
+      if(!stream)throw new Error('No camera available');
       streamRef.current=stream;
-      if(videoRef.current){videoRef.current.srcObject=stream;await videoRef.current.play();}
+      if(videoRef.current){
+        videoRef.current.srcObject=stream;
+        videoRef.current.setAttribute('autoplay','');
+        videoRef.current.setAttribute('playsinline','');
+        videoRef.current.muted=true;
+        try{await videoRef.current.play();}catch(e){console.warn('play():',e);}
+      }
       // Apply zoom out if supported
       const track=stream.getVideoTracks()[0];
       const caps=track.getCapabilities&&track.getCapabilities();
       if(caps&&caps.zoom){track.applyConstraints({advanced:[{zoom:caps.zoom.min}]}).catch(()=>{});}
       scanningRef.current=true;
       setState('scanning');
-      startTick();
+      // Small delay to let video render before starting tick
+      setTimeout(()=>startTick(),200);
     }catch(e){setCameraErr('Camera unavailable: '+e.message);}
   }
 
