@@ -13315,6 +13315,193 @@ function BadgeLookup({badgeId}){
   );
 }
 
+// ── BADGE SCAN KIOSK ──────────────────────────────────────────────────────
+// Standalone full-screen kiosk — no login required.
+// URL: https://blfoxman.github.io/qms420/?kiosk=scan
+//
+// Flow:
+//   1. Camera opens and continuously reads QR codes.
+//   2. Badge QR encodes: https://.../?badge=<user_id>
+//   3. On decode → look up user from pf_users_safe → write scan log to
+//      pf_time_clock (next event in that person's 8-step sequence).
+//   4. Show big confirmation card (green = valid, red = error) for 4s.
+//   5. Auto-reset to scanning.
+//
+function BadgeScanKiosk(){
+  const videoRef=React.useRef(null);
+  const canvasRef=React.useRef(null);
+  const scanningRef=React.useRef(true);
+  const resetTimer=React.useRef(null);
+  const[state,setState]=React.useState('scanning'); // scanning | ok | error
+  const[person,setPerson]=React.useState(null);
+  const[eventLabel,setEventLabel]=React.useState('');
+  const[scanTime,setScanTime]=React.useState('');
+  const[cameraErr,setCameraErr]=React.useState('');
+
+  React.useEffect(()=>{
+    let stream;
+    let raf;
+    async function start(){
+      try{
+        stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}},audio:false});
+        if(videoRef.current){videoRef.current.srcObject=stream;await videoRef.current.play();}
+        tick();
+      }catch(e){setCameraErr('Camera unavailable — '+e.message);}
+    }
+    function tick(){
+      if(!scanningRef.current){raf=requestAnimationFrame(tick);return;}
+      const v=videoRef.current,c=canvasRef.current;
+      if(v&&c&&v.readyState>=2){
+        c.width=v.videoWidth;c.height=v.videoHeight;
+        const ctx=c.getContext('2d');ctx.drawImage(v,0,0);
+        const img=ctx.getImageData(0,0,c.width,c.height);
+        const code=window.jsQR&&window.jsQR(img.data,img.width,img.height,{inversionAttempts:'dontInvert'});
+        if(code&&code.data)handleScan(code.data);
+      }
+      raf=requestAnimationFrame(tick);
+    }
+    start();
+    return()=>{if(raf)cancelAnimationFrame(raf);if(stream)stream.getTracks().forEach(t=>t.stop());if(resetTimer.current)clearTimeout(resetTimer.current);};
+  },[]);
+
+  async function handleScan(text){
+    let badgeId=null;
+    try{const u=new URL(text);badgeId=u.searchParams.get('badge');}catch{}
+    if(!badgeId)return;
+    scanningRef.current=false; // stop scanning while processing
+
+    const now=new Date();
+    const today=now.toISOString().slice(0,10);
+    const timeStr=now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    setScanTime(timeStr);
+
+    try{
+      // 1. Identify person
+      const users=await db.get('pf_users_safe',`id=eq.${encodeURIComponent(badgeId)}&select=id,name,position,badge_photo`);
+      const user=users&&users[0];
+      if(!user){setState('error');setPerson(null);setEventLabel('Badge not recognized');scheduleReset();return;}
+
+      // 2. Determine next event
+      const events=await db.get('pf_time_clock',`user_id=eq.${encodeURIComponent(badgeId)}&event_date=eq.${today}&order=ts.asc`);
+      const next=getNextTimeClockEvent(events||[]);
+      if(!next){setState('ok');setPerson(user);setEventLabel('Already completed all events for today');scheduleReset();return;}
+
+      // 3. Check lateness
+      const{late,lateMinutes}=computeTimeClockLateness(events||[],next);
+
+      // 4. Log it
+      await kioskWrite('pf_time_clock','insert',null,{
+        id:'tc-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),
+        user_id:user.id,
+        user_name:user.name,
+        event_type:next,
+        ts:now.toISOString(),
+        event_date:today,
+        late,
+        late_minutes:lateMinutes,
+        loc:'Michigan',
+      });
+
+      // 5. Show result
+      setPerson(user);
+      setEventLabel((late?'\u26A0\uFE0F ':'\u2705 ')+TIME_CLOCK_LABELS[next]+(late?' (+'+lateMinutes+' min late)':''));
+      setState('ok');
+      scheduleReset();
+    }catch(e){
+      setState('error');
+      setPerson(null);
+      setEventLabel('Error: '+e.message);
+      scheduleReset();
+    }
+  }
+
+  function scheduleReset(){
+    if(resetTimer.current)clearTimeout(resetTimer.current);
+    resetTimer.current=setTimeout(()=>{
+      setState('scanning');
+      setPerson(null);
+      setEventLabel('');
+      setScanTime('');
+      scanningRef.current=true;
+    },5000);
+  }
+
+  // ── Scanning screen ──────────────────────────────────────────────────────
+  const scanningScreen=el('div',{style:{position:'relative',width:'100%',height:'100%'}},
+    el('video',{ref:videoRef,playsInline:true,muted:true,style:{width:'100%',height:'100%',objectFit:'cover'}}),
+    // Overlay
+    el('div',{style:{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',pointerEvents:'none'}},
+      // Top bar
+      el('div',{style:{position:'absolute',top:0,left:0,right:0,background:'rgba(0,0,0,.7)',padding:'16px 24px',display:'flex',alignItems:'center',justifyContent:'space-between'}},
+        el('div',{style:{display:'flex',alignItems:'center',gap:12}},
+          el('img',{src:'data:image/png;base64,'+SUMMIT_LOGO_B64,style:{width:40,height:40,objectFit:'contain'}}),
+          el('div',null,
+            el('div',{style:{color:'#c9a84c',fontWeight:800,fontSize:16,letterSpacing:'1px'}},'KEY STONE MANUFACTURING'),
+            el('div',{style:{color:'rgba(255,255,255,.6)',fontSize:11,letterSpacing:'1px'}},'BADGE SCANNER'),
+          ),
+        ),
+        el('div',{style:{color:'rgba(255,255,255,.5)',fontSize:12}},new Date().toLocaleDateString([],{weekday:'long',month:'long',day:'numeric'})),
+      ),
+      // Scan frame
+      el('div',{style:{width:220,height:220,position:'relative'}},
+        el('div',{style:{position:'absolute',top:0,left:0,width:40,height:40,borderTop:'3px solid #c9a84c',borderLeft:'3px solid #c9a84c',borderRadius:'4px 0 0 0'}}),
+        el('div',{style:{position:'absolute',top:0,right:0,width:40,height:40,borderTop:'3px solid #c9a84c',borderRight:'3px solid #c9a84c',borderRadius:'0 4px 0 0'}}),
+        el('div',{style:{position:'absolute',bottom:0,left:0,width:40,height:40,borderBottom:'3px solid #c9a84c',borderLeft:'3px solid #c9a84c',borderRadius:'0 0 0 4px'}}),
+        el('div',{style:{position:'absolute',bottom:0,right:0,width:40,height:40,borderBottom:'3px solid #c9a84c',borderRight:'3px solid #c9a84c',borderRadius:'0 0 4px 0'}}),
+      ),
+      el('div',{style:{color:'rgba(255,255,255,.8)',fontSize:14,marginTop:20,letterSpacing:'1px',textAlign:'center'}},'Hold badge QR code up to camera'),
+    ),
+    el('canvas',{ref:canvasRef,style:{display:'none'}}),
+  );
+
+  // ── Result screen ────────────────────────────────────────────────────────
+  const isLate=eventLabel.startsWith('\u26A0');
+  const isError=state==='error';
+  const accentColor=isError?'#ef4444':isLate?'#f59e0b':'#22c55e';
+
+  const resultScreen=el('div',{style:{width:'100%',height:'100%',background:'#0a0a0a',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:0}},
+    // Big status banner
+    el('div',{style:{width:'100%',background:accentColor,padding:'20px 32px',textAlign:'center',marginBottom:32}},
+      el('div',{style:{fontSize:isError?40:56,lineHeight:1}},isError?'\u274C':isLate?'\u26A0\uFE0F':'\u2705'),
+      el('div',{style:{fontSize:28,fontWeight:900,color:'#fff',marginTop:4,letterSpacing:'1px'}}),
+    ),
+    // Person card
+    person&&el('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:16}},
+      person.badge_photo
+        ?el('div',{style:{width:120,height:120,borderRadius:'50%',overflow:'hidden',border:'4px solid '+accentColor,boxShadow:'0 0 30px '+accentColor+'66'}},
+            el('img',{src:person.badge_photo,style:{width:'100%',height:'100%',objectFit:'cover'}}))
+        :el('div',{style:{width:120,height:120,borderRadius:'50%',background:'#1a1a1a',border:'4px solid '+accentColor,display:'flex',alignItems:'center',justifyContent:'center',fontSize:48,boxShadow:'0 0 30px '+accentColor+'66'}},'\uD83D\uDC64'),
+      el('div',{style:{textAlign:'center'}},
+        el('div',{style:{fontSize:32,fontWeight:900,color:'#ffffff',letterSpacing:'1px',textTransform:'uppercase'}},person.name),
+        el('div',{style:{fontSize:14,color:'#c9a84c',letterSpacing:'2px',textTransform:'uppercase',marginTop:4}},person.position||'Employee'),
+      ),
+    ),
+    !person&&el('div',{style:{fontSize:18,color:'#fff',textAlign:'center',padding:'0 32px'}},eventLabel),
+    // Event label
+    person&&el('div',{style:{marginTop:20,background:'rgba(255,255,255,.07)',borderRadius:12,padding:'14px 32px',border:'1px solid rgba(255,255,255,.1)',textAlign:'center'}},
+      el('div',{style:{fontSize:22,fontWeight:700,color:accentColor,letterSpacing:'1px'}}),
+      el('div',{style:{fontSize:18,color:'#ffffff',fontWeight:700,marginTop:2}},eventLabel),
+      el('div',{style:{fontSize:14,color:'rgba(255,255,255,.5)',marginTop:6,letterSpacing:'1px'}}),
+      el('div',{style:{fontSize:20,color:'rgba(255,255,255,.8)',fontWeight:600,fontFamily:'monospace'}},scanTime),
+    ),
+    // Auto-reset hint
+    el('div',{style:{position:'absolute',bottom:24,color:'rgba(255,255,255,.3)',fontSize:12,letterSpacing:'1px'}},'Resetting in 5 seconds...'),
+  );
+
+  return el('div',{style:{
+    width:'100vw',height:'100vh',background:'#000',overflow:'hidden',
+    fontFamily:"'Inter',sans-serif",position:'relative',userSelect:'none',
+  }},
+    cameraErr&&el('div',{style:{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:16,background:'#0a0a0a'}},
+      el('div',{style:{fontSize:48}},'\uD83D\uDCF7'),
+      el('div',{style:{color:'#ef4444',fontSize:16,textAlign:'center',maxWidth:320}},cameraErr),
+    ),
+    !cameraErr&&state==='scanning'&&scanningScreen,
+    !cameraErr&&state!=='scanning'&&resultScreen,
+  );
+}
+
+
 function SanitationKiosk(){
   const fields=LOG_TYPES.sanitation.fields;
   const init=()=>{
@@ -14497,6 +14684,7 @@ function App(){
     :k==='temperature'?TemperatureKiosk
     :k==='security'?SecurityKiosk
     :k==='timeclock'?TimeClockKiosk
+    :k==='scan'?BadgeScanKiosk
     :App;
   ReactDOM.createRoot(document.getElementById('root')).render(el(C));
 })();
