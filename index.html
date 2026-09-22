@@ -13330,92 +13330,90 @@ function BadgeLookup({badgeId}){
 function BadgeScanKiosk(){
   const videoRef=React.useRef(null);
   const canvasRef=React.useRef(null);
-  const faceCheckRef=React.useRef(true);
   const scanningRef=React.useRef(false);
+  const faceCheckRef=React.useRef(false);
   const resetTimer=React.useRef(null);
-  const modelsLoaded=React.useRef(false);
-  const faceDetections=React.useRef(0);
-  const faceThrottle=React.useRef(0);
   const streamRef=React.useRef(null);
+  const faceDetector=React.useRef(null);
+  const faceConsecutive=React.useRef(0);
+  const faceThrottle=React.useRef(0);
+  const rafRef=React.useRef(null);
 
-  const[state,setState]=React.useState('face_check'); // face_check | switching | scanning | ok | error
+  const[state,setState]=React.useState('face_check');
   const[person,setPerson]=React.useState(null);
   const[eventLabel,setEventLabel]=React.useState('');
   const[scanTime,setScanTime]=React.useState('');
   const[cameraErr,setCameraErr]=React.useState('');
-  const[faceMsg,setFaceMsg]=React.useState('Look at the camera to begin...');
+  const[faceMsg,setFaceMsg]=React.useState('Position your face in the oval');
   const[faceProgress,setFaceProgress]=React.useState(0);
   const[scanActivity,setScanActivity]=React.useState(0);
+  const[faceApiAvail,setFaceApiAvail]=React.useState(true);
 
-  // Load face detection model
   React.useEffect(()=>{
-    async function loadModels(){
+    // Try Chrome built-in FaceDetector (Shape Detection API)
+    if(window.FaceDetector){
       try{
-        if(!window.faceapi)return;
-        await window.faceapi.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/weights');
-        modelsLoaded.current=true;
-      }catch(e){
-        console.warn('Face models failed, skipping face step');
-        // Skip straight to badge scan
-        startBadgeCamera();
-      }
+        faceDetector.current=new window.FaceDetector({fastMode:true,maxDetectedFaces:1});
+        setFaceApiAvail(true);
+      }catch(e){setFaceApiAvail(false);}
+    } else {
+      setFaceApiAvail(false);
     }
-    loadModels();
-  },[]);
-
-  // Start FRONT camera for face detection
-  React.useEffect(()=>{
     startFaceCamera();
-    return()=>stopCamera();
+    return()=>stopAll();
   },[]);
 
-  function stopCamera(){
+  function stopAll(){
+    if(rafRef.current)cancelAnimationFrame(rafRef.current);
     if(streamRef.current){streamRef.current.getTracks().forEach(t=>t.stop());streamRef.current=null;}
+    if(resetTimer.current)clearTimeout(resetTimer.current);
   }
 
   async function startFaceCamera(){
-    stopCamera();
+    stopAll();
     faceCheckRef.current=true;
     scanningRef.current=false;
     try{
-      const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:1280},height:{ideal:720}},audio:false});
+      const stream=await navigator.mediaDevices.getUserMedia({
+        video:{facingMode:'user',width:{ideal:1280},height:{ideal:720}},audio:false
+      });
       streamRef.current=stream;
       if(videoRef.current){videoRef.current.srcObject=stream;await videoRef.current.play();}
+      faceConsecutive.current=0;
       startTick();
     }catch(e){setCameraErr('Camera unavailable: '+e.message);}
   }
 
   async function startBadgeCamera(){
-    stopCamera();
+    stopAll();
     faceCheckRef.current=false;
     scanningRef.current=false;
     setState('switching');
     try{
-      // Try back camera first for QR scanning, fallback to any camera
       let stream;
-      try{
-        stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{exact:'environment'},width:{ideal:640},height:{ideal:480},zoom:1},audio:false});
-      }catch{
-        stream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:640},height:{ideal:480}},audio:false});
-      }
+      try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{exact:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false});}
+      catch{stream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});}
       streamRef.current=stream;
       if(videoRef.current){videoRef.current.srcObject=stream;await videoRef.current.play();}
+      // Apply zoom out if supported
+      const track=stream.getVideoTracks()[0];
+      const caps=track.getCapabilities&&track.getCapabilities();
+      if(caps&&caps.zoom){track.applyConstraints({advanced:[{zoom:caps.zoom.min}]}).catch(()=>{});}
       scanningRef.current=true;
       setState('scanning');
       startTick();
     }catch(e){setCameraErr('Camera unavailable: '+e.message);}
   }
 
-  let rafRef=null;
   function startTick(){
-    if(rafRef)cancelAnimationFrame(rafRef);
+    if(rafRef.current)cancelAnimationFrame(rafRef.current);
     function tick(){
       const v=videoRef.current,c=canvasRef.current;
       if(v&&c&&v.readyState>=2){
         c.width=v.videoWidth;c.height=v.videoHeight;
         const ctx=c.getContext('2d',{willReadFrequently:true});
         ctx.drawImage(v,0,0);
-        if(faceCheckRef.current)checkFace();
+        if(faceCheckRef.current)detectFace(v);
         if(scanningRef.current){
           const img=ctx.getImageData(0,0,c.width,c.height);
           setScanActivity(n=>n+1);
@@ -13423,35 +13421,68 @@ function BadgeScanKiosk(){
           if(code&&code.data)handleScan(code.data);
         }
       }
-      rafRef=requestAnimationFrame(tick);
+      rafRef.current=requestAnimationFrame(tick);
     }
     tick();
   }
 
-  async function checkFace(){
+  async function detectFace(video){
     const now=Date.now();
-    if(now-faceThrottle.current<250)return;
+    if(now-faceThrottle.current<300)return;
     faceThrottle.current=now;
-    if(!modelsLoaded.current||!window.faceapi||!videoRef.current)return;
-    try{
-      const det=await window.faceapi.detectSingleFace(videoRef.current,new window.faceapi.TinyFaceDetectorOptions({inputSize:224,scoreThreshold:0.5}));
-      if(det){
-        faceDetections.current=Math.min(faceDetections.current+1,4);
-        const pct=Math.round(faceDetections.current/4*100);
-        setFaceProgress(pct);
-        setFaceMsg(pct>=100?'Face confirmed! Now show your badge...':'Hold still...');
-        if(faceDetections.current>=4){
-          faceCheckRef.current=false;
-          faceDetections.current=0;
-          // Switch to back camera for badge scan
-          await startBadgeCamera();
-        }
-      }else{
-        faceDetections.current=Math.max(0,faceDetections.current-1);
-        setFaceProgress(Math.round(faceDetections.current/4*100));
-        setFaceMsg('Look directly at the camera...');
+
+    let detected=false;
+
+    if(faceDetector.current){
+      // Chrome native FaceDetector
+      try{
+        const faces=await faceDetector.current.detect(video);
+        detected=faces&&faces.length>0;
+      }catch(e){}
+    } else if(window.faceapi&&window.faceapi.nets.tinyFaceDetector.isLoaded){
+      // face-api.js fallback
+      try{
+        const det=await window.faceapi.detectSingleFace(video,new window.faceapi.TinyFaceDetectorOptions({inputSize:224,scoreThreshold:0.4}));
+        detected=!!det;
+      }catch(e){}
+    } else {
+      // No face API available - use simple skin-tone pixel detection as fallback
+      const c=canvasRef.current;
+      if(!c)return;
+      const ctx=c.getContext('2d',{willReadFrequently:true});
+      // Sample center region of frame (where face should be)
+      const cx=Math.floor(c.width/2),cy=Math.floor(c.height/3);
+      const region=ctx.getImageData(cx-60,cy-60,120,120);
+      let skinPixels=0;
+      for(let i=0;i<region.data.length;i+=4){
+        const r=region.data[i],g=region.data[i+1],b=region.data[i+2];
+        // Skin tone heuristic: r>60, g>40, b>20, r>g, r>b, r-g>15
+        if(r>60&&g>40&&b>20&&r>g&&r>b&&(r-g)>15&&(r-b)>10)skinPixels++;
       }
-    }catch(e){}
+      detected=skinPixels>(120*120*0.15); // >15% skin-tone pixels
+    }
+
+    if(detected){
+      faceConsecutive.current=Math.min(faceConsecutive.current+1,5);
+    } else {
+      faceConsecutive.current=Math.max(0,faceConsecutive.current-1);
+    }
+
+    const pct=Math.round(faceConsecutive.current/5*100);
+    setFaceProgress(pct);
+
+    if(faceConsecutive.current>=5){
+      faceCheckRef.current=false;
+      faceConsecutive.current=0;
+      setFaceMsg('Face confirmed!');
+      await startBadgeCamera();
+    } else if(faceConsecutive.current>=3){
+      setFaceMsg('Hold still...');
+    } else if(detected){
+      setFaceMsg('Face detected \u2014 stay still...');
+    } else {
+      setFaceMsg('Position your face in the oval');
+    }
   }
 
   async function handleScan(text){
@@ -13478,8 +13509,7 @@ function BadgeScanKiosk(){
         });
       }
       setEventLabel(!next?'All events completed for today':(late?'\u26a0\ufe0f ':'\u2705 ')+TIME_CLOCK_LABELS[next]+(late?' (+'+lateMinutes+' min late)':''));
-      setState('ok');
-      scheduleReset();
+      setState('ok');scheduleReset();
     }catch(e){setState('error');setEventLabel('Error: '+e.message);scheduleReset();}
   }
 
@@ -13487,8 +13517,8 @@ function BadgeScanKiosk(){
     if(resetTimer.current)clearTimeout(resetTimer.current);
     resetTimer.current=setTimeout(()=>{
       setPerson(null);setEventLabel('');setScanTime('');
-      setFaceProgress(0);setFaceMsg('Look at the camera to begin...');
-      faceDetections.current=0;
+      setFaceProgress(0);setFaceMsg('Position your face in the oval');
+      faceConsecutive.current=0;
       setState('face_check');
       startFaceCamera();
     },5000);
@@ -13502,10 +13532,9 @@ function BadgeScanKiosk(){
       el('div',null,
         el('div',{style:{color:'#c9a84c',fontWeight:800,fontSize:13,letterSpacing:'1px'}},'KEY STONE MANUFACTURING'),
         el('div',{style:{color:'rgba(255,255,255,.5)',fontSize:9,letterSpacing:'1px'}},
-          state==='face_check'?'STEP 1 OF 2 — FACE SCAN'
+          state==='face_check'?'STEP 1 — FACE SCAN'
           :state==='switching'?'SWITCHING CAMERA...'
-          :state==='scanning'?'STEP 2 OF 2 — BADGE SCAN'
-          :'ACCESS CONTROL'),
+          :state==='scanning'?'STEP 2 — BADGE SCAN':'ACCESS CONTROL'),
       ),
     ),
     state==='scanning'&&el('div',{style:{display:'flex',alignItems:'center',gap:6}},
@@ -13514,15 +13543,21 @@ function BadgeScanKiosk(){
     ),
   );
 
-  // FACE CHECK screen
   const faceScreen=el('div',{style:{position:'relative',width:'100%',height:'100%'}},
     el('video',{ref:videoRef,playsInline:true,muted:true,style:{width:'100%',height:'100%',objectFit:'cover',transform:'scaleX(-1)'}}),
     header,
     el('div',{style:{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',pointerEvents:'none'}},
-      el('div',{style:{width:280,height:340,border:'4px solid '+(faceProgress>60?'#22c55e':'#c9a84c'),borderRadius:'50%',boxShadow:'0 0 32px '+(faceProgress>60?'rgba(34,197,94,.5)':'rgba(201,168,76,.4)'),transition:'all .3s',marginBottom:20}}),
-      el('div',{style:{background:'rgba(0,0,0,.78)',borderRadius:12,padding:'12px 22px',textAlign:'center'}},
-        el('div',{style:{fontSize:13,color:faceProgress>60?'#22c55e':'rgba(255,255,255,.9)',letterSpacing:'1px',marginBottom:8}},faceMsg),
-        el('div',{style:{background:'rgba(255,255,255,.12)',borderRadius:20,height:8,overflow:'hidden',width:200}},
+      el('div',{style:{
+        width:'min(70vw,300px)',height:'min(85vw,370px)',
+        border:'4px solid '+(faceProgress>60?'#22c55e':'#c9a84c'),
+        borderRadius:'50%',
+        boxShadow:'0 0 0 2000px rgba(0,0,0,.45), 0 0 32px '+(faceProgress>60?'rgba(34,197,94,.6)':'rgba(201,168,76,.4)'),
+        transition:'border-color .3s, box-shadow .3s',
+        marginBottom:24,
+      }}),
+      el('div',{style:{background:'rgba(0,0,0,.8)',borderRadius:12,padding:'12px 22px',textAlign:'center',backdropFilter:'blur(4px)'}},
+        el('div',{style:{fontSize:14,color:faceProgress>60?'#22c55e':'rgba(255,255,255,.9)',letterSpacing:'1px',marginBottom:8,transition:'color .3s'}},faceMsg),
+        el('div',{style:{background:'rgba(255,255,255,.12)',borderRadius:20,height:10,overflow:'hidden',width:'min(60vw,220px)'}},
           el('div',{style:{height:'100%',borderRadius:20,background:'linear-gradient(90deg,#c9a84c,#22c55e)',width:faceProgress+'%',transition:'width .4s'}}),
         ),
       ),
@@ -13530,49 +13565,45 @@ function BadgeScanKiosk(){
     el('canvas',{ref:canvasRef,style:{display:'none'}}),
   );
 
-  // SWITCHING screen
   const switchScreen=el('div',{style:{position:'relative',width:'100%',height:'100%',background:'#0a0a0a',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:16}},
     el('video',{ref:videoRef,playsInline:true,muted:true,style:{display:'none'}}),
     el('canvas',{ref:canvasRef,style:{display:'none'}}),
     header,
-    el('div',{style:{fontSize:40,marginTop:60}},'\u2705'),
-    el('div',{style:{fontSize:18,color:'#22c55e',fontWeight:700,letterSpacing:'1px'}},'Face Confirmed'),
-    el('div',{style:{fontSize:13,color:'rgba(255,255,255,.5)',marginTop:8,letterSpacing:'1px'}},'Switching to badge camera...'),
-    el('div',{style:{width:40,height:40,border:'3px solid #c9a84c',borderTopColor:'transparent',borderRadius:'50%',animation:'spin 0.8s linear infinite',marginTop:8}}),
+    el('div',{style:{fontSize:56,marginTop:60}},'\u2705'),
+    el('div',{style:{fontSize:20,color:'#22c55e',fontWeight:700,letterSpacing:'1px'}},'Face Confirmed'),
+    el('div',{style:{fontSize:13,color:'rgba(255,255,255,.4)',marginTop:6,letterSpacing:'1px'}},'Switching to badge camera...'),
   );
 
-  // BADGE SCAN screen
   const scanScreen=el('div',{style:{position:'relative',width:'100%',height:'100%'}},
     el('video',{ref:videoRef,playsInline:true,muted:true,style:{width:'100%',height:'100%',objectFit:'cover'}}),
     header,
     el('div',{style:{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',pointerEvents:'none'}},
-      el('div',{style:{background:'rgba(34,197,94,.15)',borderRadius:10,padding:'6px 16px',marginBottom:18,border:'1px solid rgba(34,197,94,.4)'}}),
-        el('div',{style:{color:'#22c55e',fontSize:11,letterSpacing:'1px'}},'\u2705  Face verified — show your badge'),
-      el('div',{style:{width:260,height:260,position:'relative',marginTop:4}},
-        ['tl','tr','bl','br'].map(c=>el('div',{key:c,style:{position:'absolute',width:56,height:56,
-          ...(c==='tl'?{top:0,left:0,borderTop:'3px solid #c9a84c',borderLeft:'3px solid #c9a84c',borderRadius:'4px 0 0 0'}
-            :c==='tr'?{top:0,right:0,borderTop:'3px solid #c9a84c',borderRight:'3px solid #c9a84c',borderRadius:'0 4px 0 0'}
-            :c==='bl'?{bottom:0,left:0,borderBottom:'3px solid #c9a84c',borderLeft:'3px solid #c9a84c',borderRadius:'0 0 0 4px'}
-            :{bottom:0,right:0,borderBottom:'3px solid #c9a84c',borderRight:'3px solid #c9a84c',borderRadius:'0 0 4px 0'})
+      el('div',{style:{background:'rgba(34,197,94,.15)',borderRadius:10,padding:'6px 16px',marginBottom:16,border:'1px solid rgba(34,197,94,.4)'}}),
+        el('div',{style:{color:'#22c55e',fontSize:11,letterSpacing:'1px'}},'\u2705  Face verified — hold badge up to camera'),
+      el('div',{style:{width:'min(60vw,260px)',height:'min(60vw,260px)',position:'relative'}},
+        ['tl','tr','bl','br'].map(c=>el('div',{key:c,style:{position:'absolute',width:52,height:52,
+          ...(c==='tl'?{top:0,left:0,borderTop:'4px solid #c9a84c',borderLeft:'4px solid #c9a84c',borderRadius:'4px 0 0 0'}
+            :c==='tr'?{top:0,right:0,borderTop:'4px solid #c9a84c',borderRight:'4px solid #c9a84c',borderRadius:'0 4px 0 0'}
+            :c==='bl'?{bottom:0,left:0,borderBottom:'4px solid #c9a84c',borderLeft:'4px solid #c9a84c',borderRadius:'0 0 0 4px'}
+            :{bottom:0,right:0,borderBottom:'4px solid #c9a84c',borderRight:'4px solid #c9a84c',borderRadius:'0 0 4px 0'})
         }})),
       ),
-      el('div',{style:{marginTop:18,color:'rgba(255,255,255,.5)',fontSize:11,letterSpacing:'1px'}},'Hold QR code inside the frame'),
+      el('div',{style:{marginTop:16,color:'rgba(255,255,255,.45)',fontSize:11,letterSpacing:'1px'}},'Keep badge 8-12 inches from camera'),
     ),
     el('canvas',{ref:canvasRef,style:{display:'none'}}),
   );
 
-  // RESULT screen
   const resultScreen=el('div',{style:{width:'100%',height:'100%',background:'#0a0a0a',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',position:'relative'}},
     el('video',{ref:videoRef,style:{display:'none'}}),
     el('canvas',{ref:canvasRef,style:{display:'none'}}),
     el('div',{style:{width:'100%',background:accent,padding:'16px',textAlign:'center',position:'absolute',top:0}},
-      el('div',{style:{fontSize:44}},state==='error'?'\u274c':eventLabel.includes('\u26a0')?'\u26a0\ufe0f':'\u2705'),
+      el('div',{style:{fontSize:48}},state==='error'?'\u274c':eventLabel.includes('\u26a0')?'\u26a0\ufe0f':'\u2705'),
     ),
     el('div',{style:{marginTop:80,display:'flex',flexDirection:'column',alignItems:'center',gap:14,width:'88%',maxWidth:340}},
       person&&el('div',{style:{textAlign:'center'}},
         person.badge_photo
           ?el('div',{style:{width:100,height:100,borderRadius:'50%',overflow:'hidden',border:'4px solid '+accent,boxShadow:'0 0 24px '+accent+'55',margin:'0 auto 12px'}},el('img',{src:person.badge_photo,style:{width:'100%',height:'100%',objectFit:'cover'}}))
-          :el('div',{style:{width:100,height:100,borderRadius:'50%',background:'#1a1a1a',border:'4px solid '+accent,display:'flex',alignItems:'center',justifyContent:'center',fontSize:40,margin:'0 auto 12px',boxShadow:'0 0 24px '+accent+'55'}},'\ud83d\udc64'),
+          :el('div',{style:{width:100,height:100,borderRadius:'50%',background:'#1a1a1a',border:'4px solid '+accent,display:'flex',alignItems:'center',justifyContent:'center',fontSize:40,margin:'0 auto 12px'}},'\ud83d\udc64'),
         el('div',{style:{fontSize:26,fontWeight:900,color:'#fff',textTransform:'uppercase',letterSpacing:'1px'}},person.name),
         el('div',{style:{fontSize:11,color:'#c9a84c',letterSpacing:'2px',textTransform:'uppercase',marginTop:3}},person.position||'Employee'),
       ),
@@ -13586,9 +13617,8 @@ function BadgeScanKiosk(){
   );
 
   return el('div',{style:{width:'100vw',height:'100vh',background:'#000',overflow:'hidden',fontFamily:"'Inter',sans-serif",position:'relative',userSelect:'none'}},
-    el('style',null,'@keyframes spin{to{transform:rotate(360deg)}}'),
     cameraErr&&el('div',{style:{width:'100%',height:'100%',display:'flex',alignItems:'center',justifyContent:'center',flexDirection:'column',gap:14,background:'#0a0a0a',color:'#fff',textAlign:'center',padding:32}},
-      el('div',{style:{fontSize:44}},'\ud83d\udcf7'),
+      el('div',{style:{fontSize:48}},'\ud83d\udcf7'),
       el('div',{style:{color:'#ef4444',fontSize:14,maxWidth:280}},cameraErr),
     ),
     !cameraErr&&state==='face_check'&&faceScreen,
