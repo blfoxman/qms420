@@ -13394,9 +13394,9 @@ function BadgeScanKiosk(){
       // Try back camera first for QR scanning, fallback to any camera
       let stream;
       try{
-        stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{exact:'environment'},width:{ideal:1280},height:{ideal:720}},audio:false});
+        stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{exact:'environment'},width:{ideal:640},height:{ideal:480},zoom:1},audio:false});
       }catch{
-        stream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:1280},height:{ideal:720}},audio:false});
+        stream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:640},height:{ideal:480}},audio:false});
       }
       streamRef.current=stream;
       if(videoRef.current){videoRef.current.srcObject=stream;await videoRef.current.play();}
@@ -13519,7 +13519,7 @@ function BadgeScanKiosk(){
     el('video',{ref:videoRef,playsInline:true,muted:true,style:{width:'100%',height:'100%',objectFit:'cover',transform:'scaleX(-1)'}}),
     header,
     el('div',{style:{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',pointerEvents:'none'}},
-      el('div',{style:{width:160,height:200,border:'3px solid '+(faceProgress>60?'#22c55e':'#c9a84c'),borderRadius:'50%',boxShadow:'0 0 24px '+(faceProgress>60?'rgba(34,197,94,.4)':'rgba(201,168,76,.3)'),transition:'all .3s',marginBottom:20}}),
+      el('div',{style:{width:280,height:340,border:'4px solid '+(faceProgress>60?'#22c55e':'#c9a84c'),borderRadius:'50%',boxShadow:'0 0 32px '+(faceProgress>60?'rgba(34,197,94,.5)':'rgba(201,168,76,.4)'),transition:'all .3s',marginBottom:20}}),
       el('div',{style:{background:'rgba(0,0,0,.78)',borderRadius:12,padding:'12px 22px',textAlign:'center'}},
         el('div',{style:{fontSize:13,color:faceProgress>60?'#22c55e':'rgba(255,255,255,.9)',letterSpacing:'1px',marginBottom:8}},faceMsg),
         el('div',{style:{background:'rgba(255,255,255,.12)',borderRadius:20,height:8,overflow:'hidden',width:200}},
@@ -13548,8 +13548,8 @@ function BadgeScanKiosk(){
     el('div',{style:{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',pointerEvents:'none'}},
       el('div',{style:{background:'rgba(34,197,94,.15)',borderRadius:10,padding:'6px 16px',marginBottom:18,border:'1px solid rgba(34,197,94,.4)'}}),
         el('div',{style:{color:'#22c55e',fontSize:11,letterSpacing:'1px'}},'\u2705  Face verified — show your badge'),
-      el('div',{style:{width:200,height:200,position:'relative',marginTop:4}},
-        ['tl','tr','bl','br'].map(c=>el('div',{key:c,style:{position:'absolute',width:44,height:44,
+      el('div',{style:{width:260,height:260,position:'relative',marginTop:4}},
+        ['tl','tr','bl','br'].map(c=>el('div',{key:c,style:{position:'absolute',width:56,height:56,
           ...(c==='tl'?{top:0,left:0,borderTop:'3px solid #c9a84c',borderLeft:'3px solid #c9a84c',borderRadius:'4px 0 0 0'}
             :c==='tr'?{top:0,right:0,borderTop:'3px solid #c9a84c',borderRight:'3px solid #c9a84c',borderRadius:'0 4px 0 0'}
             :c==='bl'?{bottom:0,left:0,borderBottom:'3px solid #c9a84c',borderLeft:'3px solid #c9a84c',borderRadius:'0 0 0 4px'}
