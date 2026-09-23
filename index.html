@@ -13363,6 +13363,17 @@ function BadgeScanKiosk(){
     return()=>stopAll();
   },[]);
 
+  // Re-attach stream whenever state changes to scanning — React can detach srcObject on re-render
+  React.useEffect(()=>{
+    if(!streamRef.current||!videoRef.current)return;
+    if(state==='scanning'||state==='face_check'){
+      if(videoRef.current.srcObject!==streamRef.current){
+        videoRef.current.srcObject=streamRef.current;
+        videoRef.current.play().catch(()=>{});
+      }
+    }
+  });
+
   function stopAll(){
     if(rafRef.current)cancelAnimationFrame(rafRef.current);
     if(streamRef.current){streamRef.current.getTracks().forEach(t=>t.stop());streamRef.current=null;}
@@ -13390,46 +13401,21 @@ function BadgeScanKiosk(){
   }
 
   async function startBadgeCamera(){
-    stopAll();
+    // Keep the same camera stream — no restart, avoids black screen issues
     faceCheckRef.current=false;
     scanningRef.current=false;
-    setState('switching');
-    try{
-      let stream;
-      const constraints=[
-        {video:{facingMode:{exact:'environment'},width:{ideal:1280},height:{ideal:720}}},
-        {video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}}},
-        {video:{facingMode:'user',width:{ideal:1280},height:{ideal:720}}},
-        {video:true},
-      ];
-      for(const c of constraints){
-        try{stream=await navigator.mediaDevices.getUserMedia({...c,audio:false});break;}catch{}
-      }
-      if(!stream)throw new Error('No camera available');
-      streamRef.current=stream;
-      if(videoRef.current){
-        videoRef.current.srcObject=stream;
-        videoRef.current.setAttribute('autoplay','');
-        videoRef.current.setAttribute('playsinline','');
-        videoRef.current.muted=true;
-        try{await videoRef.current.play();}catch(e){console.warn('play():',e);}
-      }
-      // Apply zoom out if supported
-      const track=stream.getVideoTracks()[0];
-      const caps=track.getCapabilities&&track.getCapabilities();
-      if(caps&&caps.zoom){track.applyConstraints({advanced:[{zoom:caps.zoom.min}]}).catch(()=>{});}
-      scanningRef.current=true;
-      setState('scanning');
-      // Small delay to let video render before starting tick
-      setTimeout(()=>startTick(),200);
-    }catch(e){setCameraErr('Camera unavailable: '+e.message);}
+    setState('scanning');
+    // Camera is already running from face step — just enable QR scanning
+    scanningRef.current=true;
+    // Ensure tick is running
+    startTick();
   }
 
   function startTick(){
     if(rafRef.current)cancelAnimationFrame(rafRef.current);
     function tick(){
       const v=videoRef.current,c=canvasRef.current;
-      if(v&&c&&v.readyState>=2){
+      if(v&&c&&v.videoWidth>0&&v.videoHeight>0){
         c.width=v.videoWidth;c.height=v.videoHeight;
         const ctx=c.getContext('2d',{willReadFrequently:true});
         ctx.drawImage(v,0,0);
@@ -13494,7 +13480,7 @@ function BadgeScanKiosk(){
     if(faceConsecutive.current>=5){
       faceCheckRef.current=false;
       faceConsecutive.current=0;
-      setFaceMsg('Face confirmed!');
+      setFaceMsg('\u2705 Face confirmed! Please scan your badge.');
       await startBadgeCamera();
     } else if(faceConsecutive.current>=3){
       setFaceMsg('Hold still...');
@@ -13598,8 +13584,10 @@ function BadgeScanKiosk(){
     el('video',{ref:videoRef,playsInline:true,muted:true,style:{width:'100%',height:'100%',objectFit:'cover'}}),
     header,
     el('div',{style:{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',pointerEvents:'none'}},
-      el('div',{style:{background:'rgba(34,197,94,.15)',borderRadius:10,padding:'6px 16px',marginBottom:16,border:'1px solid rgba(34,197,94,.4)'}}),
-        el('div',{style:{color:'#22c55e',fontSize:11,letterSpacing:'1px'}},'\u2705  Face verified — hold badge up to camera'),
+      el('div',{style:{background:'rgba(34,197,94,.15)',borderRadius:14,padding:'14px 22px',marginBottom:18,border:'1px solid rgba(34,197,94,.5)',textAlign:'center'}},
+        el('div',{style:{color:'#22c55e',fontSize:20,fontWeight:800,marginBottom:4}},'\u2705 Face Verified'),
+        el('div',{style:{color:'rgba(255,255,255,.85)',fontSize:14}},'Please scan your badge'),
+      ),
       el('div',{style:{width:'min(60vw,260px)',height:'min(60vw,260px)',position:'relative'}},
         ['tl','tr','bl','br'].map(c=>el('div',{key:c,style:{position:'absolute',width:52,height:52,
           ...(c==='tl'?{top:0,left:0,borderTop:'4px solid #c9a84c',borderLeft:'4px solid #c9a84c',borderRadius:'4px 0 0 0'}
@@ -13610,7 +13598,7 @@ function BadgeScanKiosk(){
       ),
       el('div',{style:{marginTop:16,color:'rgba(255,255,255,.45)',fontSize:11,letterSpacing:'1px'}},'Keep badge 8-12 inches from camera'),
     ),
-    el('canvas',{ref:canvasRef,style:{display:'none'}}),
+    el('canvas',{ref:canvasRef,style:{position:'absolute',top:0,left:0,width:'100%',height:'100%',opacity:0,pointerEvents:'none'}}),
   );
 
   const resultScreen=el('div',{style:{width:'100%',height:'100%',background:'#0a0a0a',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',position:'relative'}},
