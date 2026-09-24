@@ -7429,32 +7429,32 @@ function ComplianceModule({cu,isElevated,isAdmin,LICENSES,SUPA_URL,SUPA_KEY,H,db
         return el('div',{key:clause.id,style:{background:'var(--surface2)',border:'1px solid '+(stale?'#f59e0b':'var(--border)'),borderRadius:12,overflow:'hidden',boxShadow:isOpen?'0 2px 12px rgba(15,23,42,.08)':'0 1px 3px rgba(15,23,42,.04)',transition:'box-shadow .2s'}},
           // Header row
           el('div',{onClick:()=>setExpanded(p=>({...p,[clause.id]:!p[clause.id]})),
-            style:{display:'flex',alignItems:'center',gap:12,padding:'14px 16px',cursor:'pointer',userSelect:'none',background:isOpen?'rgba(30,58,95,.03)':'transparent'},
+            style:{display:'flex',alignItems:'center',gap:12,padding:'14px 16px',cursor:'pointer',userSelect:'none',background:isOpen?'var(--surface3)':'transparent'},
           },
             el('div',{style:{background:fw.color,color:'#fff',borderRadius:6,padding:'4px 8px',fontSize:10,fontWeight:800,flexShrink:0,textAlign:'center',minWidth:56}},clause.id),
             el('div',{style:{flex:1,minWidth:0}},
-              el('div',{style:{fontSize:14,fontWeight:700,color:'var(--text)'}},clause.title),
-              !isOpen&&el('div',{style:{fontSize:12,color:'var(--text2)',marginTop:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}},clause.req),
+              el('div',{style:{fontSize:14,fontWeight:700,color:'#e8eaed'}},clause.title),
+              !isOpen&&el('div',{style:{fontSize:12,color:'#aab0b6',marginTop:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}},clause.req),
             ),
             stale&&el('span',{style:{background:'rgba(245,158,11,.12)',color:'#d97706',border:'1px solid rgba(245,158,11,.4)',borderRadius:6,padding:'3px 10px',fontSize:11,fontWeight:700,whiteSpace:'nowrap'}},'\uD83D\uDD01 Needs Re-verification'),
             el('span',{style:sStyle(status)},so.label),
-            el('span',{style:{color:'var(--text3)',fontSize:12,marginLeft:6,flexShrink:0}},isOpen?'\u25B2':'\u25BC'),
+            el('span',{style:{color:'#6f767c',fontSize:12,marginLeft:6,flexShrink:0}},isOpen?'\u25B2':'\u25BC'),
           ),
 
           // Expanded body
-          isOpen&&el('div',{style:{borderTop:'1px solid var(--border)',padding:'18px 16px',background:'#fafcff'}},
+          isOpen&&el('div',{style:{borderTop:'1px solid var(--border)',padding:'18px 16px',background:'#1e2022'}},
             // Requirement
-            el('div',{style:{background:'rgba(30,58,95,.04)',border:'1px solid rgba(30,58,95,.1)',borderRadius:8,padding:'12px 14px',marginBottom:16}},
-              el('div',{style:{fontSize:10,fontWeight:800,color:'var(--accent)',textTransform:'uppercase',letterSpacing:'.6px',marginBottom:5}},'Requirement'),
-              el('div',{style:{fontSize:13,color:'var(--text)',lineHeight:1.6}},clause.req),
+            el('div',{style:{background:'var(--surface3)',border:'1px solid var(--border)',borderRadius:8,padding:'12px 14px',marginBottom:16}},
+              el('div',{style:{fontSize:10,fontWeight:800,color:'#6ba022',textTransform:'uppercase',letterSpacing:'.6px',marginBottom:5}},'Requirement'),
+              el('div',{style:{fontSize:13,color:'#e8eaed',lineHeight:1.6}},clause.req),
             ),
 
             // Actions checklist
             el('div',{style:{marginBottom:16}},
-              el('div',{style:{fontSize:10,fontWeight:800,color:'var(--accent)',textTransform:'uppercase',letterSpacing:'.6px',marginBottom:8}},'Required Actions'),
+              el('div',{style:{fontSize:10,fontWeight:800,color:'#6ba022',textTransform:'uppercase',letterSpacing:'.6px',marginBottom:8}},'Required Actions'),
               el('div',{style:{display:'flex',flexDirection:'column',gap:7}},
-                clause.actions.map((action,i)=>el('div',{key:i,style:{display:'flex',alignItems:'flex-start',gap:10,fontSize:13,color:'var(--text)',lineHeight:1.5}},
-                  el('span',{style:{color:status==='compliant'?'#16a34a':'#cbd5e1',fontSize:17,flexShrink:0,marginTop:0}},status==='compliant'?'\u2713':'\u25CB'),
+                clause.actions.map((action,i)=>el('div',{key:i,style:{display:'flex',alignItems:'flex-start',gap:10,fontSize:13,color:'#e8eaed',lineHeight:1.5}},
+                  el('span',{style:{color:status==='compliant'?'#16a34a':'#aab0b6',fontSize:17,flexShrink:0,marginTop:0}},status==='compliant'?'\u2713':'\u25CB'),
                   action,
                 ))
               ),
@@ -7463,7 +7463,7 @@ function ComplianceModule({cu,isElevated,isAdmin,LICENSES,SUPA_URL,SUPA_KEY,H,db
             // Status buttons
             el('div',{style:{marginBottom:14}},
               el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:8}},
-                el('div',{style:{fontSize:10,fontWeight:800,color:'var(--accent)',textTransform:'uppercase',letterSpacing:'.6px'}},'Set Status'),
+                el('div',{style:{fontSize:10,fontWeight:800,color:'#6ba022',textTransform:'uppercase',letterSpacing:'.6px'}},'Set Status'),
                 el('div',{style:{fontSize:11,color:stale?'#d97706':'var(--text3)',fontWeight:stale?700:400}},
                   lastVerified?('Last verified: '+new Date(lastVerified).toLocaleDateString()+(stale?' \u2014 before this month, needs re-verification':'')):'Never verified',
                 ),
@@ -7474,7 +7474,7 @@ function ComplianceModule({cu,isElevated,isAdmin,LICENSES,SUPA_URL,SUPA_KEY,H,db
                   style:{padding:'7px 14px',borderRadius:8,border:'2px solid',fontSize:12,fontWeight:600,cursor:'pointer',fontFamily:'inherit',transition:'all .15s',
                     borderColor:status===opt.v?opt.color:'var(--border)',
                     background:status===opt.v?opt.bg:'transparent',
-                    color:status===opt.v?opt.color:'var(--text2)',
+                    color:status===opt.v?opt.color:'#aab0b6',
                   }
                 },opt.label)),
                 status!=='pending'&&el('button',{onClick:()=>saveClause(clause.id,status,note),
@@ -7485,16 +7485,16 @@ function ComplianceModule({cu,isElevated,isAdmin,LICENSES,SUPA_URL,SUPA_KEY,H,db
 
             // Notes
             el('div',null,
-              el('div',{style:{fontSize:10,fontWeight:800,color:'var(--accent)',textTransform:'uppercase',letterSpacing:'.6px',marginBottom:6}},'Notes / Evidence'),
+              el('div',{style:{fontSize:10,fontWeight:800,color:'#6ba022',textTransform:'uppercase',letterSpacing:'.6px',marginBottom:6}},'Notes / Evidence'),
               el('textarea',{
                 value:note,
                 onChange:ev=>setNotes(p=>({...p,[clause.id]:ev.target.value})),
                 onBlur:ev=>saveClause(clause.id,status,ev.target.value),
                 placeholder:'Document evidence, responsible person, target date, or gaps found...',
                 rows:3,
-                style:{width:'100%',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:8,padding:'8px 12px',color:'var(--text)',fontFamily:'inherit',fontSize:13,resize:'vertical',boxSizing:'border-box'},
+                style:{width:'100%',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:8,padding:'8px 12px',color:'#e8eaed',fontFamily:'inherit',fontSize:13,resize:'vertical',boxSizing:'border-box'},
               }),
-              el('div',{style:{fontSize:11,color:'var(--text3)',marginTop:4}},'Notes auto-save on blur \u00B7 Last saved by '+cu.name),
+              el('div',{style:{fontSize:11,color:'#6f767c',marginTop:4}},'Notes auto-save on blur \u00B7 Last saved by '+cu.name),
             ),
           ),
         );
@@ -13037,10 +13037,27 @@ function Calendar({events,setEvents,tasks,cu,users,locFilter,meetingNotes,setMee
         el('div',{className:'mf',style:{justifyContent:'space-between'}},
           el('div',null,!sel._task&&(sel.created_by_id===cu.id||cu.role==='admin')&&el('button',{className:'btn b-red',onClick:()=>deleteEvent(sel.id)},'Delete')),
           el('div',{style:{display:'flex',gap:8,flexWrap:'wrap'}},
+            !sel._task&&(sel.created_by_id===cu.id||cu.role==='admin')&&(sel.attendees||[]).filter(a=>a.id!==cu.id).length>0&&el('button',{
+              className:'btn b-ghost',
+              onClick:()=>{
+                const pending=(sel.attendees||[]).filter(a=>a.email&&a.id!==cu.id);
+                if(!pending.length){alert('No attendees with emails.');return;}
+                pending.forEach(a=>{
+                  const body='<div style="font-family:sans-serif;background:#000;color:#fff;padding:24px;max-width:500px">'
+                    +'<b style="color:#f5a623">\uD83D\uDCC5 Meeting Invite: '+sel.title+'</b><br><br>'
+                    +sel.date+(sel.start_time?' at '+sel.start_time:'')+'<br>'
+                    +(sel.meet_link?'<a href="'+sel.meet_link+'">Join Meeting</a><br>':'')
+                    +'<br>'+cu.name+' invited you. Log in to QMS420 to Accept or Decline.<br>'
+                    +'<a href="'+APP_URL+'">Open QMS420</a></div>';
+                  sendEmail({to:a.email,subject:'\uD83D\uDCC5 Meeting Invite: '+sel.title,html:body});
+                });
+                alert('\u2705 Invites sent to '+pending.map(a=>a.name).join(', ')+'. They will also see this when they log into QMS420.');
+              }
+            },'\uD83D\uDCE7 Resend Invites'),
             !sel._task&&sel.created_by_id!==cu.id&&(sel.attendee_status||{})[cu.id]==='pending'&&el('button',{
               onClick:async()=>{
                 const update={attendee_status:{...(sel.attendee_status||{}),[cu.id]:'rejected'},updated_at:new Date().toISOString()};
-                try{await db.update('pf_events',sel.id,update);}catch(e){console.error(e);}
+                                try{await db.update('pf_events',sel.id,update);}catch(e){console.error(e);}
                 setEvents(p=>p.map(e=>e.id===sel.id?{...e,...update}:e));
                 setSel(null);
               },
@@ -13422,24 +13439,36 @@ function BadgeScanKiosk(){
         if(faceCheckRef.current)detectFace(v);
         if(scanningRef.current){
           setScanActivity(n=>n+1);
-          // Try 1: normal scan
-          const img=ctx.getImageData(0,0,c.width,c.height);
+          // Draw un-mirrored version for QR scanning (front cam is CSS-mirrored for face UX)
+          const qc=document.createElement('canvas');
+          qc.width=c.width;qc.height=c.height;
+          const qx=qc.getContext('2d');
+          qx.translate(c.width,0);qx.scale(-1,1);
+          qx.drawImage(v,0,0);
+          // Try 1: normal
+          const img=qx.getImageData(0,0,qc.width,qc.height);
           let code=window.jsQR&&window.jsQR(img.data,img.width,img.height,{inversionAttempts:'attemptBoth'});
-          // Try 2: boost contrast — convert to high-contrast grayscale
+          // Try 2: also try non-flipped
           if(!code){
-            const d=img.data;
+            const img2=ctx.getImageData(0,0,c.width,c.height);
+            code=window.jsQR&&window.jsQR(img2.data,img2.width,img2.height,{inversionAttempts:'attemptBoth'});
+          }
+          // Try 3: high contrast threshold on the flipped version
+          if(!code){
+            const d=[...img.data];
             for(let i=0;i<d.length;i+=4){
               const gray=0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
-              const v2=gray>100?255:0; // hard threshold
-              d[i]=d[i+1]=d[i+2]=v2;
+              const val=gray>128?255:0;
+              d[i]=d[i+1]=d[i+2]=val;d[i+3]=255;
             }
-            code=window.jsQR&&window.jsQR(d,img.width,img.height,{inversionAttempts:'attemptBoth'});
+            const id=new ImageData(new Uint8ClampedArray(d),img.width,img.height);
+            code=window.jsQR&&window.jsQR(id.data,id.width,id.height,{inversionAttempts:'attemptBoth'});
           }
-          // Try 3: scan center crop only (less noise)
-          if(!code&&c.width>200&&c.height>200){
-            const cx=Math.floor(c.width/2),cy=Math.floor(c.height/2);
-            const size=Math.min(c.width,c.height)*0.6;
-            const crop=ctx.getImageData(cx-size/2,cy-size/2,size,size);
+          // Try 4: center crop
+          if(!code&&qc.width>200&&qc.height>200){
+            const cx=Math.floor(qc.width/2),cy=Math.floor(qc.height/2);
+            const size=Math.floor(Math.min(qc.width,qc.height)*0.6);
+            const crop=qx.getImageData(cx-size/2,cy-size/2,size,size);
             code=window.jsQR&&window.jsQR(crop.data,crop.width,crop.height,{inversionAttempts:'attemptBoth'});
           }
           if(code&&code.data)handleScan(code.data);
@@ -13600,6 +13629,7 @@ function BadgeScanKiosk(){
 
   const scanScreen=el('div',{style:{position:'relative',width:'100%',height:'100%'}},
     el('video',{ref:videoRef,playsInline:true,muted:true,style:{width:'100%',height:'100%',objectFit:'cover'}}),
+    el('canvas',{ref:canvasRef,style:{display:'none'}}),
     header,
     el('div',{style:{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',pointerEvents:'none'}},
       el('div',{style:{background:'rgba(34,197,94,.15)',borderRadius:14,padding:'14px 22px',marginBottom:18,border:'1px solid rgba(34,197,94,.5)',textAlign:'center'}},
