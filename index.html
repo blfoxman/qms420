@@ -6061,13 +6061,31 @@ function TestingModule({cu,isAdmin,isElevated,SUPA_URL,SUPA_KEY,H,db}){
 
       // If no file object, fetch the stored URL to get raw bytes
       if(!srcFile&&item.coa_url){
-        const fetched=await fetch(item.coa_url);
-        if(!fetched.ok) throw new Error('Could not fetch stored COA file');
-        const blob=await fetched.blob();
-        // Reconstruct a File-like object with proper type
-        const ext=(item.coa_filename||'').split('.').pop().toLowerCase();
-        const mime=ext==='pdf'?'application/pdf':fetched.headers.get('content-type')||'application/octet-stream';
-        srcFile=new File([blob],item.coa_filename||'coa.pdf',{type:mime});
+        let fetchedOk=false;
+        try{
+          const fetched=await fetch(item.coa_url,{mode:'cors',cache:'no-cache'});
+          if(fetched.ok){
+            const blob=await fetched.blob();
+            const ext=(item.coa_filename||'').split('.').pop().toLowerCase();
+            const mime=ext==='pdf'?'application/pdf':(blob.type&&blob.type!=='application/octet-stream'?blob.type:'application/pdf');
+            srcFile=new File([blob],item.coa_filename||'coa.pdf',{type:mime});
+            fetchedOk=true;
+          }
+        }catch(corsErr){
+          // CORS blocked — try no-cors (gets opaque blob, may still work for base64)
+          try{
+            const fetched2=await fetch(item.coa_url,{mode:'no-cors',cache:'no-cache'});
+            const blob2=await fetched2.blob();
+            if(blob2&&blob2.size>0){
+              srcFile=new File([blob2],item.coa_filename||'coa.pdf',{type:'application/pdf'});
+              fetchedOk=true;
+            }
+          }catch(e2){}
+        }
+        if(!fetchedOk){
+          // Can't fetch — prompt user to re-upload the file directly
+          throw new Error('Cannot load stored COA from URL. Please use "Choose File" to re-upload the PDF and click Analyze again.');
+        }
       }
 
       if(srcFile&&srcFile.type==='application/pdf'){
@@ -6089,7 +6107,7 @@ function TestingModule({cu,isAdmin,isElevated,SUPA_URL,SUPA_KEY,H,db}){
         userContent=[{type:'text',text:COA_ANALYSIS_PROMPT(item)+'\n\n(No COA file could be loaded for analysis.)'}];
       }
 
-      const res=await fetch(`${SUPA_URL}/functions/v1/claude-proxy`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPA_KEY},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2000,messages:[{role:'user',content:userContent}]})});
+      const res=await fetch(`${SUPA_URL}/functions/v1/claude-proxy`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPA_KEY},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:4000,messages:[{role:'user',content:userContent}]})});
       const data=await res.json();
       const text=data.content?.[0]?.text||'';
       let analysis;
@@ -6357,7 +6375,14 @@ Respond ONLY with valid JSON (no markdown, no extra text):
                 ),
                 editItem.coa_url&&el('div',{style:{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}},
                   el('a',{href:editItem.coa_url,target:'_blank',style:{fontSize:12,color:'#6366f1',fontWeight:600}},'📄 '+(editItem.coa_filename||'View COA')),
-                  el('button',{onClick:()=>analyzeCoa(null,editItem),disabled:coaAnalyzing,style:{background:'#6366f1',color:'#fff',border:'none',borderRadius:6,padding:'4px 12px',fontSize:11,fontWeight:700,cursor:'pointer',fontFamily:'inherit'}},coaAnalyzing?'Analyzing…':'🧬 Re-Analyze COA'),
+                  el('label',{style:{display:'flex',alignItems:'center',gap:6,cursor:'pointer',background:'rgba(99,102,241,.1)',border:'1px solid rgba(99,102,241,.3)',borderRadius:6,padding:'4px 10px',fontSize:11,fontWeight:700,color:'#6366f1'}},
+                    '📂 Re-Upload & Analyze',
+                    el('input',{type:'file',accept:'.pdf,application/pdf,image/*',style:{display:'none'},onChange:async e=>{
+                      const f=e.target.files&&e.target.files[0];if(!f)return;
+                      await uploadCoa(f,editItem);
+                    }}),
+                  ),
+                  el('button',{onClick:()=>analyzeCoa(null,editItem),disabled:coaAnalyzing,style:{background:'#6366f1',color:'#fff',border:'none',borderRadius:6,padding:'4px 12px',fontSize:11,fontWeight:700,cursor:'pointer',fontFamily:'inherit'}},coaAnalyzing?'🧬 Analyzing…':'🧬 Re-Analyze COA'),
                 ),
                 editItem.coa_analysis&&el(CoaAnalysisPanel,{analysis:editItem.coa_analysis}),
               ),
