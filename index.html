@@ -5589,6 +5589,29 @@ function FacilityLogs({cu,isElevated,isAdmin,SUPA_URL,SUPA_KEY,H}){
 
 // ══════════════════════════════════════════════════════════════════════════════
 // BATCH TRACKER \u2014 dropdown-selected batch type, list + create/edit/PDF, one shared table
+// Sanitize a testing record so coa_analysis never has unexpected objects that crash React
+function sanitizeTestingRec(t){
+  if(!t) return t;
+  try{
+    let coa=t.coa_analysis;
+    if(coa&&typeof coa==='object'){
+      // Only keep known safe top-level keys
+      const KNOWN=['lab','sample','potency','terpenes','pesticides','microbials','mycotoxins','heavy_metals','residual_solvents','moisture','foreign_matter','sections','thc_pct','cbd_pct','total_cannabinoids','overall','summary','analyzed_at','parse_error','raw_response'];
+      const cleaned={};
+      KNOWN.forEach(k=>{if(coa[k]!==undefined)cleaned[k]=coa[k];});
+      // Ensure sections values are all objects with at least status
+      if(cleaned.sections&&typeof cleaned.sections==='object'){
+        Object.keys(cleaned.sections).forEach(k=>{
+          const v=cleaned.sections[k];
+          if(!v||typeof v!=='object'){cleaned.sections[k]={status:'not_tested',value:String(v||''),flag:null};}
+        });
+      }
+      return {...t,coa_analysis:cleaned};
+    }
+  }catch(e){}
+  return t;
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
 function BatchTracker({cu,isElevated,isAdmin,SUPA_URL,SUPA_KEY,H,restricted,mpFn,setPage}){
   const visibleBatchTypes=(restricted==='lead'||restricted==='pm')?['cartridges','gummies','pre_rolls','infused_flower','moon_rocks','snow_caps']:BATCH_TYPE_IDS;
@@ -5620,7 +5643,7 @@ function BatchTracker({cu,isElevated,isAdmin,SUPA_URL,SUPA_KEY,H,restricted,mpFn
     function onTestingUpdated(ev){
       const rec=ev.detail;
       if(rec&&rec.batch_id){
-        setTestingMap(p=>({...p,[rec.batch_id]:rec}));
+        setTestingMap(p=>({...p,[rec.batch_id]:sanitizeTestingRec(rec)}));
       }
     }
     window.addEventListener('pf_testing_updated',onTestingUpdated);
@@ -5642,10 +5665,16 @@ function BatchTracker({cu,isElevated,isAdmin,SUPA_URL,SUPA_KEY,H,restricted,mpFn
           .then(r=>r.ok?r.json():[]).then(trecs=>{
             const map={};
             (Array.isArray(trecs)?trecs:[]).forEach(t=>{
-              // Keep most recent record per batch
-              if(!map[t.batch_id])map[t.batch_id]=t;
+              if(!map[t.batch_id])map[t.batch_id]=sanitizeTestingRec(t);
             });
             setTestingMap(map);
+            // Auto-fix any stored coa_analysis with bad shape (clears parse errors)
+            Object.values(map).forEach(t=>{
+              const coa=t.coa_analysis;
+              if(coa&&coa.parse_error){
+                fetch(`${SUPA_URL}/rest/v1/pf_testing?id=eq.${encodeURIComponent(t.id)}`,{method:'PATCH',headers:{...H.headers,'Content-Type':'application/json'},body:JSON.stringify({coa_analysis:null,updated_at:new Date().toISOString()})}).catch(()=>{});
+              }
+            });
           }).catch(()=>{});
       }
     }).catch(()=>setLoading(false));
