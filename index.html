@@ -5903,6 +5903,11 @@ function TestingModule({cu,isAdmin,isElevated,SUPA_URL,SUPA_KEY,H,db}){
   async function uploadCoa(file,item){
     setCoaUploading(true);
     try{
+      // Ensure bucket exists (creates it if missing)
+      const bucketCheck=await fetch(`${SUPA_URL}/storage/v1/bucket/coa-uploads`,{headers:H.headers});
+      if(!bucketCheck.ok){
+        await fetch(`${SUPA_URL}/storage/v1/bucket`,{method:'POST',headers:{...H.headers,'Content-Type':'application/json'},body:JSON.stringify({id:'coa-uploads',name:'coa-uploads',public:true})});
+      }
       const ext=file.name.split('.').pop().toLowerCase();
       const path='coa/'+item.id+'-'+Date.now()+'.'+ext;
       const upRes=await fetch(`${SUPA_URL}/storage/v1/object/coa-uploads/${path}`,{method:'POST',headers:{...H.headers,'Content-Type':file.type,'x-upsert':'true'},body:file});
