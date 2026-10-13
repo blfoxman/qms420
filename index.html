@@ -5824,34 +5824,162 @@ const COA_THRESHOLDS={
   foreignMatter:{pass:'No foreign matter',required:false},
 };
 
-function CoaAnalysisPanel({analysis}){
+function CoaAnalysisPanel({analysis,expanded}){
+  const[show,setShow]=React.useState(expanded||false);
   if(!analysis) return null;
   const sections=Object.entries(analysis.sections||{});
-  const overallPass=sections.length>0&&sections.every(([,v])=>v.status==='pass'||v.status==='not_tested');
-  const overallFail=sections.some(([,v])=>v.status==='fail');
+  const overallPass=analysis.overall==='pass'||(sections.length>0&&sections.every(([,v])=>v.status==='pass'||v.status==='not_tested'));
+  const overallFail=analysis.overall==='fail'||sections.some(([,v])=>v.status==='fail');
+  const p=analysis.potency||{};
+  const lab=analysis.lab||{};
+  const smp=analysis.sample||{};
+
+  function AnalyteTable({data}){
+    if(!data||Object.keys(data).length===0) return el('div',{style:{fontSize:11,color:'var(--text3)',fontStyle:'italic'}},'No analyte data');
+    const entries=Object.entries(data);
+    return el('div',{style:{overflowX:'auto'}},
+      el('table',{style:{width:'100%',borderCollapse:'collapse',fontSize:11}},
+        el('thead',null,el('tr',null,
+          el('th',{style:{textAlign:'left',padding:'3px 6px',color:'var(--text2)',fontWeight:700,borderBottom:'1px solid var(--border)'}},'Analyte'),
+          el('th',{style:{textAlign:'right',padding:'3px 6px',color:'var(--text2)',fontWeight:700,borderBottom:'1px solid var(--border)'}},'Result'),
+          el('th',{style:{textAlign:'right',padding:'3px 6px',color:'var(--text2)',fontWeight:700,borderBottom:'1px solid var(--border)'}},'Limit'),
+          el('th',{style:{textAlign:'center',padding:'3px 6px',color:'var(--text2)',fontWeight:700,borderBottom:'1px solid var(--border)'}},'Status'),
+        )),
+        el('tbody',null,entries.map(([name,v])=>{
+          const pass=v.pass!==false;
+          return el('tr',{key:name,style:{borderBottom:'1px solid rgba(100,116,139,.08)'}},
+            el('td',{style:{padding:'3px 6px',color:'var(--text)'}},name),
+            el('td',{style:{padding:'3px 6px',textAlign:'right',color:'var(--text)',fontWeight:600}},v.result!=null?v.result+(v.unit?' '+v.unit:''):'—'),
+            el('td',{style:{padding:'3px 6px',textAlign:'right',color:'var(--text3)'}},v.action_level!=null?v.action_level+(v.unit?' '+v.unit:''):'—'),
+            el('td',{style:{padding:'3px 6px',textAlign:'center',color:pass?'#16a34a':'#dc2626',fontWeight:700}},pass?'✓':'FAIL'),
+          );
+        }))
+      )
+    );
+  }
+
   return el('div',{style:{background:overallFail?'rgba(220,38,38,.06)':overallPass?'rgba(22,163,74,.06)':'rgba(99,102,241,.06)',border:'1px solid '+(overallFail?'rgba(220,38,38,.3)':overallPass?'rgba(22,163,74,.3)':'rgba(99,102,241,.2)'),borderRadius:10,padding:'12px 14px',marginTop:8}},
-    el('div',{style:{display:'flex',gap:8,alignItems:'center',marginBottom:10}},
+    // Header row
+    el('div',{style:{display:'flex',gap:8,alignItems:'center',marginBottom:8,flexWrap:'wrap'}},
       el('span',{style:{fontSize:13,fontWeight:800,color:'var(--text)'}},'🧬 COA Analysis'),
       el('span',{style:{fontSize:11,fontWeight:700,padding:'2px 8px',borderRadius:4,background:overallFail?'rgba(220,38,38,.15)':overallPass?'rgba(22,163,74,.15)':'rgba(100,116,139,.12)',color:overallFail?'#dc2626':overallPass?'#16a34a':'#64748b'}},overallFail?'❌ FAILED':overallPass?'✅ PASSED':'⚠️ PARTIAL'),
+      lab.name&&el('span',{style:{fontSize:11,color:'var(--text2)'}},lab.name+(lab.report_date?' · '+lab.report_date:'')),
+      lab.report_id&&el('span',{style:{fontSize:11,color:'var(--text3)'}},'№ '+lab.report_id),
       analysis.analyzed_at&&el('span',{style:{fontSize:10,color:'var(--text3)',marginLeft:'auto'}},new Date(analysis.analyzed_at).toLocaleString()),
+      el('button',{onClick:()=>setShow(s=>!s),style:{marginLeft:'auto',background:'transparent',border:'none',color:'#6366f1',fontSize:11,fontWeight:700,cursor:'pointer',padding:'2px 6px'}},show?'▲ Collapse':'▼ Full Data'),
     ),
-    analysis.thc_pct!=null&&el('div',{style:{display:'flex',gap:16,marginBottom:8,flexWrap:'wrap',fontSize:12}},
-      el('span',null,el('b',null,'THC: '),analysis.thc_pct+'%'),
-      analysis.cbd_pct!=null&&el('span',null,el('b',null,'CBD: '),analysis.cbd_pct+'%'),
-      analysis.total_cannabinoids!=null&&el('span',null,el('b',null,'Total Cannabinoids: '),analysis.total_cannabinoids+'%'),
+
+    // Potency summary — always visible
+    (p.total_thc!=null||p.thc!=null)&&el('div',{style:{display:'flex',gap:12,marginBottom:10,flexWrap:'wrap',background:'rgba(99,102,241,.06)',borderRadius:7,padding:'8px 12px',fontSize:12}},
+      (p.total_thc!=null||p.thc!=null)&&el('span',null,el('b',null,'Total THC: '),(p.total_thc??p.thc)+'%'),
+      (p.total_cbd!=null||p.cbd!=null)&&el('span',null,el('b',null,'Total CBD: '),(p.total_cbd??p.cbd)+'%'),
+      p.thca!=null&&el('span',null,el('b',null,'THCA: '),p.thca+'%'),
+      p.cbda!=null&&el('span',null,el('b',null,'CBDA: '),p.cbda+'%'),
+      p.total_cannabinoids!=null&&el('span',null,el('b',null,'Total Cannabinoids: '),p.total_cannabinoids+'%'),
+      analysis.terpenes?.total_terpenes!=null&&el('span',null,el('b',null,'Total Terpenes: '),analysis.terpenes.total_terpenes+'%'),
     ),
-    el('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',gap:6}},
+
+    // Section badges — always visible
+    el('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(130px,1fr))',gap:5,marginBottom:8}},
       sections.map(([key,val])=>{
         const pass=val.status==='pass';const fail=val.status==='fail';const na=val.status==='not_tested';
-        return el('div',{key,style:{background:fail?'rgba(220,38,38,.08)':pass?'rgba(22,163,74,.08)':'rgba(100,116,139,.06)',border:'1px solid '+(fail?'rgba(220,38,38,.25)':pass?'rgba(22,163,74,.25)':'rgba(100,116,139,.15)'),borderRadius:7,padding:'8px 10px'}},
-          el('div',{style:{fontSize:10,fontWeight:800,color:'var(--text2)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:2}},key.replace(/_/g,' ')),
-          el('div',{style:{fontSize:12,fontWeight:700,color:fail?'#dc2626':pass?'#16a34a':'#94a3b8'}},na?'Not Tested':fail?'❌ FAIL':'✅ PASS'),
-          val.value&&el('div',{style:{fontSize:11,color:'var(--text3)',marginTop:2}},val.value),
-          val.flag&&el('div',{style:{fontSize:11,color:'#dc2626',marginTop:2}},'⚠️ '+val.flag),
+        return el('div',{key,style:{background:fail?'rgba(220,38,38,.08)':pass?'rgba(22,163,74,.08)':'rgba(100,116,139,.06)',border:'1px solid '+(fail?'rgba(220,38,38,.25)':pass?'rgba(22,163,74,.25)':'rgba(100,116,139,.15)'),borderRadius:7,padding:'6px 8px'}},
+          el('div',{style:{fontSize:9,fontWeight:800,color:'var(--text2)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:2}},key.replace(/_/g,' ')),
+          el('div',{style:{fontSize:11,fontWeight:700,color:fail?'#dc2626':pass?'#16a34a':'#94a3b8'}},na?'Not Tested':fail?'❌ FAIL':'✅ PASS'),
+          val.value&&el('div',{style:{fontSize:10,color:'var(--text3)',marginTop:1}},val.value),
+          val.flag&&el('div',{style:{fontSize:10,color:'#dc2626',marginTop:1}},'⚠️ '+val.flag),
         );
       })
     ),
-    analysis.summary&&el('div',{style:{marginTop:8,fontSize:12,color:'var(--text2)',borderTop:'1px solid var(--border)',paddingTop:8}},analysis.summary),
+
+    // Summary
+    analysis.summary&&el('div',{style:{fontSize:12,color:'var(--text2)',marginBottom:show?8:0}},analysis.summary),
+
+    // Full detail — collapsed by default
+    show&&el('div',{style:{borderTop:'1px solid var(--border)',paddingTop:10,display:'flex',flexDirection:'column',gap:12}},
+      // Lab & sample info
+      (lab.name||smp.sample_id)&&el('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,fontSize:11}},
+        el('div',null,
+          el('div',{style:{fontWeight:800,color:'var(--text2)',marginBottom:4,textTransform:'uppercase',fontSize:10}},'Laboratory'),
+          lab.name&&el('div',null,lab.name),
+          lab.license&&el('div',{style:{color:'var(--text2)'}},'Lic: '+lab.license),
+          lab.report_id&&el('div',{style:{color:'var(--text2)'}},'Report №: '+lab.report_id),
+          lab.report_date&&el('div',{style:{color:'var(--text2)'}},'Issued: '+lab.report_date),
+          lab.sample_received&&el('div',{style:{color:'var(--text2)'}},'Received: '+lab.sample_received),
+        ),
+        el('div',null,
+          el('div',{style:{fontWeight:800,color:'var(--text2)',marginBottom:4,textTransform:'uppercase',fontSize:10}},'Sample'),
+          smp.product_name&&el('div',null,smp.product_name),
+          smp.batch_id&&el('div',{style:{color:'var(--text2)'}},'Batch: '+smp.batch_id),
+          smp.matrix&&el('div',{style:{color:'var(--text2)'}},'Matrix: '+smp.matrix),
+          smp.sample_id&&el('div',{style:{color:'var(--text2)'}},'Sample ID: '+smp.sample_id),
+          smp.sample_mass&&el('div',{style:{color:'var(--text2)'}},'Mass: '+smp.sample_mass),
+        ),
+      ),
+
+      // Potency detail
+      analysis.potency&&el('div',null,
+        el('div',{style:{fontWeight:800,color:'var(--text2)',marginBottom:6,textTransform:'uppercase',fontSize:10,letterSpacing:'.5px'}},'🌿 Potency / Cannabinoids'),
+        el('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(120px,1fr))',gap:4}},
+          [['THC',p.thc],['THCA',p.thca],['Total THC',p.total_thc],['CBD',p.cbd],['CBDA',p.cbda],['Total CBD',p.total_cbd],['CBG',p.cbg],['CBGA',p.cbga],['CBN',p.cbn],['CBC',p.cbc],['THCV',p.thcv],['Δ₈-THC',p.d8_thc],['Total Cannabinoids',p.total_cannabinoids]].filter(([,v])=>v!=null).map(([name,val])=>
+            el('div',{key:name,style:{background:'rgba(99,102,241,.06)',borderRadius:5,padding:'5px 8px',fontSize:11}},
+              el('div',{style:{color:'var(--text2)',fontSize:10}},name),
+              el('div',{style:{fontWeight:700,color:'var(--text)'}},val+'%'),
+            )
+          )
+        )
+      ),
+
+      // Terpenes
+      analysis.terpenes?.analytes&&Object.keys(analysis.terpenes.analytes).length>0&&el('div',null,
+        el('div',{style:{fontWeight:800,color:'var(--text2)',marginBottom:6,textTransform:'uppercase',fontSize:10,letterSpacing:'.5px'}},'🌼 Terpenes'+(analysis.terpenes.total_terpenes!=null?' — '+analysis.terpenes.total_terpenes+'% Total':'')),
+        el('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))',gap:4}},
+          Object.entries(analysis.terpenes.analytes).filter(([,v])=>v!=null).map(([name,val])=>
+            el('div',{key:name,style:{background:'rgba(20,184,166,.06)',borderRadius:5,padding:'5px 8px',fontSize:11}},
+              el('div',{style:{color:'var(--text2)',fontSize:10}},name),
+              el('div',{style:{fontWeight:700,color:'var(--text)'}},val+'%'),
+            )
+          )
+        )
+      ),
+
+      // Pesticides
+      analysis.pesticides?.analytes&&el('div',null,
+        el('div',{style:{fontWeight:800,color:analysis.pesticides.status==='fail'?'#dc2626':'var(--text2)',marginBottom:6,textTransform:'uppercase',fontSize:10,letterSpacing:'.5px'}},'🚨 Pesticides — '+(analysis.pesticides.status==='pass'?'✅ PASS':analysis.pesticides.status==='fail'?'❌ FAIL':'Not Tested')),
+        el(AnalyteTable,{data:analysis.pesticides.analytes}),
+      ),
+
+      // Microbials
+      analysis.microbials?.analytes&&el('div',null,
+        el('div',{style:{fontWeight:800,color:analysis.microbials.status==='fail'?'#dc2626':'var(--text2)',marginBottom:6,textTransform:'uppercase',fontSize:10,letterSpacing:'.5px'}},'🦠 Microbials — '+(analysis.microbials.status==='pass'?'✅ PASS':analysis.microbials.status==='fail'?'❌ FAIL':'Not Tested')),
+        el(AnalyteTable,{data:analysis.microbials.analytes}),
+      ),
+
+      // Mycotoxins
+      analysis.mycotoxins?.analytes&&el('div',null,
+        el('div',{style:{fontWeight:800,color:analysis.mycotoxins.status==='fail'?'#dc2626':'var(--text2)',marginBottom:6,textTransform:'uppercase',fontSize:10,letterSpacing:'.5px'}},'☣️ Mycotoxins — '+(analysis.mycotoxins.status==='pass'?'✅ PASS':analysis.mycotoxins.status==='fail'?'❌ FAIL':'Not Tested')),
+        el(AnalyteTable,{data:analysis.mycotoxins.analytes}),
+      ),
+
+      // Heavy Metals
+      analysis.heavy_metals?.analytes&&el('div',null,
+        el('div',{style:{fontWeight:800,color:analysis.heavy_metals.status==='fail'?'#dc2626':'var(--text2)',marginBottom:6,textTransform:'uppercase',fontSize:10,letterSpacing:'.5px'}},'⚗️ Heavy Metals — '+(analysis.heavy_metals.status==='pass'?'✅ PASS':analysis.heavy_metals.status==='fail'?'❌ FAIL':'Not Tested')),
+        el(AnalyteTable,{data:analysis.heavy_metals.analytes}),
+      ),
+
+      // Residual Solvents
+      analysis.residual_solvents?.analytes&&el('div',null,
+        el('div',{style:{fontWeight:800,color:analysis.residual_solvents.status==='fail'?'#dc2626':'var(--text2)',marginBottom:6,textTransform:'uppercase',fontSize:10,letterSpacing:'.5px'}},'🧪 Residual Solvents — '+(analysis.residual_solvents.status==='pass'?'✅ PASS':analysis.residual_solvents.status==='fail'?'❌ FAIL':'Not Tested')),
+        el(AnalyteTable,{data:analysis.residual_solvents.analytes}),
+      ),
+
+      // Moisture
+      analysis.moisture?.value!=null&&el('div',{style:{display:'flex',gap:16,fontSize:11}},
+        el('div',null,el('span',{style:{color:'var(--text2)'}},'Moisture: '),el('b',null,analysis.moisture.value+'%')),
+        analysis.moisture.water_activity!=null&&el('div',null,el('span',{style:{color:'var(--text2)'}},'Water Activity (Aw): '),el('b',null,analysis.moisture.water_activity)),
+        el('span',{style:{color:analysis.moisture.status==='pass'?'#16a34a':'#dc2626',fontWeight:700}},analysis.moisture.status==='pass'?'✅ PASS':'❌ FAIL'),
+      ),
+    ),
   );
 }
 
@@ -5923,25 +6051,44 @@ function TestingModule({cu,isAdmin,isElevated,SUPA_URL,SUPA_KEY,H,db}){
   }
 
   async function analyzeCoa(fileOrNull,item){
-    // fileOrNull: if we have the raw file we base64 it for vision; else we send the URL
     setCoaAnalyzing(true);
     try{
+      // Helper: file/blob -> base64 string
+      const toB64=blob=>new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(blob);});
+
       let userContent;
-      if(fileOrNull&&(fileOrNull.type==='application/pdf'||fileOrNull.type.startsWith('image/'))){
-        // Send as base64 vision message if image; PDF: extract text via reading URL
-        if(fileOrNull.type.startsWith('image/')){
-          const b64=await new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result.split(',')[1]);r.readAsDataURL(fileOrNull);});
-          userContent=[
-            {type:'image',source:{type:'base64',media_type:fileOrNull.type,data:b64}},
-            {type:'text',text:COA_ANALYSIS_PROMPT(item)},
-          ];
-        } else {
-          // PDF: pass URL text prompt
-          userContent=[{type:'text',text:COA_ANALYSIS_PROMPT(item)+'\n\nCOA URL: '+item.coa_url}];
-        }
-      } else {
-        userContent=[{type:'text',text:COA_ANALYSIS_PROMPT(item)+'\n\nCOA URL: '+item.coa_url}];
+      let srcFile=fileOrNull;
+
+      // If no file object, fetch the stored URL to get raw bytes
+      if(!srcFile&&item.coa_url){
+        const fetched=await fetch(item.coa_url);
+        if(!fetched.ok) throw new Error('Could not fetch stored COA file');
+        const blob=await fetched.blob();
+        // Reconstruct a File-like object with proper type
+        const ext=(item.coa_filename||'').split('.').pop().toLowerCase();
+        const mime=ext==='pdf'?'application/pdf':fetched.headers.get('content-type')||'application/octet-stream';
+        srcFile=new File([blob],item.coa_filename||'coa.pdf',{type:mime});
       }
+
+      if(srcFile&&srcFile.type==='application/pdf'){
+        // Send PDF as base64 document block — Claude reads it natively
+        const b64=await toB64(srcFile);
+        userContent=[
+          {type:'document',source:{type:'base64',media_type:'application/pdf',data:b64}},
+          {type:'text',text:COA_ANALYSIS_PROMPT(item)},
+        ];
+      } else if(srcFile&&srcFile.type.startsWith('image/')){
+        // Send image as vision block
+        const b64=await toB64(srcFile);
+        userContent=[
+          {type:'image',source:{type:'base64',media_type:srcFile.type,data:b64}},
+          {type:'text',text:COA_ANALYSIS_PROMPT(item)},
+        ];
+      } else {
+        // Fallback: text-only prompt (no file available)
+        userContent=[{type:'text',text:COA_ANALYSIS_PROMPT(item)+'\n\n(No COA file could be loaded for analysis.)'}];
+      }
+
       const res=await fetch(`${SUPA_URL}/functions/v1/claude-proxy`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPA_KEY},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2000,messages:[{role:'user',content:userContent}]})});
       const data=await res.json();
       const text=data.content?.[0]?.text||'';
@@ -5949,7 +6096,6 @@ function TestingModule({cu,isAdmin,isElevated,SUPA_URL,SUPA_KEY,H,db}){
       try{analysis=JSON.parse(text.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim());}
       catch{analysis={summary:text,sections:{},analyzed_at:new Date().toISOString()};}
       analysis.analyzed_at=new Date().toISOString();
-      // Save analysis back to record
       const updated={...item,coa_analysis:analysis,result_thc:analysis.thc_pct!=null?String(analysis.thc_pct):item.result_thc,result_cbd:analysis.cbd_pct!=null?String(analysis.cbd_pct):item.result_cbd,result_notes:analysis.summary||item.result_notes};
       await saveItem(updated);
       setEditItem(p=>p?({...p,coa_analysis:analysis,result_thc:updated.result_thc,result_cbd:updated.result_cbd,result_notes:updated.result_notes}):p);
@@ -5959,37 +6105,120 @@ function TestingModule({cu,isAdmin,isElevated,SUPA_URL,SUPA_KEY,H,db}){
   }
 
   function COA_ANALYSIS_PROMPT(item){
-    return `You are a cannabis compliance analyst. Analyze this Certificate of Analysis (COA) for a Michigan CRA-licensed cannabis product.
+    return `You are a cannabis compliance data extraction specialist. Read this Certificate of Analysis (COA) PDF carefully and extract EVERY piece of data present. This data will be stored permanently and used to print Michigan CRA compliance labels.
 
-Product: ${item.sku||''} ${item.flavor||''} | Batch: ${item.batch_number||item.batch_id||''} | METRC: ${item.metrc_tag||''}
+Product context: ${item.sku||''} ${item.flavor||''} | Batch: ${item.batch_number||item.batch_id||''} | METRC: ${item.metrc_tag||''}
 
-Extract ALL analyte results and determine pass/fail for each section. Michigan CRA mandatory testing requirements:
-- Potency: Required (extract THC%, CBD%, Total Cannabinoids%)
-- Pesticides: PASS = ND (non-detect) or below action level for all analytes
-- Microbials: PASS = ND for Salmonella, STEC, Aspergillus (4 species), no exceeding CFU limits
-- Mycotoxins: PASS = below action level for aflatoxins + ochratoxin
-- Heavy Metals: PASS = below action level for As, Cd, Hg, Pb
-- Residual Solvents: PASS = below action level (if applicable)
-- Moisture Content: PASS = below 15% (flower/pre-roll)
-- Foreign Matter: PASS = no foreign matter detected
+Extract ALL of the following. If a field is not present in the COA, use null.
 
-Respond ONLY with this JSON (no markdown):
+Respond ONLY with valid JSON (no markdown, no extra text):
 {
-  “thc_pct”: <number or null>,
-  “cbd_pct”: <number or null>,
-  “total_cannabinoids”: <number or null>,
-  “sections”: {
-    “potency”: {“status”: “pass|fail|not_tested”, “value”: “<THC>% THC / <CBD>% CBD”, “flag”: “<any flag or null>”},
-    “pesticides”: {“status”: “pass|fail|not_tested”, “value”: “<summary>”, “flag”: “<any failing analyte or null>”},
-    “microbials”: {“status”: “pass|fail|not_tested”, “value”: “<summary>”, “flag”: “<any failing analyte or null>”},
-    “mycotoxins”: {“status”: “pass|fail|not_tested”, “value”: “<summary>”, “flag”: “<any failing analyte or null>”},
-    “heavy_metals”: {“status”: “pass|fail|not_tested”, “value”: “<summary>”, “flag”: “<any failing analyte or null>”},
-    “residual_solvents”: {“status”: “pass|fail|not_tested”, “value”: “<summary>”, “flag”: “<any failing analyte or null>”},
-    “moisture”: {“status”: “pass|fail|not_tested”, “value”: “<value or ND>”, “flag”: null},
-    “foreign_matter”: {“status”: “pass|fail|not_tested”, “value”: “<result>”, “flag”: null}
+  “lab”: {
+    “name”: “<lab name>”,
+    “license”: “<lab license number>”,
+    “address”: “<lab address>”,
+    “phone”: “<lab phone>”,
+    “report_id”: “<COA report / certificate number>”,
+    “report_date”: “<date COA was issued YYYY-MM-DD>”,
+    “sample_received”: “<date sample received YYYY-MM-DD>”,
+    “sample_id”: “<lab sample ID>”
   },
+  “sample”: {
+    “product_name”: “<product name on COA>”,
+    “batch_id”: “<batch or lot number on COA>”,
+    “metrc_tag”: “<METRC tag on COA>”,
+    “matrix”: “<product matrix e.g. Concentrate, Flower, Edible>”,
+    “sample_mass”: “<mass/quantity of sample tested>”,
+    “collection_date”: “<YYYY-MM-DD>”
+  },
+  “potency”: {
+    “status”: “pass|fail|not_tested”,
+    “thc”: <number|null>,
+    “thca”: <number|null>,
+    “total_thc”: <number|null>,
+    “cbd”: <number|null>,
+    “cbda”: <number|null>,
+    “total_cbd”: <number|null>,
+    “cbg”: <number|null>,
+    “cbga”: <number|null>,
+    “cbn”: <number|null>,
+    “cbc”: <number|null>,
+    “thcv”: <number|null>,
+    “d8_thc”: <number|null>,
+    “total_cannabinoids”: <number|null>,
+    “unit”: “% by weight”
+  },
+  “terpenes”: {
+    “status”: “pass|fail|not_tested”,
+    “total_terpenes”: <number|null>,
+    “analytes”: {
+      “<terpene_name>”: <number|null>
+    }
+  },
+  “pesticides”: {
+    “status”: “pass|fail|not_tested”,
+    “flag”: “<failing analyte name or null>”,
+    “analytes”: {
+      “<pesticide_name>”: {“result”: <number|”ND”|null>, “action_level”: <number|null>, “unit”: “<unit>”, “pass”: <true|false>}
+    }
+  },
+  “microbials”: {
+    “status”: “pass|fail|not_tested”,
+    “flag”: “<failing analyte or null>”,
+    “analytes”: {
+      “<organism_name>”: {“result”: <number|”ND”|null>, “action_level”: <number|”Absent”|null>, “unit”: “<unit>”, “pass”: <true|false>}
+    }
+  },
+  “mycotoxins”: {
+    “status”: “pass|fail|not_tested”,
+    “flag”: “<failing analyte or null>”,
+    “analytes”: {
+      “<toxin_name>”: {“result”: <number|”ND”|null>, “action_level”: <number|null>, “unit”: “<unit>”, “pass”: <true|false>}
+    }
+  },
+  “heavy_metals”: {
+    “status”: “pass|fail|not_tested”,
+    “flag”: “<failing element or null>”,
+    “analytes”: {
+      “arsenic”: {“result”: <number|”ND”|null>, “action_level”: <number|null>, “unit”: “ug/g”, “pass”: <true|false>},
+      “cadmium”: {“result”: <number|”ND”|null>, “action_level”: <number|null>, “unit”: “ug/g”, “pass”: <true|false>},
+      “lead”: {“result”: <number|”ND”|null>, “action_level”: <number|null>, “unit”: “ug/g”, “pass”: <true|false>},
+      “mercury”: {“result”: <number|”ND”|null>, “action_level”: <number|null>, “unit”: “ug/g”, “pass”: <true|false>}
+    }
+  },
+  “residual_solvents”: {
+    “status”: “pass|fail|not_tested”,
+    “flag”: “<failing solvent or null>”,
+    “analytes”: {
+      “<solvent_name>”: {“result”: <number|”ND”|null>, “action_level”: <number|null>, “unit”: “ug/g”, “pass”: <true|false>}
+    }
+  },
+  “moisture”: {
+    “status”: “pass|fail|not_tested”,
+    “value”: <number|null>,
+    “water_activity”: <number|null>,
+    “unit”: “%”
+  },
+  “foreign_matter”: {
+    “status”: “pass|fail|not_tested”,
+    “result”: “<result text>”
+  },
+  “sections”: {
+    “potency”: {“status”: “pass|fail|not_tested”, “value”: “<summary e.g. 85.2% Total THC>”, “flag”: null},
+    “pesticides”: {“status”: “pass|fail|not_tested”, “value”: “<summary>”, “flag”: “<failing analyte or null>”},
+    “microbials”: {“status”: “pass|fail|not_tested”, “value”: “<summary>”, “flag”: “<failing organism or null>”},
+    “mycotoxins”: {“status”: “pass|fail|not_tested”, “value”: “<summary>”, “flag”: “<failing toxin or null>”},
+    “heavy_metals”: {“status”: “pass|fail|not_tested”, “value”: “<summary>”, “flag”: “<failing element or null>”},
+    “residual_solvents”: {“status”: “pass|fail|not_tested”, “value”: “<summary>”, “flag”: “<failing solvent or null>”},
+    “moisture”: {“status”: “pass|fail|not_tested”, “value”: “<value>%”, “flag”: null},
+    “foreign_matter”: {“status”: “pass|fail|not_tested”, “value”: “<result>”, “flag”: null},
+    “terpenes”: {“status”: “pass|fail|not_tested”, “value”: “<total terpenes %>”, “flag”: null}
+  },
+  “thc_pct”: <total_thc number for label — use Total THC if available, else THC>,
+  “cbd_pct”: <total_cbd number for label>,
+  “total_cannabinoids”: <number|null>,
   “overall”: “pass|fail|incomplete”,
-  “summary”: “<1-2 sentence plain-English summary of overall result and any flags>”
+  “summary”: “<2-3 sentence plain-English summary: product, key potency numbers, overall pass/fail, any flags>”
 }`;
   }
 
