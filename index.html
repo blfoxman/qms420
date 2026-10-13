@@ -5824,12 +5824,24 @@ const COA_THRESHOLDS={
   foreignMatter:{pass:'No foreign matter',required:false},
 };
 
-function CoaAnalysisPanel({analysis,expanded}){
+class CoaErrorBoundary extends React.Component{
+  constructor(p){super(p);this.state={err:null};}
+  static getDerivedStateFromError(e){return{err:e};}
+  render(){
+    if(this.state.err)return el('div',{style:{padding:'10px 12px',background:'rgba(220,38,38,.08)',border:'1px solid rgba(220,38,38,.3)',borderRadius:8,fontSize:12,color:'#dc2626'}},
+      '⚠️ COA panel error: '+this.state.err.message+' — try re-analyzing the COA.');
+    return this.props.children;
+  }
+}
+
+function CoaAnalysisPanelInner({analysis,expanded}){
+  // safe() converts any value to a renderable string
+  const safe=v=>v==null?null:(typeof v==='object'?JSON.stringify(v):String(v));
   const[show,setShow]=React.useState(expanded||false);
   if(!analysis) return null;
   const sections=Object.entries(analysis.sections||{});
-  const overallPass=analysis.overall==='pass'||(sections.length>0&&sections.every(([,v])=>v.status==='pass'||v.status==='not_tested'));
-  const overallFail=analysis.overall==='fail'||sections.some(([,v])=>v.status==='fail');
+  const overallPass=analysis.overall==='pass'||(sections.length>0&&sections.every(([,v])=>v&&(v.status==='pass'||v.status==='not_tested')));
+  const overallFail=analysis.overall==='fail'||sections.some(([,v])=>v&&v.status==='fail');
   const p=analysis.potency||{};
   const lab=analysis.lab||{};
   const smp=analysis.sample||{};
@@ -5846,11 +5858,14 @@ function CoaAnalysisPanel({analysis,expanded}){
           el('th',{style:{textAlign:'center',padding:'3px 6px',color:'var(--text2)',fontWeight:700,borderBottom:'1px solid var(--border)'}},'Status'),
         )),
         el('tbody',null,entries.map(([name,v])=>{
+          if(!v||typeof v!=='object') return null;
           const pass=v.pass!==false;
+          const resultStr=v.result!=null?safe(v.result)+(v.unit?' '+v.unit:''):'—';
+          const limitStr=v.action_level!=null?safe(v.action_level)+(v.unit?' '+v.unit:''):'—';
           return el('tr',{key:name,style:{borderBottom:'1px solid rgba(100,116,139,.08)'}},
             el('td',{style:{padding:'3px 6px',color:'var(--text)'}},name),
-            el('td',{style:{padding:'3px 6px',textAlign:'right',color:'var(--text)',fontWeight:600}},v.result!=null?v.result+(v.unit?' '+v.unit:''):'—'),
-            el('td',{style:{padding:'3px 6px',textAlign:'right',color:'var(--text3)'}},v.action_level!=null?v.action_level+(v.unit?' '+v.unit:''):'—'),
+            el('td',{style:{padding:'3px 6px',textAlign:'right',color:'var(--text)',fontWeight:600}},resultStr),
+            el('td',{style:{padding:'3px 6px',textAlign:'right',color:'var(--text3)'}},limitStr),
             el('td',{style:{padding:'3px 6px',textAlign:'center',color:pass?'#16a34a':'#dc2626',fontWeight:700}},pass?'✓':'FAIL'),
           );
         }))
@@ -5863,8 +5878,8 @@ function CoaAnalysisPanel({analysis,expanded}){
     el('div',{style:{display:'flex',gap:8,alignItems:'center',marginBottom:8,flexWrap:'wrap'}},
       el('span',{style:{fontSize:13,fontWeight:800,color:'var(--text)'}},'🧬 COA Analysis'),
       el('span',{style:{fontSize:11,fontWeight:700,padding:'2px 8px',borderRadius:4,background:overallFail?'rgba(220,38,38,.15)':overallPass?'rgba(22,163,74,.15)':'rgba(100,116,139,.12)',color:overallFail?'#dc2626':overallPass?'#16a34a':'#64748b'}},overallFail?'❌ FAILED':overallPass?'✅ PASSED':'⚠️ PARTIAL'),
-      lab.name&&el('span',{style:{fontSize:11,color:'var(--text2)'}},lab.name+(lab.report_date?' · '+lab.report_date:'')),
-      lab.report_id&&el('span',{style:{fontSize:11,color:'var(--text3)'}},'№ '+lab.report_id),
+      lab.name&&el('span',{style:{fontSize:11,color:'var(--text2)'}},safe(lab.name)+(lab.report_date?' · '+safe(lab.report_date):'')),
+      lab.report_id&&el('span',{style:{fontSize:11,color:'var(--text3)'}},'№ '+safe(lab.report_id)),
       analysis.analyzed_at&&el('span',{style:{fontSize:10,color:'var(--text3)',marginLeft:'auto'}},new Date(analysis.analyzed_at).toLocaleString()),
       el('button',{onClick:()=>setShow(s=>!s),style:{marginLeft:'auto',background:'transparent',border:'none',color:'#6366f1',fontSize:11,fontWeight:700,cursor:'pointer',padding:'2px 6px'}},show?'▲ Collapse':'▼ Full Data'),
     ),
@@ -5886,8 +5901,8 @@ function CoaAnalysisPanel({analysis,expanded}){
         return el('div',{key,style:{background:fail?'rgba(220,38,38,.08)':pass?'rgba(22,163,74,.08)':'rgba(100,116,139,.06)',border:'1px solid '+(fail?'rgba(220,38,38,.25)':pass?'rgba(22,163,74,.25)':'rgba(100,116,139,.15)'),borderRadius:7,padding:'6px 8px'}},
           el('div',{style:{fontSize:9,fontWeight:800,color:'var(--text2)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:2}},key.replace(/_/g,' ')),
           el('div',{style:{fontSize:11,fontWeight:700,color:fail?'#dc2626':pass?'#16a34a':'#94a3b8'}},na?'Not Tested':fail?'❌ FAIL':'✅ PASS'),
-          val.value&&el('div',{style:{fontSize:10,color:'var(--text3)',marginTop:1}},val.value),
-          val.flag&&el('div',{style:{fontSize:10,color:'#dc2626',marginTop:1}},'⚠️ '+val.flag),
+          val.value&&el('div',{style:{fontSize:10,color:'var(--text3)',marginTop:1}},safe(val.value)),
+          val.flag&&el('div',{style:{fontSize:10,color:'#dc2626',marginTop:1}},'⚠️ '+safe(val.flag)),
         );
       })
     ),
@@ -5906,19 +5921,19 @@ function CoaAnalysisPanel({analysis,expanded}){
       (lab.name||smp.sample_id)&&el('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,fontSize:11}},
         el('div',null,
           el('div',{style:{fontWeight:800,color:'var(--text2)',marginBottom:4,textTransform:'uppercase',fontSize:10}},'Laboratory'),
-          lab.name&&el('div',null,lab.name),
-          lab.license&&el('div',{style:{color:'var(--text2)'}},'Lic: '+lab.license),
-          lab.report_id&&el('div',{style:{color:'var(--text2)'}},'Report №: '+lab.report_id),
-          lab.report_date&&el('div',{style:{color:'var(--text2)'}},'Issued: '+lab.report_date),
-          lab.sample_received&&el('div',{style:{color:'var(--text2)'}},'Received: '+lab.sample_received),
+          lab.name&&el('div',null,safe(lab.name)),
+          lab.license&&el('div',{style:{color:'var(--text2)'}},'Lic: '+safe(lab.license)),
+          lab.report_id&&el('div',{style:{color:'var(--text2)'}},'Report №: '+safe(lab.report_id)),
+          lab.report_date&&el('div',{style:{color:'var(--text2)'}},'Issued: '+safe(lab.report_date)),
+          lab.sample_received&&el('div',{style:{color:'var(--text2)'}},'Received: '+safe(lab.sample_received)),
         ),
         el('div',null,
           el('div',{style:{fontWeight:800,color:'var(--text2)',marginBottom:4,textTransform:'uppercase',fontSize:10}},'Sample'),
-          smp.product_name&&el('div',null,smp.product_name),
-          smp.batch_id&&el('div',{style:{color:'var(--text2)'}},'Batch: '+smp.batch_id),
-          smp.matrix&&el('div',{style:{color:'var(--text2)'}},'Matrix: '+smp.matrix),
-          smp.sample_id&&el('div',{style:{color:'var(--text2)'}},'Sample ID: '+smp.sample_id),
-          smp.sample_mass&&el('div',{style:{color:'var(--text2)'}},'Mass: '+smp.sample_mass),
+          smp.product_name&&el('div',null,safe(smp.product_name)),
+          smp.batch_id&&el('div',{style:{color:'var(--text2)'}},'Batch: '+safe(smp.batch_id)),
+          smp.matrix&&el('div',{style:{color:'var(--text2)'}},'Matrix: '+safe(smp.matrix)),
+          smp.sample_id&&el('div',{style:{color:'var(--text2)'}},'Sample ID: '+safe(smp.sample_id)),
+          smp.sample_mass&&el('div',{style:{color:'var(--text2)'}},'Mass: '+safe(smp.sample_mass)),
         ),
       ),
 
@@ -5939,12 +5954,14 @@ function CoaAnalysisPanel({analysis,expanded}){
       analysis.terpenes?.analytes&&Object.keys(analysis.terpenes.analytes).length>0&&el('div',null,
         el('div',{style:{fontWeight:800,color:'var(--text2)',marginBottom:6,textTransform:'uppercase',fontSize:10,letterSpacing:'.5px'}},'🌼 Terpenes'+(analysis.terpenes.total_terpenes!=null?' — '+analysis.terpenes.total_terpenes+'% Total':'')),
         el('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))',gap:4}},
-          Object.entries(analysis.terpenes.analytes).filter(([,v])=>v!=null).map(([name,val])=>
-            el('div',{key:name,style:{background:'rgba(20,184,166,.06)',borderRadius:5,padding:'5px 8px',fontSize:11}},
+          Object.entries(analysis.terpenes.analytes).filter(([,v])=>v!=null).map(([name,val])=>{
+            // terpene val may be a number or an object {result,unit,...}
+            const tval=typeof val==='object'?(val.result??val.value??JSON.stringify(val)):val;
+            return el('div',{key:name,style:{background:'rgba(20,184,166,.06)',borderRadius:5,padding:'5px 8px',fontSize:11}},
               el('div',{style:{color:'var(--text2)',fontSize:10}},name),
-              el('div',{style:{fontWeight:700,color:'var(--text)'}},val+'%'),
-            )
-          )
+              el('div',{style:{fontWeight:700,color:'var(--text)'}},safe(tval)+(typeof tval==='number'?'%':'')),
+            );
+          })
         )
       ),
 
@@ -5980,12 +5997,16 @@ function CoaAnalysisPanel({analysis,expanded}){
 
       // Moisture
       analysis.moisture?.value!=null&&el('div',{style:{display:'flex',gap:16,fontSize:11}},
-        el('div',null,el('span',{style:{color:'var(--text2)'}},'Moisture: '),el('b',null,analysis.moisture.value+'%')),
-        analysis.moisture.water_activity!=null&&el('div',null,el('span',{style:{color:'var(--text2)'}},'Water Activity (Aw): '),el('b',null,analysis.moisture.water_activity)),
+        el('div',null,el('span',{style:{color:'var(--text2)'}},'Moisture: '),el('b',null,safe(analysis.moisture.value)+'%')),
+        analysis.moisture.water_activity!=null&&el('div',null,el('span',{style:{color:'var(--text2)'}},'Water Activity (Aw): '),el('b',null,safe(analysis.moisture.water_activity))),
         el('span',{style:{color:analysis.moisture.status==='pass'?'#16a34a':'#dc2626',fontWeight:700}},analysis.moisture.status==='pass'?'✅ PASS':'❌ FAIL'),
       ),
     ),
   );
+}
+
+function CoaAnalysisPanel(props){
+  return el(CoaErrorBoundary,null,el(CoaAnalysisPanelInner,props));
 }
 
 function TestingModule({cu,isAdmin,isElevated,SUPA_URL,SUPA_KEY,H,db}){
