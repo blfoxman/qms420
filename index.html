@@ -5894,6 +5894,11 @@ function CoaAnalysisPanel({analysis,expanded}){
 
     // Summary
     analysis.summary&&el('div',{style:{fontSize:12,color:'var(--text2)',marginBottom:show?8:0}},analysis.summary),
+    // Debug: show raw response if parse failed
+    analysis.parse_error&&el('div',{style:{marginTop:8,background:'rgba(220,38,38,.06)',border:'1px solid rgba(220,38,38,.2)',borderRadius:7,padding:'8px 10px'}},
+      el('div',{style:{fontSize:10,fontWeight:800,color:'#dc2626',marginBottom:4,textTransform:'uppercase'}},'Parse Error — Raw Claude Response'),
+      el('div',{style:{fontSize:10,color:'var(--text2)',fontFamily:'monospace',whiteSpace:'pre-wrap',wordBreak:'break-all',maxHeight:200,overflowY:'auto'}},analysis.raw_response||'(empty)'),
+    ),
 
     // Full detail — collapsed by default
     show&&el('div',{style:{borderTop:'1px solid var(--border)',paddingTop:10,display:'flex',flexDirection:'column',gap:12}},
@@ -6107,14 +6112,24 @@ function TestingModule({cu,isAdmin,isElevated,SUPA_URL,SUPA_KEY,H,db}){
         userContent=[{type:'text',text:COA_ANALYSIS_PROMPT(item)+'\n\n(No COA file could be loaded for analysis.)'}];
       }
 
-      const res=await fetch(`${SUPA_URL}/functions/v1/claude-proxy`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPA_KEY},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:4000,messages:[{role:'user',content:userContent}]})});
+      const res=await fetch(`${SUPA_URL}/functions/v1/claude-proxy`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPA_KEY},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:8000,messages:[{role:'user',content:userContent}]})});
       const data=await res.json();
-      const text=data.content?.[0]?.text||'';
+      // Log raw response for debugging
+      console.log('[COA] Raw Claude response:',JSON.stringify(data).slice(0,2000));
+      const text=data.content?.[0]?.text||data.error?.message||'';
+      if(!text){throw new Error('No response from Claude proxy. Check console.');}
       let analysis;
-      try{analysis=JSON.parse(text.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim());}
-      catch{analysis={summary:text,sections:{},analyzed_at:new Date().toISOString()};}
+      // Try to extract JSON even if wrapped in markdown or has trailing text
+      const jsonMatch=text.match(/\{[\s\S]*\}/);
+      try{
+        analysis=JSON.parse(jsonMatch?jsonMatch[0]:text);
+      }catch(parseErr){
+        console.error('[COA] JSON parse failed:',parseErr.message,'\nRaw text:',text.slice(0,500));
+        // Store raw text so user can see it
+        analysis={summary:text,sections:{},raw_response:text,parse_error:parseErr.message,analyzed_at:new Date().toISOString()};
+      }
       analysis.analyzed_at=new Date().toISOString();
-      const updated={...item,coa_analysis:analysis,result_thc:analysis.thc_pct!=null?String(analysis.thc_pct):item.result_thc,result_cbd:analysis.cbd_pct!=null?String(analysis.cbd_pct):item.result_cbd,result_notes:analysis.summary||item.result_notes};
+      const updated={...item,coa_analysis:analysis,result_thc:analysis.thc_pct!=null?String(analysis.thc_pct):(analysis.potency?.total_thc!=null?String(analysis.potency.total_thc):item.result_thc),result_cbd:analysis.cbd_pct!=null?String(analysis.cbd_pct):(analysis.potency?.total_cbd!=null?String(analysis.potency.total_cbd):item.result_cbd),result_notes:analysis.summary||item.result_notes};
       await saveItem(updated);
       setEditItem(p=>p?({...p,coa_analysis:analysis,result_thc:updated.result_thc,result_cbd:updated.result_cbd,result_notes:updated.result_notes}):p);
       alert('🧬 COA analyzed! Review results below.');
@@ -6123,121 +6138,13 @@ function TestingModule({cu,isAdmin,isElevated,SUPA_URL,SUPA_KEY,H,db}){
   }
 
   function COA_ANALYSIS_PROMPT(item){
-    return `You are a cannabis compliance data extraction specialist. Read this Certificate of Analysis (COA) PDF carefully and extract EVERY piece of data present. This data will be stored permanently and used to print Michigan CRA compliance labels.
+    return `Extract ALL data from this Michigan cannabis COA PDF for compliance label printing. Product: ${item.sku||''} ${item.flavor||''} | Batch: ${item.batch_number||item.batch_id||''} | METRC: ${item.metrc_tag||''}
 
-Product context: ${item.sku||''} ${item.flavor||''} | Batch: ${item.batch_number||item.batch_id||''} | METRC: ${item.metrc_tag||''}
+Return ONLY raw JSON (no markdown fences). Missing fields = null. Include EVERY analyte listed in the COA.
 
-Extract ALL of the following. If a field is not present in the COA, use null.
+{“lab”:{“name”:null,”license”:null,”address”:null,”phone”:null,”report_id”:null,”report_date”:null,”sample_received”:null,”sample_id”:null},”sample”:{“product_name”:null,”batch_id”:null,”metrc_tag”:null,”matrix”:null,”sample_mass”:null,”collection_date”:null},”potency”:{“status”:”pass”,”thc”:null,”thca”:null,”total_thc”:null,”cbd”:null,”cbda”:null,”total_cbd”:null,”cbg”:null,”cbga”:null,”cbn”:null,”cbc”:null,”thcv”:null,”d8_thc”:null,”total_cannabinoids”:null,”unit”:”% by weight”},”terpenes”:{“status”:”not_tested”,”total_terpenes”:null,”analytes”:{}},”pesticides”:{“status”:”not_tested”,”flag”:null,”analytes”:{}},”microbials”:{“status”:”not_tested”,”flag”:null,”analytes”:{}},”mycotoxins”:{“status”:”not_tested”,”flag”:null,”analytes”:{}},”heavy_metals”:{“status”:”not_tested”,”flag”:null,”analytes”:{“arsenic”:{“result”:null,”action_level”:null,”unit”:”ug/g”,”pass”:true},”cadmium”:{“result”:null,”action_level”:null,”unit”:”ug/g”,”pass”:true},”lead”:{“result”:null,”action_level”:null,”unit”:”ug/g”,”pass”:true},”mercury”:{“result”:null,”action_level”:null,”unit”:”ug/g”,”pass”:true}}},”residual_solvents”:{“status”:”not_tested”,”flag”:null,”analytes”:{}},”moisture”:{“status”:”not_tested”,”value”:null,”water_activity”:null,”unit”:”%”},”foreign_matter”:{“status”:”not_tested”,”result”:null},”sections”:{“potency”:{“status”:”not_tested”,”value”:null,”flag”:null},”terpenes”:{“status”:”not_tested”,”value”:null,”flag”:null},”pesticides”:{“status”:”not_tested”,”value”:null,”flag”:null},”microbials”:{“status”:”not_tested”,”value”:null,”flag”:null},”mycotoxins”:{“status”:”not_tested”,”value”:null,”flag”:null},”heavy_metals”:{“status”:”not_tested”,”value”:null,”flag”:null},”residual_solvents”:{“status”:”not_tested”,”value”:null,”flag”:null},”moisture”:{“status”:”not_tested”,”value”:null,”flag”:null},”foreign_matter”:{“status”:”not_tested”,”value”:null,”flag”:null}},”thc_pct”:null,”cbd_pct”:null,”total_cannabinoids”:null,”overall”:”incomplete”,”summary”:null}
 
-Respond ONLY with valid JSON (no markdown, no extra text):
-{
-  “lab”: {
-    “name”: “<lab name>”,
-    “license”: “<lab license number>”,
-    “address”: “<lab address>”,
-    “phone”: “<lab phone>”,
-    “report_id”: “<COA report / certificate number>”,
-    “report_date”: “<date COA was issued YYYY-MM-DD>”,
-    “sample_received”: “<date sample received YYYY-MM-DD>”,
-    “sample_id”: “<lab sample ID>”
-  },
-  “sample”: {
-    “product_name”: “<product name on COA>”,
-    “batch_id”: “<batch or lot number on COA>”,
-    “metrc_tag”: “<METRC tag on COA>”,
-    “matrix”: “<product matrix e.g. Concentrate, Flower, Edible>”,
-    “sample_mass”: “<mass/quantity of sample tested>”,
-    “collection_date”: “<YYYY-MM-DD>”
-  },
-  “potency”: {
-    “status”: “pass|fail|not_tested”,
-    “thc”: <number|null>,
-    “thca”: <number|null>,
-    “total_thc”: <number|null>,
-    “cbd”: <number|null>,
-    “cbda”: <number|null>,
-    “total_cbd”: <number|null>,
-    “cbg”: <number|null>,
-    “cbga”: <number|null>,
-    “cbn”: <number|null>,
-    “cbc”: <number|null>,
-    “thcv”: <number|null>,
-    “d8_thc”: <number|null>,
-    “total_cannabinoids”: <number|null>,
-    “unit”: “% by weight”
-  },
-  “terpenes”: {
-    “status”: “pass|fail|not_tested”,
-    “total_terpenes”: <number|null>,
-    “analytes”: {
-      “<terpene_name>”: <number|null>
-    }
-  },
-  “pesticides”: {
-    “status”: “pass|fail|not_tested”,
-    “flag”: “<failing analyte name or null>”,
-    “analytes”: {
-      “<pesticide_name>”: {“result”: <number|”ND”|null>, “action_level”: <number|null>, “unit”: “<unit>”, “pass”: <true|false>}
-    }
-  },
-  “microbials”: {
-    “status”: “pass|fail|not_tested”,
-    “flag”: “<failing analyte or null>”,
-    “analytes”: {
-      “<organism_name>”: {“result”: <number|”ND”|null>, “action_level”: <number|”Absent”|null>, “unit”: “<unit>”, “pass”: <true|false>}
-    }
-  },
-  “mycotoxins”: {
-    “status”: “pass|fail|not_tested”,
-    “flag”: “<failing analyte or null>”,
-    “analytes”: {
-      “<toxin_name>”: {“result”: <number|”ND”|null>, “action_level”: <number|null>, “unit”: “<unit>”, “pass”: <true|false>}
-    }
-  },
-  “heavy_metals”: {
-    “status”: “pass|fail|not_tested”,
-    “flag”: “<failing element or null>”,
-    “analytes”: {
-      “arsenic”: {“result”: <number|”ND”|null>, “action_level”: <number|null>, “unit”: “ug/g”, “pass”: <true|false>},
-      “cadmium”: {“result”: <number|”ND”|null>, “action_level”: <number|null>, “unit”: “ug/g”, “pass”: <true|false>},
-      “lead”: {“result”: <number|”ND”|null>, “action_level”: <number|null>, “unit”: “ug/g”, “pass”: <true|false>},
-      “mercury”: {“result”: <number|”ND”|null>, “action_level”: <number|null>, “unit”: “ug/g”, “pass”: <true|false>}
-    }
-  },
-  “residual_solvents”: {
-    “status”: “pass|fail|not_tested”,
-    “flag”: “<failing solvent or null>”,
-    “analytes”: {
-      “<solvent_name>”: {“result”: <number|”ND”|null>, “action_level”: <number|null>, “unit”: “ug/g”, “pass”: <true|false>}
-    }
-  },
-  “moisture”: {
-    “status”: “pass|fail|not_tested”,
-    “value”: <number|null>,
-    “water_activity”: <number|null>,
-    “unit”: “%”
-  },
-  “foreign_matter”: {
-    “status”: “pass|fail|not_tested”,
-    “result”: “<result text>”
-  },
-  “sections”: {
-    “potency”: {“status”: “pass|fail|not_tested”, “value”: “<summary e.g. 85.2% Total THC>”, “flag”: null},
-    “pesticides”: {“status”: “pass|fail|not_tested”, “value”: “<summary>”, “flag”: “<failing analyte or null>”},
-    “microbials”: {“status”: “pass|fail|not_tested”, “value”: “<summary>”, “flag”: “<failing organism or null>”},
-    “mycotoxins”: {“status”: “pass|fail|not_tested”, “value”: “<summary>”, “flag”: “<failing toxin or null>”},
-    “heavy_metals”: {“status”: “pass|fail|not_tested”, “value”: “<summary>”, “flag”: “<failing element or null>”},
-    “residual_solvents”: {“status”: “pass|fail|not_tested”, “value”: “<summary>”, “flag”: “<failing solvent or null>”},
-    “moisture”: {“status”: “pass|fail|not_tested”, “value”: “<value>%”, “flag”: null},
-    “foreign_matter”: {“status”: “pass|fail|not_tested”, “value”: “<result>”, “flag”: null},
-    “terpenes”: {“status”: “pass|fail|not_tested”, “value”: “<total terpenes %>”, “flag”: null}
-  },
-  “thc_pct”: <total_thc number for label — use Total THC if available, else THC>,
-  “cbd_pct”: <total_cbd number for label>,
-  “total_cannabinoids”: <number|null>,
-  “overall”: “pass|fail|incomplete”,
-  “summary”: “<2-3 sentence plain-English summary: product, key potency numbers, overall pass/fail, any flags>”
-}`;
+Fill every field from the actual COA. For analyte tables (pesticides, solvents, etc.) include ALL rows present. Each analyte: {“result”:”ND or number”,”action_level”:number,”unit”:”unit string”,”pass”:true/false}`;
   }
 
   const filtered=entries.filter(e=>{
