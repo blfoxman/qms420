@@ -4387,30 +4387,31 @@ const LOG_TYPES={
     {key:'distillate_qty',label:'Distillate Used',type:'text',placeholder:'e.g. 80g'},
     {key:'infused_flower_number',label:'Infused Flower #',type:'text',placeholder:'Infused flower batch/lot #'},
     {key:'infused_flower_total_wt',label:'Infused Flower Total WT',type:'text',placeholder:'e.g. 1,240g'},
+    {key:'infused_flower_bulk_metrc',label:'Infused Flower Bulk METRC Tag',type:'text',placeholder:'METRC tag for the infused flower bulk'},
     {key:'flower_metrc_confirmed',label:'Recorded on METRC?',type:'checkbox'},
     {key:'_s_flower_system_check',label:'--- SYSTEM CHECK ---',type:'section'},
     {key:'flower_check_result',label:'System Check',type:'display'},
-    {key:'_s_infused_joints',label:'--- INFUSED JOINTS ---',type:'section'},
+    {key:'_s_infused_joints',label:'--- FILLED PRE-ROLLS BULK ---',type:'section'},
     {key:'infused_flower_used',label:'Infused Flower Used',type:'text',placeholder:'Amount used for this run'},
     {key:'infused_flower_waste',label:'Infused Flower Waste',type:'text',placeholder:'Amount wasted'},
     {key:'infused_flower_waste_metrc_confirmed',label:'Recorded on METRC?',type:'checkbox'},
     {key:'total_joint_filled',label:'Total Joint Filled',type:'text',placeholder:'e.g. 1,500 joints'},
-    {key:'infused_preroll_metrc',label:'Infused Pre Roll METRC Tag',type:'text',placeholder:'METRC tag for the infused joints'},
+    {key:'infused_preroll_metrc',label:'Filled Pre-Rolls Bulk METRC Tag',type:'text',placeholder:'METRC tag for the filled pre-rolls bulk'},
     {key:'joints_metrc_confirmed',label:'Recorded on METRC?',type:'checkbox'},
     {key:'_s_joints_system_check',label:'--- SYSTEM CHECK ---',type:'section'},
     {key:'joints_check_result',label:'System Check',type:'display'},
-    {key:'_s_kiefed',label:'--- INFUSED KIEFED PREROLL ---',type:'section'},
+    {key:'_s_kiefed',label:'--- KIEFED PRE-ROLLS BULK (TESTING TAG) ---',type:'section'},
     {key:'total_infused_preroll_used',label:'Total Infused Pre Roll Used',type:'text',placeholder:'Joints used for kiefing'},
     {key:'total_infused_preroll_waste',label:'Total Infused Pre Roll Waste',type:'text',placeholder:'Joints wasted'},
     {key:'preroll_waste_metrc_confirmed',label:'Recorded on METRC?',type:'checkbox'},
     {key:'kief_metrc',label:'Kief METRC #',type:'text',placeholder:'METRC tag for the kief used'},
     {key:'kief_qty_used',label:'Kief QTY Used',type:'text',placeholder:'e.g. 60g'},
     {key:'total_kiefed_infused_joints',label:'Total Kiefed Infused Joints',type:'text',placeholder:'e.g. 1,480 joints'},
-    {key:'kiefed_infused_preroll_metrc',label:'Kiefed Infused Preroll METRC #',type:'text',placeholder:'METRC tag for the kiefed joints'},
+    {key:'kiefed_infused_preroll_metrc',label:'Kiefed Pre-Rolls Bulk METRC Tag ⚠️ TESTING TAG',type:'text',placeholder:'This tag is submitted for mandatory testing'},
     {key:'kiefed_metrc_confirmed',label:'Recorded on METRC?',type:'checkbox'},
     {key:'_s_kiefed_system_check',label:'--- SYSTEM CHECK ---',type:'section'},
     {key:'kiefed_check_result',label:'System Check',type:'display'},
-    {key:'_s_final_packaging',label:'--- FINAL PACKAGING ---',type:'section'},
+    {key:'_s_final_packaging',label:'--- FINAL PACKAGED JARS ---',type:'section'},
     {key:'kiefed_infused_joints_used',label:'Kiefed Infused Joints Used',type:'text',placeholder:'Joints used for packaging'},
     {key:'kief_infused_joints_waste',label:'Kief Infused Joints Waste',type:'text',placeholder:'Joints wasted during packaging'},
     {key:'kief_waste_metrc_confirmed',label:'Recorded on METRC?',type:'checkbox'},
@@ -4435,18 +4436,26 @@ const LOG_TYPES={
     {key:'input_weight',label:'Input Oil Weight',type:'text',placeholder:'e.g. 800g distillate'},
     {key:'terpene_added',label:'Amount Terpene Added',type:'text',placeholder:'e.g. 40g or 5%'},
     {key:'source_metrc_confirmed',label:'Recorded on METRC?',type:'checkbox'},
-    {key:'_s_primed',label:'--- PRIMED OIL ---',type:'section'},
+    {key:'_s_primed',label:'--- PRIMED OIL / DISTILLATE ---',type:'section'},
     {key:'primed_oil_total_weight',label:'Primed Oil Total Weight',type:'text',placeholder:'e.g. 840g'},
-    {key:'primed_oil_metrc',label:'Primed Oil METRC #',type:'text',placeholder:'METRC tag for the primed oil'},
+    {key:'primed_distillate_metrc',label:'Primed Distillate METRC Tag',type:'text',placeholder:'METRC tag for the primed distillate'},
+    {key:'primed_oil_metrc',label:'Primed Oil METRC #',type:'text',placeholder:'METRC tag for the primed oil batch'},
     {key:'primed_oil_used',label:'Primed Oil Used',type:'text',placeholder:'How much primed oil was used in this fill run'},
-    {key:'primed_rd1',label:'R&D Test',type:'text'},
-    {key:'primed_rd2',label:'R&D Test 2',type:'text'},
+    {key:'primed_rd1',label:'R&D Test (optional)',type:'text'},
+    {key:'primed_rd2',label:'R&D Test 2 (optional)',type:'text'},
     {key:'primed_metrc_confirmed',label:'Recorded on METRC?',type:'checkbox'},
     {key:'_s_primed_system_check',label:'--- SYSTEM CHECK ---',type:'section'},
     {key:'primed_check_result',label:'System Check',type:'display'},
+    {key:'_s_filled_vapes',label:'--- FILLED VAPES BULK ---',type:'section'},
+    {key:'filled_vapes_bulk_weight',label:'Filled Vapes Bulk Weight',type:'text',placeholder:'e.g. 820g total'},
+    {key:'filled_vapes_bulk_metrc',label:'Filled Vapes Bulk METRC Tag',type:'text',placeholder:'METRC tag for filled vapes — this is the testing tag'},
+    {key:'filled_vapes_waste',label:'Filled Vapes Waste',type:'text',placeholder:'e.g. 20g waste'},
+    {key:'filled_rd1',label:'R&D Fill Test (optional)',type:'text'},
+    {key:'filled_rd2',label:'R&D Fill Test 2 (optional)',type:'text'},
+    {key:'filled_vapes_metrc_confirmed',label:'Recorded on METRC?',type:'checkbox'},
     {key:'_s_packaged',label:'--- PACKAGED ---',type:'section'},
     {key:'cart_packaged',label:'Total Cart Packaged',type:'text',placeholder:'Final packaged unit count'},
-    {key:'cart_packaged_metrc',label:'Total Cart Packaged METRC#',type:'text',placeholder:'METRC tag for packaged units'},
+    {key:'cart_packaged_metrc',label:'Total Cart Packaged METRC#',type:'text',placeholder:'METRC tag for packaged bulk'},
     {key:'mandatory_test',label:'Mandatory Test',type:'select',options:['Not Submitted','Submitted','Passed','Failed']},
     {key:'packaged_metrc_confirmed',label:'Recorded on METRC?',type:'checkbox'},
     {key:'status',label:'Status',type:'select',options:['In Progress','QC Hold','Passed','Failed','Completed']},
@@ -5592,6 +5601,7 @@ function BatchTracker({cu,isElevated,isAdmin,SUPA_URL,SUPA_KEY,H,restricted,mpFn
   const[dateTo,setDateTo]=React.useState('');
   const[search,setSearch]=React.useState('');
   const[historyFor,setHistoryFor]=React.useState(null);
+  const[testingMap,setTestingMap]=React.useState({}); // batch_id -> testing record
 
   const lt=LOG_TYPES[activeType];
   // Production Manager can edit batch records (with a mandatory note logged
@@ -5605,12 +5615,40 @@ function BatchTracker({cu,isElevated,isAdmin,SUPA_URL,SUPA_KEY,H,restricted,mpFn
   const canDelete=batchPerm==='admin'||(batchPerm===null&&(isElevated||isAdmin));
   const canOpen=restricted==='lead';
 
+  // Listen for testing record updates from the Testing module
+  React.useEffect(()=>{
+    function onTestingUpdated(ev){
+      const rec=ev.detail;
+      if(rec&&rec.batch_id){
+        setTestingMap(p=>({...p,[rec.batch_id]:rec}));
+      }
+    }
+    window.addEventListener('pf_testing_updated',onTestingUpdated);
+    return ()=>window.removeEventListener('pf_testing_updated',onTestingUpdated);
+  },[]);
+
   React.useEffect(()=>{
     setLoading(true);setEntries([]);
     let url=`${SUPA_URL}/rest/v1/${lt.table}?select=*&log_type=eq.${activeType}&order=created_at.desc`;
     if(dateFrom)url+=`&created_at=gte.${dateFrom}`;
     if(dateTo)url+=`&created_at=lte.${dateTo}T23:59:59`;
-    fetch(url,{headers:H.headers}).then(r=>r.ok?r.json():[]).then(rows=>{setEntries(Array.isArray(rows)?rows:[]);setLoading(false);}).catch(()=>setLoading(false));
+    fetch(url,{headers:H.headers}).then(r=>r.ok?r.json():[]).then(rows=>{
+      setEntries(Array.isArray(rows)?rows:[]);
+      setLoading(false);
+      // After loading batches, load their testing records
+      if(Array.isArray(rows)&&rows.length>0){
+        const ids=rows.map(r=>`"${r.id}"`).join(',');
+        fetch(`${SUPA_URL}/rest/v1/pf_testing?select=*&batch_id=in.(${ids})&order=created_at.desc`,{headers:H.headers})
+          .then(r=>r.ok?r.json():[]).then(trecs=>{
+            const map={};
+            (Array.isArray(trecs)?trecs:[]).forEach(t=>{
+              // Keep most recent record per batch
+              if(!map[t.batch_id])map[t.batch_id]=t;
+            });
+            setTestingMap(map);
+          }).catch(()=>{});
+      }
+    }).catch(()=>setLoading(false));
   },[activeType,dateFrom,dateTo]);
 
   const filtered=entries.filter(e=>!search||JSON.stringify(e).toLowerCase().includes(search.toLowerCase()));
@@ -5661,6 +5699,16 @@ function BatchTracker({cu,isElevated,isAdmin,SUPA_URL,SUPA_KEY,H,restricted,mpFn
                 el('span',{style:{fontSize:12,color:'var(--text2)'}},'\u00B7 '+(entry.submitted_by||'')),
                 entry.signature_image&&el('span',{style:{background:'rgba(22,163,74,.1)',color:'#16a34a',borderRadius:4,padding:'2px 8px',fontSize:10,fontWeight:700}},'\u270D\uFE0F Signed'),
                 (()=>{
+                  const tr=testingMap[entry.id];if(!tr)return null;
+                  const st=tr.status||'not_submitted';
+                  const isFail=st==='failed';const isPass=st==='passed';const isSub=st==='submitted';const isRet=st==='retest';
+                  const bg=isFail?'rgba(220,38,38,.12)':isPass?'rgba(22,163,74,.12)':isSub?'rgba(99,102,241,.12)':isRet?'rgba(245,158,11,.12)':'rgba(100,116,139,.1)';
+                  const col=isFail?'#dc2626':isPass?'#16a34a':isSub?'#6366f1':isRet?'#d97706':'#64748b';
+                  const icon=isFail?'\u274C':isPass?'\u2705':isSub?'\uD83D\uDCE4':isRet?'\uD83D\uDD04':'\u23F3';
+                  const lbl=isFail?'TEST FAILED':isPass?'TEST PASSED':isSub?'SUBMITTED':isRet?'RETEST REQ':'NOT SUBMITTED';
+                  return el('span',{onClick:()=>setPage('testing'),title:'Click to open Testing',style:{background:bg,color:col,borderRadius:4,padding:'2px 8px',fontSize:10,fontWeight:700,cursor:'pointer'}},icon+' '+lbl);
+                })(),
+                (()=>{
                   // METRC conversion status: count how many "Recorded on METRC?"
                   // checkboxes this batch type has, and how many are checked on
                   // this specific entry \u2014 gives an at-a-glance completion badge
@@ -5694,14 +5742,43 @@ function BatchTracker({cu,isElevated,isAdmin,SUPA_URL,SUPA_KEY,H,restricted,mpFn
               el('button',{onClick:()=>exportLogPdf(activeType,[entry],'',''),className:'btn b-ghost btn-sm'},'PDF'),
               canEdit&&el('button',{onClick:()=>{setEditEntry(entry);setShowForm(true);},className:'btn b-ghost btn-sm'},'Edit'),
               !canEdit&&canOpen&&el('button',{onClick:()=>{setEditEntry(entry);setShowForm(true);},className:'btn b-ghost btn-sm'},'\uD83D\uDD13 Open'),
-              (canEdit||isAdmin)&&el('button',{onClick:async()=>{
-                const metrcTag=entry.metrc_lot||entry.metrc_tag||entry.metrc_id||entry.package_tag||'';
-                const id='test-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);
-                const rec={id,batch_id:entry.id,batch_number:entry.batch_number||entry.id,batch_type:activeType,sku:entry.sku||entry.product||'',flavor:entry.flavor||'',metrc_tag:metrcTag,sample_metrc_tag:'',status:'not_submitted',submitted_by:cu.name,notes:'',loc:'Michigan',created_at:new Date().toISOString(),updated_at:new Date().toISOString()};
-                const res=await fetch(`${SUPA_URL}/rest/v1/pf_testing`,{method:'POST',headers:{...H.headers,'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(rec)});
-                if(res.ok){alert('\u2705 Testing record created! Go to the Testing section to manage it.');setPage('testing');}
-                else{const e=await res.json();alert('Error: '+(e.message||JSON.stringify(e)));}
-              },style:{background:'rgba(99,102,241,.15)',color:'#6366f1',border:'1px solid rgba(99,102,241,.4)',borderRadius:6,padding:'4px 10px',fontSize:11,fontWeight:700,cursor:'pointer',fontFamily:'inherit'}},'\uD83E\uDDEA Submit for Testing'),
+              (()=>{
+                const tr=testingMap[entry.id];
+                if(tr){
+                  // Show live testing status badge \u2014 click goes to testing module
+                  const st=tr.status||'not_submitted';
+                  const isFail=st==='failed';const isPass=st==='passed';const isSub=st==='submitted';const isRet=st==='retest';
+                  const badgeBg=isFail?'rgba(220,38,38,.15)':isPass?'rgba(22,163,74,.15)':isSub?'rgba(99,102,241,.15)':isRet?'rgba(245,158,11,.15)':'rgba(100,116,139,.12)';
+                  const badgeColor=isFail?'#dc2626':isPass?'#16a34a':isSub?'#6366f1':isRet?'#d97706':'#64748b';
+                  const badgeIcon=isFail?'\u274C':isPass?'\u2705':isSub?'\uD83D\uDCE4':isRet?'\uD83D\uDD04':'\u23F3';
+                  const badgeLabel=isFail?'FAILED \u2014 RETEST REQUIRED':isPass?'TEST PASSED':isSub?'SUBMITTED TO LAB':isRet?'RETEST':st.replace(/_/g,' ').toUpperCase();
+                  const coa=tr.coa_analysis;const coaFail=coa&&coa.overall==='fail';const coaPass=coa&&coa.overall==='pass';
+                  return el('button',{onClick:()=>setPage('testing'),title:'Click to open Testing module',style:{background:badgeBg,color:badgeColor,border:'1px solid '+badgeColor+'55',borderRadius:6,padding:'4px 10px',fontSize:11,fontWeight:700,cursor:'pointer',fontFamily:'inherit',display:'flex',alignItems:'center',gap:5}},
+                    el('span',null,badgeIcon+' '+badgeLabel),
+                    coaPass&&el('span',{style:{fontSize:10,background:'rgba(22,163,74,.2)',color:'#16a34a',borderRadius:3,padding:'1px 5px',marginLeft:2}},'\uD83E\uDDEC COA\u2713'),
+                    coaFail&&el('span',{style:{fontSize:10,background:'rgba(220,38,38,.2)',color:'#dc2626',borderRadius:3,padding:'1px 5px',marginLeft:2}},'\uD83E\uDDEC COA\u274C'),
+                  );
+                }
+                if(!(canEdit||isAdmin)) return null;
+                return el('button',{onClick:async()=>{
+                  let metrcTag='';
+                  if(activeType==='cartridges'){
+                    metrcTag=entry.filled_vapes_bulk_metrc||entry.cart_packaged_metrc||entry.metrc_tag||'';
+                  } else if(activeType==='pre_rolls'){
+                    metrcTag=entry.kiefed_infused_preroll_metrc||entry.infused_preroll_metrc||entry.metrc_tag||'';
+                  } else {
+                    metrcTag=entry.metrc_lot||entry.metrc_tag||entry.metrc_id||entry.package_tag||'';
+                  }
+                  const id='test-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);
+                  const rec={id,batch_id:entry.id,batch_number:entry.batch_number||entry.id,batch_type:activeType,sku:entry.sku||entry.product||'',flavor:entry.flavor||'',metrc_tag:metrcTag,sample_metrc_tag:'',status:'not_submitted',submitted_by:cu.name,notes:'',loc:'Michigan',created_at:new Date().toISOString(),updated_at:new Date().toISOString()};
+                  const res=await fetch(`${SUPA_URL}/rest/v1/pf_testing`,{method:'POST',headers:{...H.headers,'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(rec)});
+                  if(res.ok){
+                    const data=await res.json();const newRec=Array.isArray(data)?data[0]:data;
+                    setTestingMap(p=>({...p,[entry.id]:newRec}));
+                    setPage('testing');
+                  } else {const e=await res.json();alert('Error: '+(e.message||JSON.stringify(e)));}
+                },style:{background:'rgba(99,102,241,.15)',color:'#6366f1',border:'1px solid rgba(99,102,241,.4)',borderRadius:6,padding:'4px 10px',fontSize:11,fontWeight:700,cursor:'pointer',fontFamily:'inherit'}},'\uD83E\uDDEA Submit for Testing');
+              })(),
               canDelete&&el('button',{onClick:async()=>{if(!confirm('Delete this batch record?'))return;await db.remove(lt.table,entry.id);setEntries(p=>p.filter(e=>e.id!==entry.id));},className:'btn b-red btn-sm'},'Delete'),
             ),
           ),
@@ -5722,14 +5799,60 @@ function BatchTracker({cu,isElevated,isAdmin,SUPA_URL,SUPA_KEY,H,restricted,mpFn
 // ── TESTING MODULE ───────────────────────────────────────────────────────────
 const TESTING_STATUSES=[
   {v:'not_submitted',label:'Not Submitted',color:'#64748b',bg:'rgba(100,116,139,.1)'},
-  {v:'submitted',label:'Submitted',color:'#d97706',bg:'rgba(217,119,6,.12)'},
+  {v:'submitted',label:'Submitted to Lab',color:'#d97706',bg:'rgba(217,119,6,.12)'},
   {v:'passed',label:'Passed',color:'#16a34a',bg:'rgba(22,163,74,.12)'},
-  {v:'failed',label:'Failed',color:'#dc2626',bg:'rgba(220,38,38,.12)'},
+  {v:'retest',label:'Retest Required',color:'#f59e0b',bg:'rgba(245,158,11,.12)'},
+  {v:'failed',label:'Failed — Retest Required',color:'#dc2626',bg:'rgba(220,38,38,.12)'},
 ];
+const TESTING_STATUS_ICON={not_submitted:'⏳',submitted:'📤',passed:'✅',retest:'🔄',failed:'❌'};
 
 function TestingStatusBadge({status}){
   const s=TESTING_STATUSES.find(x=>x.v===status)||TESTING_STATUSES[0];
-  return el('span',{style:{background:s.bg,color:s.color,border:'1px solid '+s.color+'55',borderRadius:6,padding:'2px 10px',fontSize:11,fontWeight:700,whiteSpace:'nowrap'}},s.label);
+  const icon=TESTING_STATUS_ICON[s.v]||'';
+  return el('span',{style:{background:s.bg,color:s.color,border:'1px solid '+s.color+'55',borderRadius:6,padding:'2px 10px',fontSize:11,fontWeight:700,whiteSpace:'nowrap'}},icon+' '+s.label);
+}
+
+// MI CRA pass thresholds per analyte category
+const COA_THRESHOLDS={
+  potency:{required:true,note:'THC % extracted from COA'},
+  pesticides:{pass:'ND or below action level',required:true},
+  microbials:{pass:'ND for target pathogens',required:true},
+  mycotoxins:{pass:'Below action level',required:true},
+  heavyMetals:{pass:'Below action level',required:true},
+  residualSolvents:{pass:'Below action level',required:false},
+  moisture:{pass:'Below 15%',required:false},
+  foreignMatter:{pass:'No foreign matter',required:false},
+};
+
+function CoaAnalysisPanel({analysis}){
+  if(!analysis) return null;
+  const sections=Object.entries(analysis.sections||{});
+  const overallPass=sections.length>0&&sections.every(([,v])=>v.status==='pass'||v.status==='not_tested');
+  const overallFail=sections.some(([,v])=>v.status==='fail');
+  return el('div',{style:{background:overallFail?'rgba(220,38,38,.06)':overallPass?'rgba(22,163,74,.06)':'rgba(99,102,241,.06)',border:'1px solid '+(overallFail?'rgba(220,38,38,.3)':overallPass?'rgba(22,163,74,.3)':'rgba(99,102,241,.2)'),borderRadius:10,padding:'12px 14px',marginTop:8}},
+    el('div',{style:{display:'flex',gap:8,alignItems:'center',marginBottom:10}},
+      el('span',{style:{fontSize:13,fontWeight:800,color:'var(--text)'}},'🧬 COA Analysis'),
+      el('span',{style:{fontSize:11,fontWeight:700,padding:'2px 8px',borderRadius:4,background:overallFail?'rgba(220,38,38,.15)':overallPass?'rgba(22,163,74,.15)':'rgba(100,116,139,.12)',color:overallFail?'#dc2626':overallPass?'#16a34a':'#64748b'}},overallFail?'❌ FAILED':overallPass?'✅ PASSED':'⚠️ PARTIAL'),
+      analysis.analyzed_at&&el('span',{style:{fontSize:10,color:'var(--text3)',marginLeft:'auto'}},new Date(analysis.analyzed_at).toLocaleString()),
+    ),
+    analysis.thc_pct!=null&&el('div',{style:{display:'flex',gap:16,marginBottom:8,flexWrap:'wrap',fontSize:12}},
+      el('span',null,el('b',null,'THC: '),analysis.thc_pct+'%'),
+      analysis.cbd_pct!=null&&el('span',null,el('b',null,'CBD: '),analysis.cbd_pct+'%'),
+      analysis.total_cannabinoids!=null&&el('span',null,el('b',null,'Total Cannabinoids: '),analysis.total_cannabinoids+'%'),
+    ),
+    el('div',{style:{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',gap:6}},
+      sections.map(([key,val])=>{
+        const pass=val.status==='pass';const fail=val.status==='fail';const na=val.status==='not_tested';
+        return el('div',{key,style:{background:fail?'rgba(220,38,38,.08)':pass?'rgba(22,163,74,.08)':'rgba(100,116,139,.06)',border:'1px solid '+(fail?'rgba(220,38,38,.25)':pass?'rgba(22,163,74,.25)':'rgba(100,116,139,.15)'),borderRadius:7,padding:'8px 10px'}},
+          el('div',{style:{fontSize:10,fontWeight:800,color:'var(--text2)',textTransform:'uppercase',letterSpacing:'.5px',marginBottom:2}},key.replace(/_/g,' ')),
+          el('div',{style:{fontSize:12,fontWeight:700,color:fail?'#dc2626':pass?'#16a34a':'#94a3b8'}},na?'Not Tested':fail?'❌ FAIL':'✅ PASS'),
+          val.value&&el('div',{style:{fontSize:11,color:'var(--text3)',marginTop:2}},val.value),
+          val.flag&&el('div',{style:{fontSize:11,color:'#dc2626',marginTop:2}},'⚠️ '+val.flag),
+        );
+      })
+    ),
+    analysis.summary&&el('div',{style:{marginTop:8,fontSize:12,color:'var(--text2)',borderTop:'1px solid var(--border)',paddingTop:8}},analysis.summary),
+  );
 }
 
 function TestingModule({cu,isAdmin,isElevated,SUPA_URL,SUPA_KEY,H,db}){
@@ -5740,6 +5863,7 @@ function TestingModule({cu,isAdmin,isElevated,SUPA_URL,SUPA_KEY,H,db}){
   const[editItem,setEditItem]=React.useState(null);
   const[saving,setSaving]=React.useState(false);
   const[coaUploading,setCoaUploading]=React.useState(false);
+  const[coaAnalyzing,setCoaAnalyzing]=React.useState(false);
   const TABLE='pf_testing';
   const canEdit=isAdmin||isElevated;
 
@@ -5755,16 +5879,21 @@ function TestingModule({cu,isAdmin,isElevated,SUPA_URL,SUPA_KEY,H,db}){
     const isNew=!item.id||!entries.find(e=>e.id===item.id);
     const payload={...item,updated_at:new Date().toISOString()};
     try{
+      let savedRec;
       if(isNew){
         const res=await fetch(`${SUPA_URL}/rest/v1/${TABLE}`,{method:'POST',headers:{...H.headers,'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(payload)});
         const data=await res.json();
-        const rec=Array.isArray(data)?data[0]:data;
-        setEntries(p=>[rec,...p]);
+        savedRec=Array.isArray(data)?data[0]:data;
+        setEntries(p=>[savedRec,...p]);
       } else {
         const res=await fetch(`${SUPA_URL}/rest/v1/${TABLE}?id=eq.${encodeURIComponent(item.id)}`,{method:'PATCH',headers:{...H.headers,'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(payload)});
         const data=await res.json();
-        const rec=Array.isArray(data)?data[0]:data;
-        setEntries(p=>p.map(e=>e.id===rec.id?rec:e));
+        savedRec=Array.isArray(data)?data[0]:data;
+        setEntries(p=>p.map(e=>e.id===savedRec.id?savedRec:e));
+      }
+      // Notify BatchTracker to update its testingMap
+      if(savedRec&&savedRec.batch_id){
+        window.dispatchEvent(new CustomEvent('pf_testing_updated',{detail:savedRec}));
       }
       setEditItem(null);
     }catch(e){alert('Save failed: '+e.message);}
@@ -5774,15 +5903,89 @@ function TestingModule({cu,isAdmin,isElevated,SUPA_URL,SUPA_KEY,H,db}){
   async function uploadCoa(file,item){
     setCoaUploading(true);
     try{
-      const ext=file.name.split('.').pop();
+      const ext=file.name.split('.').pop().toLowerCase();
       const path='coa/'+item.id+'-'+Date.now()+'.'+ext;
       const upRes=await fetch(`${SUPA_URL}/storage/v1/object/coa-uploads/${path}`,{method:'POST',headers:{...H.headers,'Content-Type':file.type,'x-upsert':'true'},body:file});
       if(!upRes.ok){const e=await upRes.text();throw new Error(e);}
       const url=`${SUPA_URL}/storage/v1/object/public/coa-uploads/${path}`;
-      await saveItem({...item,coa_url:url,coa_filename:file.name});
+      const updated={...item,coa_url:url,coa_filename:file.name};
+      await saveItem(updated);
       setEditItem(p=>p?({...p,coa_url:url,coa_filename:file.name}):p);
+      // Auto-trigger analysis after upload
+      setTimeout(()=>analyzeCoa(file,updated),200);
     }catch(e){alert('Upload failed: '+e.message);}
     setCoaUploading(false);
+  }
+
+  async function analyzeCoa(fileOrNull,item){
+    // fileOrNull: if we have the raw file we base64 it for vision; else we send the URL
+    setCoaAnalyzing(true);
+    try{
+      let userContent;
+      if(fileOrNull&&(fileOrNull.type==='application/pdf'||fileOrNull.type.startsWith('image/'))){
+        // Send as base64 vision message if image; PDF: extract text via reading URL
+        if(fileOrNull.type.startsWith('image/')){
+          const b64=await new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result.split(',')[1]);r.readAsDataURL(fileOrNull);});
+          userContent=[
+            {type:'image',source:{type:'base64',media_type:fileOrNull.type,data:b64}},
+            {type:'text',text:COA_ANALYSIS_PROMPT(item)},
+          ];
+        } else {
+          // PDF: pass URL text prompt
+          userContent=[{type:'text',text:COA_ANALYSIS_PROMPT(item)+'\n\nCOA URL: '+item.coa_url}];
+        }
+      } else {
+        userContent=[{type:'text',text:COA_ANALYSIS_PROMPT(item)+'\n\nCOA URL: '+item.coa_url}];
+      }
+      const res=await fetch(`${SUPA_URL}/functions/v1/claude-proxy`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPA_KEY},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:2000,messages:[{role:'user',content:userContent}]})});
+      const data=await res.json();
+      const text=data.content?.[0]?.text||'';
+      let analysis;
+      try{analysis=JSON.parse(text.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim());}
+      catch{analysis={summary:text,sections:{},analyzed_at:new Date().toISOString()};}
+      analysis.analyzed_at=new Date().toISOString();
+      // Save analysis back to record
+      const updated={...item,coa_analysis:analysis,result_thc:analysis.thc_pct!=null?String(analysis.thc_pct):item.result_thc,result_cbd:analysis.cbd_pct!=null?String(analysis.cbd_pct):item.result_cbd,result_notes:analysis.summary||item.result_notes};
+      await saveItem(updated);
+      setEditItem(p=>p?({...p,coa_analysis:analysis,result_thc:updated.result_thc,result_cbd:updated.result_cbd,result_notes:updated.result_notes}):p);
+      alert('🧬 COA analyzed! Review results below.');
+    }catch(e){alert('Analysis failed: '+e.message);}
+    setCoaAnalyzing(false);
+  }
+
+  function COA_ANALYSIS_PROMPT(item){
+    return `You are a cannabis compliance analyst. Analyze this Certificate of Analysis (COA) for a Michigan CRA-licensed cannabis product.
+
+Product: ${item.sku||''} ${item.flavor||''} | Batch: ${item.batch_number||item.batch_id||''} | METRC: ${item.metrc_tag||''}
+
+Extract ALL analyte results and determine pass/fail for each section. Michigan CRA mandatory testing requirements:
+- Potency: Required (extract THC%, CBD%, Total Cannabinoids%)
+- Pesticides: PASS = ND (non-detect) or below action level for all analytes
+- Microbials: PASS = ND for Salmonella, STEC, Aspergillus (4 species), no exceeding CFU limits
+- Mycotoxins: PASS = below action level for aflatoxins + ochratoxin
+- Heavy Metals: PASS = below action level for As, Cd, Hg, Pb
+- Residual Solvents: PASS = below action level (if applicable)
+- Moisture Content: PASS = below 15% (flower/pre-roll)
+- Foreign Matter: PASS = no foreign matter detected
+
+Respond ONLY with this JSON (no markdown):
+{
+  “thc_pct”: <number or null>,
+  “cbd_pct”: <number or null>,
+  “total_cannabinoids”: <number or null>,
+  “sections”: {
+    “potency”: {“status”: “pass|fail|not_tested”, “value”: “<THC>% THC / <CBD>% CBD”, “flag”: “<any flag or null>”},
+    “pesticides”: {“status”: “pass|fail|not_tested”, “value”: “<summary>”, “flag”: “<any failing analyte or null>”},
+    “microbials”: {“status”: “pass|fail|not_tested”, “value”: “<summary>”, “flag”: “<any failing analyte or null>”},
+    “mycotoxins”: {“status”: “pass|fail|not_tested”, “value”: “<summary>”, “flag”: “<any failing analyte or null>”},
+    “heavy_metals”: {“status”: “pass|fail|not_tested”, “value”: “<summary>”, “flag”: “<any failing analyte or null>”},
+    “residual_solvents”: {“status”: “pass|fail|not_tested”, “value”: “<summary>”, “flag”: “<any failing analyte or null>”},
+    “moisture”: {“status”: “pass|fail|not_tested”, “value”: “<value or ND>”, “flag”: null},
+    “foreign_matter”: {“status”: “pass|fail|not_tested”, “value”: “<result>”, “flag”: null}
+  },
+  “overall”: “pass|fail|incomplete”,
+  “summary”: “<1-2 sentence plain-English summary of overall result and any flags>”
+}`;
   }
 
   const filtered=entries.filter(e=>{
@@ -5799,7 +6002,7 @@ function TestingModule({cu,isAdmin,isElevated,SUPA_URL,SUPA_KEY,H,db}){
       el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:12}},
         el('div',null,
           el('div',{style:{fontSize:22,fontWeight:800,marginBottom:3}},'🧪 Testing'),
-          el('div',{style:{fontSize:13,opacity:.8}},'COA tracking · Lab submissions · Sample METRC tags'),
+          el('div',{style:{fontSize:13,opacity:.8}},'COA tracking · Lab submissions · AI analysis · METRC tags'),
         ),
       ),
       el('div',{style:{display:'flex',gap:20,marginTop:18,flexWrap:'wrap'}},
@@ -5830,33 +6033,44 @@ function TestingModule({cu,isAdmin,isElevated,SUPA_URL,SUPA_KEY,H,db}){
     :el('div',{style:{display:'flex',flexDirection:'column',gap:10}},
         filtered.map((item,i)=>{
           const editing=editItem&&editItem.id===item.id;
-          return el('div',{key:item.id||i,style:{background:'var(--surface2)',border:'1px solid var(--border)',borderRadius:12,padding:'16px 18px',boxShadow:'0 1px 3px rgba(15,23,42,.04)'}},
+          const hasAnalysis=item.coa_analysis&&Object.keys(item.coa_analysis.sections||{}).length>0;
+          const analysisPass=hasAnalysis&&item.coa_analysis.overall==='pass';
+          const analysisFail=hasAnalysis&&item.coa_analysis.overall==='fail';
+          return el('div',{key:item.id||i,style:{background:'var(--surface2)',border:'1px solid '+(analysisFail?'rgba(220,38,38,.3)':analysisPass?'rgba(22,163,74,.2)':'var(--border)'),borderRadius:12,padding:'16px 18px',boxShadow:'0 1px 3px rgba(15,23,42,.04)'}},
             // Header row
-            el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:8,flexWrap:'wrap',marginBottom:editing?12:0}},
+            el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:8,flexWrap:'wrap',marginBottom:4}},
               el('div',{style:{flex:1}},
                 el('div',{style:{display:'flex',gap:8,flexWrap:'wrap',alignItems:'center',marginBottom:4}},
                   el('span',{style:{fontWeight:800,fontSize:14,color:'var(--text)'}},item.batch_number||item.batch_id),
+                  item.batch_type&&el('span',{style:{fontSize:11,background:'rgba(100,116,139,.12)',color:'var(--text2)',borderRadius:4,padding:'2px 7px',fontWeight:600}},item.batch_type.replace(/_/g,' ')),
                   item.sku&&el('span',{style:{fontSize:12,color:'var(--text2)'}},item.sku),
                   item.flavor&&el('span',{style:{background:'rgba(99,102,241,.1)',color:'#6366f1',borderRadius:4,padding:'2px 8px',fontSize:11,fontWeight:600}},item.flavor),
                   el(TestingStatusBadge,{status:item.status}),
+                  hasAnalysis&&el('span',{style:{fontSize:11,fontWeight:700,padding:'2px 8px',borderRadius:4,background:analysisFail?'rgba(220,38,38,.12)':analysisPass?'rgba(22,163,74,.12)':'rgba(100,116,139,.08)',color:analysisFail?'#dc2626':analysisPass?'#16a34a':'#64748b'}},'🧬 '+(analysisFail?'COA FAIL':analysisPass?'COA PASS':'COA PARTIAL')),
                 ),
-                el('div',{style:{display:'flex',gap:16,flexWrap:'wrap',fontSize:12,color:'var(--text2)'}},
+                el('div',{style:{display:'flex',gap:12,flexWrap:'wrap',fontSize:12,color:'var(--text2)'}},
                   item.metrc_tag&&el('span',null,'🏷️ METRC: '+item.metrc_tag),
-                  item.sample_metrc_tag&&el('span',null,'📋 Sample Tag: '+item.sample_metrc_tag),
-                  item.lab_name&&el('span',null,'🏛️ Lab: '+item.lab_name),
+                  item.sample_metrc_tag&&el('span',null,'📋 Sample: '+item.sample_metrc_tag),
+                  item.lab_name&&el('span',null,'🏛️ '+item.lab_name),
+                  item.result_thc&&el('span',{style:{fontWeight:700,color:'var(--text)'}},'Δ₉ THC '+item.result_thc+'%'),
+                  item.result_cbd&&el('span',null,'CBD '+item.result_cbd+'%'),
                   item.submitted_at&&el('span',null,'Submitted: '+new Date(item.submitted_at).toLocaleDateString()),
-                  item.coa_url&&el('a',{href:item.coa_url,target:'_blank',style:{color:'#6366f1',textDecoration:'none',fontWeight:600}},'📄 '+( item.coa_filename||'View COA')),
+                  item.coa_url&&el('a',{href:item.coa_url,target:'_blank',style:{color:'#6366f1',textDecoration:'none',fontWeight:600}},'📄 '+(item.coa_filename||'View COA')),
                 ),
               ),
-              el('div',{style:{display:'flex',gap:6,flexShrink:0}},
+              el('div',{style:{display:'flex',gap:6,flexShrink:0,flexWrap:'wrap'}},
+                item.coa_url&&!editing&&el('button',{onClick:()=>analyzeCoa(null,item),disabled:coaAnalyzing,style:{background:'rgba(99,102,241,.12)',color:'#6366f1',border:'1px solid rgba(99,102,241,.3)',borderRadius:6,padding:'4px 10px',fontSize:11,fontWeight:700,cursor:'pointer',fontFamily:'inherit'}},coaAnalyzing?'🧬 Analyzing…':'🧬 Analyze COA'),
                 canEdit&&el('button',{onClick:()=>setEditItem(editing?null:{...item}),className:'btn b-ghost btn-sm'},editing?'Cancel':'Edit'),
                 canEdit&&el('button',{onClick:async()=>{if(!confirm('Delete this testing record?'))return;await fetch(`${SUPA_URL}/rest/v1/${TABLE}?id=eq.${item.id}`,{method:'DELETE',headers:H.headers});setEntries(p=>p.filter(e=>e.id!==item.id));},className:'btn b-red btn-sm'},'Del'),
               ),
             ),
 
+            // COA analysis panel (always visible if analysis exists)
+            !editing&&hasAnalysis&&el(CoaAnalysisPanel,{analysis:item.coa_analysis}),
+
             // Inline editor
-            editing&&el('div',{style:{borderTop:'1px solid var(--border)',paddingTop:12,display:'flex',flexDirection:'column',gap:10}},
-              // Status dropdown
+            editing&&el('div',{style:{borderTop:'1px solid var(--border)',paddingTop:12,marginTop:8,display:'flex',flexDirection:'column',gap:10}},
+              // Status + Lab row
               el('div',{style:{display:'flex',gap:10,flexWrap:'wrap',alignItems:'flex-start'}},
                 el('div',{style:{flex:1,minWidth:160}},
                   el('label',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',display:'block',marginBottom:4}},'STATUS'),
@@ -5869,10 +6083,10 @@ function TestingModule({cu,isAdmin,isElevated,SUPA_URL,SUPA_KEY,H,db}){
                   el('input',{type:'text',value:editItem.lab_name||'',onChange:ev=>setEditItem(p=>({...p,lab_name:ev.target.value})),placeholder:'e.g. Psilabs, ACS Lab…',style:{width:'100%',boxSizing:'border-box',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:'8px 10px',color:'var(--text)',fontFamily:'inherit',fontSize:13}}),
                 ),
               ),
-              // METRC tags row
+              // METRC tags
               el('div',{style:{display:'flex',gap:10,flexWrap:'wrap'}},
                 el('div',{style:{flex:1,minWidth:160}},
-                  el('label',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',display:'block',marginBottom:4}},'BATCH METRC TAG'),
+                  el('label',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',display:'block',marginBottom:4}},'BATCH / TESTING METRC TAG'),
                   el('input',{type:'text',value:editItem.metrc_tag||'',onChange:ev=>setEditItem(p=>({...p,metrc_tag:ev.target.value})),placeholder:'1A4000…',style:{width:'100%',boxSizing:'border-box',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:'8px 10px',color:'var(--text)',fontFamily:'inherit',fontSize:13}}),
                 ),
                 el('div',{style:{flex:1,minWidth:160}},
@@ -5880,7 +6094,7 @@ function TestingModule({cu,isAdmin,isElevated,SUPA_URL,SUPA_KEY,H,db}){
                   el('input',{type:'text',value:editItem.sample_metrc_tag||'',onChange:ev=>setEditItem(p=>({...p,sample_metrc_tag:ev.target.value})),placeholder:'Sample package tag…',style:{width:'100%',boxSizing:'border-box',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:'8px 10px',color:'var(--text)',fontFamily:'inherit',fontSize:13}}),
                 ),
               ),
-              // THC/CBD results row
+              // THC/CBD results
               el('div',{style:{display:'flex',gap:10,flexWrap:'wrap'}},
                 el('div',{style:{flex:1,minWidth:100}},
                   el('label',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',display:'block',marginBottom:4}},'THC % (result)'),
@@ -5900,12 +6114,18 @@ function TestingModule({cu,isAdmin,isElevated,SUPA_URL,SUPA_KEY,H,db}){
                 el('label',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',display:'block',marginBottom:4}},'INTERNAL NOTES'),
                 el('textarea',{value:editItem.notes||'',onChange:ev=>setEditItem(p=>({...p,notes:ev.target.value})),rows:2,placeholder:'Internal notes…',style:{width:'100%',boxSizing:'border-box',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:'8px 10px',color:'var(--text)',fontFamily:'inherit',fontSize:13,resize:'vertical'}}),
               ),
-              // COA upload
-              el('div',{style:{display:'flex',gap:10,alignItems:'center',flexWrap:'wrap'}},
-                el('label',{style:{fontSize:11,fontWeight:700,color:'var(--text2)'}},'COA UPLOAD'),
-                el('input',{type:'file',accept:'.pdf,.png,.jpg,.jpeg',onChange:async ev=>{const f=ev.target.files[0];if(f)await uploadCoa(f,editItem);},style:{fontSize:12,color:'var(--text)'}}),
-                coaUploading&&el('span',{style:{fontSize:12,color:'#6366f1'}},'Uploading…'),
-                editItem.coa_url&&el('a',{href:editItem.coa_url,target:'_blank',style:{fontSize:12,color:'#6366f1',fontWeight:600}},'📄 '+(editItem.coa_filename||'View COA')),
+              // COA upload + analyze
+              el('div',{style:{background:'rgba(99,102,241,.04)',border:'1px solid rgba(99,102,241,.15)',borderRadius:8,padding:'10px 12px'}},
+                el('div',{style:{fontSize:11,fontWeight:800,color:'#6366f1',marginBottom:8,textTransform:'uppercase',letterSpacing:'.5px'}},'📄 COA Upload & AI Analysis'),
+                el('div',{style:{display:'flex',gap:10,alignItems:'center',flexWrap:'wrap',marginBottom:6}},
+                  el('input',{type:'file',accept:'.pdf,.png,.jpg,.jpeg',onChange:async ev=>{const f=ev.target.files[0];if(f)await uploadCoa(f,editItem);},style:{fontSize:12,color:'var(--text)',flex:1}}),
+                  (coaUploading||coaAnalyzing)&&el('span',{style:{fontSize:12,color:'#6366f1',fontWeight:600}},coaUploading?'📤 Uploading…':'🧬 Analyzing COA…'),
+                ),
+                editItem.coa_url&&el('div',{style:{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap'}},
+                  el('a',{href:editItem.coa_url,target:'_blank',style:{fontSize:12,color:'#6366f1',fontWeight:600}},'📄 '+(editItem.coa_filename||'View COA')),
+                  el('button',{onClick:()=>analyzeCoa(null,editItem),disabled:coaAnalyzing,style:{background:'#6366f1',color:'#fff',border:'none',borderRadius:6,padding:'4px 12px',fontSize:11,fontWeight:700,cursor:'pointer',fontFamily:'inherit'}},coaAnalyzing?'Analyzing…':'🧬 Re-Analyze COA'),
+                ),
+                editItem.coa_analysis&&el(CoaAnalysisPanel,{analysis:editItem.coa_analysis}),
               ),
               // Save row
               el('div',{style:{display:'flex',gap:8,justifyContent:'flex-end'}},
