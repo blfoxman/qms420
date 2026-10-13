@@ -5581,7 +5581,7 @@ function FacilityLogs({cu,isElevated,isAdmin,SUPA_URL,SUPA_KEY,H}){
 // ══════════════════════════════════════════════════════════════════════════════
 // BATCH TRACKER \u2014 dropdown-selected batch type, list + create/edit/PDF, one shared table
 // ══════════════════════════════════════════════════════════════════════════════
-function BatchTracker({cu,isElevated,isAdmin,SUPA_URL,SUPA_KEY,H,restricted,mpFn}){
+function BatchTracker({cu,isElevated,isAdmin,SUPA_URL,SUPA_KEY,H,restricted,mpFn,setPage}){
   const visibleBatchTypes=(restricted==='lead'||restricted==='pm')?['cartridges','gummies','pre_rolls','infused_flower','moon_rocks','snow_caps']:BATCH_TYPE_IDS;
   const[activeType,setActiveType]=React.useState(visibleBatchTypes[0]);
   const[entries,setEntries]=React.useState([]);
@@ -5694,6 +5694,14 @@ function BatchTracker({cu,isElevated,isAdmin,SUPA_URL,SUPA_KEY,H,restricted,mpFn
               el('button',{onClick:()=>exportLogPdf(activeType,[entry],'',''),className:'btn b-ghost btn-sm'},'PDF'),
               canEdit&&el('button',{onClick:()=>{setEditEntry(entry);setShowForm(true);},className:'btn b-ghost btn-sm'},'Edit'),
               !canEdit&&canOpen&&el('button',{onClick:()=>{setEditEntry(entry);setShowForm(true);},className:'btn b-ghost btn-sm'},'\uD83D\uDD13 Open'),
+              (canEdit||isAdmin)&&el('button',{onClick:async()=>{
+                const metrcTag=entry.metrc_lot||entry.metrc_tag||entry.metrc_id||entry.package_tag||'';
+                const id='test-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);
+                const rec={id,batch_id:entry.id,batch_number:entry.batch_number||entry.id,batch_type:activeType,sku:entry.sku||entry.product||'',flavor:entry.flavor||'',metrc_tag:metrcTag,sample_metrc_tag:'',status:'not_submitted',submitted_by:cu.name,notes:'',loc:'Michigan',created_at:new Date().toISOString(),updated_at:new Date().toISOString()};
+                const res=await fetch(`${SUPA_URL}/rest/v1/pf_testing`,{method:'POST',headers:{...H.headers,'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(rec)});
+                if(res.ok){alert('\u2705 Testing record created! Go to the Testing section to manage it.');setPage('testing');}
+                else{const e=await res.json();alert('Error: '+(e.message||JSON.stringify(e)));}
+              },style:{background:'rgba(99,102,241,.15)',color:'#6366f1',border:'1px solid rgba(99,102,241,.4)',borderRadius:6,padding:'4px 10px',fontSize:11,fontWeight:700,cursor:'pointer',fontFamily:'inherit'}},'\uD83E\uDDEA Submit for Testing'),
               canDelete&&el('button',{onClick:async()=>{if(!confirm('Delete this batch record?'))return;await db.remove(lt.table,entry.id);setEntries(p=>p.filter(e=>e.id!==entry.id));},className:'btn b-red btn-sm'},'Delete'),
             ),
           ),
@@ -5708,6 +5716,206 @@ function BatchTracker({cu,isElevated,isAdmin,SUPA_URL,SUPA_KEY,H,restricted,mpFn
         else{setEntries(p=>[rec,...p]);}
         setShowForm(false);setEditEntry(null);
       }}),
+  );
+}
+
+// ── TESTING MODULE ───────────────────────────────────────────────────────────
+const TESTING_STATUSES=[
+  {v:'not_submitted',label:'Not Submitted',color:'#64748b',bg:'rgba(100,116,139,.1)'},
+  {v:'submitted',label:'Submitted',color:'#d97706',bg:'rgba(217,119,6,.12)'},
+  {v:'passed',label:'Passed',color:'#16a34a',bg:'rgba(22,163,74,.12)'},
+  {v:'failed',label:'Failed',color:'#dc2626',bg:'rgba(220,38,38,.12)'},
+];
+
+function TestingStatusBadge({status}){
+  const s=TESTING_STATUSES.find(x=>x.v===status)||TESTING_STATUSES[0];
+  return el('span',{style:{background:s.bg,color:s.color,border:'1px solid '+s.color+'55',borderRadius:6,padding:'2px 10px',fontSize:11,fontWeight:700,whiteSpace:'nowrap'}},s.label);
+}
+
+function TestingModule({cu,isAdmin,isElevated,SUPA_URL,SUPA_KEY,H,db}){
+  const[entries,setEntries]=React.useState([]);
+  const[loading,setLoading]=React.useState(true);
+  const[search,setSearch]=React.useState('');
+  const[filterStatus,setFilterStatus]=React.useState('');
+  const[editItem,setEditItem]=React.useState(null);
+  const[saving,setSaving]=React.useState(false);
+  const[coaUploading,setCoaUploading]=React.useState(false);
+  const TABLE='pf_testing';
+  const canEdit=isAdmin||isElevated;
+
+  function load(){
+    setLoading(true);
+    fetch(`${SUPA_URL}/rest/v1/${TABLE}?select=*&order=created_at.desc`,{headers:H.headers})
+      .then(r=>r.ok?r.json():[]).then(rows=>{setEntries(Array.isArray(rows)?rows:[]);setLoading(false);}).catch(()=>setLoading(false));
+  }
+  React.useEffect(()=>{load();},[]);
+
+  async function saveItem(item){
+    setSaving(true);
+    const isNew=!item.id||!entries.find(e=>e.id===item.id);
+    const payload={...item,updated_at:new Date().toISOString()};
+    try{
+      if(isNew){
+        const res=await fetch(`${SUPA_URL}/rest/v1/${TABLE}`,{method:'POST',headers:{...H.headers,'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(payload)});
+        const data=await res.json();
+        const rec=Array.isArray(data)?data[0]:data;
+        setEntries(p=>[rec,...p]);
+      } else {
+        const res=await fetch(`${SUPA_URL}/rest/v1/${TABLE}?id=eq.${encodeURIComponent(item.id)}`,{method:'PATCH',headers:{...H.headers,'Content-Type':'application/json','Prefer':'return=representation'},body:JSON.stringify(payload)});
+        const data=await res.json();
+        const rec=Array.isArray(data)?data[0]:data;
+        setEntries(p=>p.map(e=>e.id===rec.id?rec:e));
+      }
+      setEditItem(null);
+    }catch(e){alert('Save failed: '+e.message);}
+    setSaving(false);
+  }
+
+  async function uploadCoa(file,item){
+    setCoaUploading(true);
+    try{
+      const ext=file.name.split('.').pop();
+      const path='coa/'+item.id+'-'+Date.now()+'.'+ext;
+      const upRes=await fetch(`${SUPA_URL}/storage/v1/object/coa-uploads/${path}`,{method:'POST',headers:{...H.headers,'Content-Type':file.type,'x-upsert':'true'},body:file});
+      if(!upRes.ok){const e=await upRes.text();throw new Error(e);}
+      const url=`${SUPA_URL}/storage/v1/object/public/coa-uploads/${path}`;
+      await saveItem({...item,coa_url:url,coa_filename:file.name});
+      setEditItem(p=>p?({...p,coa_url:url,coa_filename:file.name}):p);
+    }catch(e){alert('Upload failed: '+e.message);}
+    setCoaUploading(false);
+  }
+
+  const filtered=entries.filter(e=>{
+    if(filterStatus&&e.status!==filterStatus) return false;
+    if(search&&!JSON.stringify(e).toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  });
+
+  const counts={};TESTING_STATUSES.forEach(s=>{counts[s.v]=entries.filter(e=>e.status===s.v).length;});
+
+  return el('div',{style:{padding:'0 0 48px'}},
+    // Header
+    el('div',{style:{background:'linear-gradient(135deg,#6366f1 0%,#8b5cf6 100%)',borderRadius:14,padding:'24px 28px',marginBottom:24,color:'#fff'}},
+      el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',flexWrap:'wrap',gap:12}},
+        el('div',null,
+          el('div',{style:{fontSize:22,fontWeight:800,marginBottom:3}},'🧪 Testing'),
+          el('div',{style:{fontSize:13,opacity:.8}},'COA tracking · Lab submissions · Sample METRC tags'),
+        ),
+      ),
+      el('div',{style:{display:'flex',gap:20,marginTop:18,flexWrap:'wrap'}},
+        TESTING_STATUSES.map(s=>el('div',{key:s.v,style:{background:'rgba(255,255,255,.12)',borderRadius:8,padding:'8px 16px',textAlign:'center'}},
+          el('div',{style:{fontSize:18,fontWeight:800}},counts[s.v]||0),
+          el('div',{style:{fontSize:10,opacity:.8,marginTop:2}},s.label),
+        )),
+      ),
+    ),
+
+    // Filters
+    el('div',{style:{display:'flex',gap:10,marginBottom:16,flexWrap:'wrap',alignItems:'center'}},
+      el('input',{type:'text',value:search,onChange:ev=>setSearch(ev.target.value),placeholder:'Search batches, SKU, METRC…',style:{flex:1,minWidth:180,background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:'8px 12px',color:'var(--text)',fontFamily:'inherit',fontSize:13}}),
+      el('select',{value:filterStatus,onChange:ev=>setFilterStatus(ev.target.value),style:{background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:'8px 12px',color:'var(--text)',fontFamily:'inherit',fontSize:13}},
+        el('option',{value:''},'All Statuses'),
+        TESTING_STATUSES.map(s=>el('option',{key:s.v,value:s.v},s.label)),
+      ),
+      el('button',{onClick:load,className:'btn b-ghost btn-sm'},'↻ Refresh'),
+    ),
+
+    // List
+    loading?el('div',{style:{textAlign:'center',padding:40,color:'var(--text3)'}},'Loading…')
+    :filtered.length===0?el('div',{style:{textAlign:'center',padding:'48px 24px',background:'var(--surface)',borderRadius:12,border:'1px solid var(--border)'}},
+        el('div',{style:{fontSize:36,marginBottom:12}},'🧪'),
+        el('div',{style:{fontSize:15,fontWeight:700,color:'var(--text)',marginBottom:6}},'No testing records'),
+        el('div',{style:{fontSize:13,color:'var(--text2)'}},'Use “Submit for Testing” on a batch in the Batch Tracker to create one.'),
+      )
+    :el('div',{style:{display:'flex',flexDirection:'column',gap:10}},
+        filtered.map((item,i)=>{
+          const editing=editItem&&editItem.id===item.id;
+          return el('div',{key:item.id||i,style:{background:'var(--surface2)',border:'1px solid var(--border)',borderRadius:12,padding:'16px 18px',boxShadow:'0 1px 3px rgba(15,23,42,.04)'}},
+            // Header row
+            el('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:8,flexWrap:'wrap',marginBottom:editing?12:0}},
+              el('div',{style:{flex:1}},
+                el('div',{style:{display:'flex',gap:8,flexWrap:'wrap',alignItems:'center',marginBottom:4}},
+                  el('span',{style:{fontWeight:800,fontSize:14,color:'var(--text)'}},item.batch_number||item.batch_id),
+                  item.sku&&el('span',{style:{fontSize:12,color:'var(--text2)'}},item.sku),
+                  item.flavor&&el('span',{style:{background:'rgba(99,102,241,.1)',color:'#6366f1',borderRadius:4,padding:'2px 8px',fontSize:11,fontWeight:600}},item.flavor),
+                  el(TestingStatusBadge,{status:item.status}),
+                ),
+                el('div',{style:{display:'flex',gap:16,flexWrap:'wrap',fontSize:12,color:'var(--text2)'}},
+                  item.metrc_tag&&el('span',null,'🏷️ METRC: '+item.metrc_tag),
+                  item.sample_metrc_tag&&el('span',null,'📋 Sample Tag: '+item.sample_metrc_tag),
+                  item.lab_name&&el('span',null,'🏛️ Lab: '+item.lab_name),
+                  item.submitted_at&&el('span',null,'Submitted: '+new Date(item.submitted_at).toLocaleDateString()),
+                  item.coa_url&&el('a',{href:item.coa_url,target:'_blank',style:{color:'#6366f1',textDecoration:'none',fontWeight:600}},'📄 '+( item.coa_filename||'View COA')),
+                ),
+              ),
+              el('div',{style:{display:'flex',gap:6,flexShrink:0}},
+                canEdit&&el('button',{onClick:()=>setEditItem(editing?null:{...item}),className:'btn b-ghost btn-sm'},editing?'Cancel':'Edit'),
+                canEdit&&el('button',{onClick:async()=>{if(!confirm('Delete this testing record?'))return;await fetch(`${SUPA_URL}/rest/v1/${TABLE}?id=eq.${item.id}`,{method:'DELETE',headers:H.headers});setEntries(p=>p.filter(e=>e.id!==item.id));},className:'btn b-red btn-sm'},'Del'),
+              ),
+            ),
+
+            // Inline editor
+            editing&&el('div',{style:{borderTop:'1px solid var(--border)',paddingTop:12,display:'flex',flexDirection:'column',gap:10}},
+              // Status dropdown
+              el('div',{style:{display:'flex',gap:10,flexWrap:'wrap',alignItems:'flex-start'}},
+                el('div',{style:{flex:1,minWidth:160}},
+                  el('label',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',display:'block',marginBottom:4}},'STATUS'),
+                  el('select',{value:editItem.status||'not_submitted',onChange:ev=>setEditItem(p=>({...p,status:ev.target.value,submitted_at:ev.target.value==='submitted'&&!p.submitted_at?new Date().toISOString():p.submitted_at,result_at:['passed','failed'].includes(ev.target.value)&&!p.result_at?new Date().toISOString():p.result_at})),style:{width:'100%',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:'8px 10px',color:'var(--text)',fontFamily:'inherit',fontSize:13}},
+                    TESTING_STATUSES.map(s=>el('option',{key:s.v,value:s.v},s.label)),
+                  ),
+                ),
+                el('div',{style:{flex:1,minWidth:160}},
+                  el('label',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',display:'block',marginBottom:4}},'LAB NAME'),
+                  el('input',{type:'text',value:editItem.lab_name||'',onChange:ev=>setEditItem(p=>({...p,lab_name:ev.target.value})),placeholder:'e.g. Psilabs, ACS Lab…',style:{width:'100%',boxSizing:'border-box',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:'8px 10px',color:'var(--text)',fontFamily:'inherit',fontSize:13}}),
+                ),
+              ),
+              // METRC tags row
+              el('div',{style:{display:'flex',gap:10,flexWrap:'wrap'}},
+                el('div',{style:{flex:1,minWidth:160}},
+                  el('label',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',display:'block',marginBottom:4}},'BATCH METRC TAG'),
+                  el('input',{type:'text',value:editItem.metrc_tag||'',onChange:ev=>setEditItem(p=>({...p,metrc_tag:ev.target.value})),placeholder:'1A4000…',style:{width:'100%',boxSizing:'border-box',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:'8px 10px',color:'var(--text)',fontFamily:'inherit',fontSize:13}}),
+                ),
+                el('div',{style:{flex:1,minWidth:160}},
+                  el('label',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',display:'block',marginBottom:4}},'SAMPLE METRC TAG'),
+                  el('input',{type:'text',value:editItem.sample_metrc_tag||'',onChange:ev=>setEditItem(p=>({...p,sample_metrc_tag:ev.target.value})),placeholder:'Sample package tag…',style:{width:'100%',boxSizing:'border-box',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:'8px 10px',color:'var(--text)',fontFamily:'inherit',fontSize:13}}),
+                ),
+              ),
+              // THC/CBD results row
+              el('div',{style:{display:'flex',gap:10,flexWrap:'wrap'}},
+                el('div',{style:{flex:1,minWidth:100}},
+                  el('label',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',display:'block',marginBottom:4}},'THC % (result)'),
+                  el('input',{type:'number',step:'0.01',value:editItem.result_thc||'',onChange:ev=>setEditItem(p=>({...p,result_thc:ev.target.value})),placeholder:'e.g. 82.4',style:{width:'100%',boxSizing:'border-box',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:'8px 10px',color:'var(--text)',fontFamily:'inherit',fontSize:13}}),
+                ),
+                el('div',{style:{flex:1,minWidth:100}},
+                  el('label',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',display:'block',marginBottom:4}},'CBD % (result)'),
+                  el('input',{type:'number',step:'0.01',value:editItem.result_cbd||'',onChange:ev=>setEditItem(p=>({...p,result_cbd:ev.target.value})),placeholder:'e.g. 0.12',style:{width:'100%',boxSizing:'border-box',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:'8px 10px',color:'var(--text)',fontFamily:'inherit',fontSize:13}}),
+                ),
+                el('div',{style:{flex:2,minWidth:180}},
+                  el('label',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',display:'block',marginBottom:4}},'RESULT NOTES'),
+                  el('input',{type:'text',value:editItem.result_notes||'',onChange:ev=>setEditItem(p=>({...p,result_notes:ev.target.value})),placeholder:'Any flags, fails, pesticides…',style:{width:'100%',boxSizing:'border-box',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:'8px 10px',color:'var(--text)',fontFamily:'inherit',fontSize:13}}),
+                ),
+              ),
+              // Notes
+              el('div',null,
+                el('label',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',display:'block',marginBottom:4}},'INTERNAL NOTES'),
+                el('textarea',{value:editItem.notes||'',onChange:ev=>setEditItem(p=>({...p,notes:ev.target.value})),rows:2,placeholder:'Internal notes…',style:{width:'100%',boxSizing:'border-box',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:'8px 10px',color:'var(--text)',fontFamily:'inherit',fontSize:13,resize:'vertical'}}),
+              ),
+              // COA upload
+              el('div',{style:{display:'flex',gap:10,alignItems:'center',flexWrap:'wrap'}},
+                el('label',{style:{fontSize:11,fontWeight:700,color:'var(--text2)'}},'COA UPLOAD'),
+                el('input',{type:'file',accept:'.pdf,.png,.jpg,.jpeg',onChange:async ev=>{const f=ev.target.files[0];if(f)await uploadCoa(f,editItem);},style:{fontSize:12,color:'var(--text)'}}),
+                coaUploading&&el('span',{style:{fontSize:12,color:'#6366f1'}},'Uploading…'),
+                editItem.coa_url&&el('a',{href:editItem.coa_url,target:'_blank',style:{fontSize:12,color:'#6366f1',fontWeight:600}},'📄 '+(editItem.coa_filename||'View COA')),
+              ),
+              // Save row
+              el('div',{style:{display:'flex',gap:8,justifyContent:'flex-end'}},
+                el('button',{onClick:()=>setEditItem(null),className:'btn b-ghost btn-sm'},'Cancel'),
+                el('button',{onClick:()=>saveItem(editItem),disabled:saving,style:{background:'#6366f1',color:'#fff',border:'none',borderRadius:8,padding:'8px 20px',fontFamily:'inherit',fontSize:13,fontWeight:700,cursor:'pointer'}},saving?'Saving…':'✓ Save'),
+              ),
+            ),
+          );
+        })
+      ),
   );
 }
 
@@ -14552,6 +14760,7 @@ function App(){
         canAccessQms&&el('button',{className:`nav${page==='qms_audits'?' on':''}`,onClick:()=>setPage('qms_audits')},el('span',null,'\uD83D\uDD0D'),'Audits'),
         canAccessQms&&el('button',{className:`nav${page==='training'?' on':''}`,onClick:()=>setPage('training')},el('span',null,'\uD83C\uDF93'),'Training Matrix'),
         canAccessCompliance&&el('button',{className:`nav${page==='compliance'?' on':''}`,onClick:()=>setPage('compliance')},el('span',null,'\u2705'),'CRA Compliance'),
+        canAccessBatch&&el('button',{className:`nav${page==='testing'?' on':''}`,onClick:()=>setPage('testing')},el('span',null,'\ud83e\uddea'),'Testing'),
       ),
 
       // ── Management dropdown ───────────────────────────────────────────
@@ -14760,9 +14969,10 @@ function App(){
       page==='license'&&el(LicenseChart,{}),
       page==='sops'&&restricted&&el(SOPs,{sops,setSops,cu,users}),
       page==='compliance'&&canAccessCompliance&&el(ComplianceModule,{cu,isElevated,isAdmin,LICENSES,SUPA_URL,SUPA_KEY,H,db}),
+      page==='testing'&&canAccessBatch&&el(TestingModule,{cu,isAdmin,isElevated,SUPA_URL,SUPA_KEY,H,db}),
       page==='risks'&&canAccessRisks&&el(RiskRegister,{cu,isElevated,isAdmin,SUPA_URL,SUPA_KEY,H}),
       page==='logs'&&canAccessLogs&&el(FacilityLogs,{cu,isElevated,isAdmin,SUPA_URL,SUPA_KEY,H}),
-      page==='batch'&&canAccessBatch&&el(BatchTracker,{cu,isElevated,isAdmin,SUPA_URL,SUPA_KEY,H,restricted,mpFn:modulePerm.bind(null,cu)}),
+      page==='batch'&&canAccessBatch&&el(BatchTracker,{cu,isElevated,isAdmin,SUPA_URL,SUPA_KEY,H,restricted,mpFn:modulePerm.bind(null,cu),setPage}),
       page==='formbank'&&canAccessFormBank&&el(FormulationBank,{cu,SUPA_URL,SUPA_KEY,H}),
       page==='cogs'&&canAccessCogs&&el(CogsCalculator,{cu,SUPA_URL,SUPA_KEY,H}),
       page==='reporter'&&canAccessQms&&el(AIReporter,{cu,SUPA_URL,SUPA_KEY,H}),
