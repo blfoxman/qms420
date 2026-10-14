@@ -6466,16 +6466,51 @@ function riskLevel(score){
 // Natural-language interface over live Supabase data. Fetches only the tables
 // relevant to what the user asked, sends the data + question to Claude API,
 // returns a formatted summary + keeps the conversation open for follow-ups.
+// Michigan-specific keyword → table routing
 const REPORTER_TABLE_MAP={
+  // Production & batches
   batch:['pf_batch_tracker'],
+  batches:['pf_batch_tracker'],
   yield:['pf_batch_tracker'],
-  metrc:['pf_batch_tracker'],
-  extraction:['pf_batch_tracker'],
-  cartridge:['pf_batch_tracker'],
-  gummy:['pf_batch_tracker'],
-  'pre-roll':['pf_batch_tracker'],
-  'pre roll':['pf_batch_tracker'],
+  metrc:['pf_batch_tracker','pf_testing'],
   production:['pf_batch_tracker','pf_tasks'],
+  manufactured:['pf_batch_tracker'],
+  // Product types (Michigan)
+  cartridge:['pf_batch_tracker','pf_testing'],
+  cart:['pf_batch_tracker','pf_testing'],
+  vape:['pf_batch_tracker','pf_testing'],
+  '510':['pf_batch_tracker','pf_testing'],
+  distillate:['pf_batch_tracker'],
+  concentrate:['pf_batch_tracker'],
+  extraction:['pf_batch_tracker'],
+  flower:['pf_batch_tracker','pf_testing'],
+  trim:['pf_batch_tracker'],
+  'pre-roll':['pf_batch_tracker','pf_testing'],
+  'pre roll':['pf_batch_tracker','pf_testing'],
+  preroll:['pf_batch_tracker','pf_testing'],
+  joint:['pf_batch_tracker','pf_testing'],
+  infused:['pf_batch_tracker','pf_testing'],
+  edible:['pf_batch_tracker','pf_testing'],
+  gummy:['pf_batch_tracker','pf_testing'],
+  gummies:['pf_batch_tracker','pf_testing'],
+  // Testing & COA
+  test:['pf_testing'],
+  testing:['pf_testing'],
+  coa:['pf_testing'],
+  lab:['pf_testing'],
+  passed:['pf_testing'],
+  failed:['pf_testing'],
+  submitted:['pf_testing'],
+  retest:['pf_testing'],
+  thc:['pf_testing'],
+  cbd:['pf_testing'],
+  potency:['pf_testing'],
+  pesticide:['pf_testing'],
+  microbial:['pf_testing'],
+  mycotoxin:['pf_testing'],
+  'heavy metal':['pf_testing'],
+  solvent:['pf_testing'],
+  // QMS & compliance
   sop:['pf_sops'],
   acknowledge:['pf_sops'],
   sign:['pf_sops'],
@@ -6489,27 +6524,43 @@ const REPORTER_TABLE_MAP={
   complaint:['pf_qms_complaints'],
   change:['pf_qms_changes'],
   compliance:['pf_compliance_checks','pf_qms_audits'],
+  cra:['pf_compliance_checks'],
+  mrtma:['pf_compliance_checks'],
+  michigan:['pf_compliance_checks','pf_batch_tracker'],
   clause:['pf_compliance_checks'],
-  iso:['pf_compliance_checks'],
-  dcr:['pf_compliance_checks'],
+  // Tasks
   task:['pf_tasks'],
   board:['pf_tasks'],
+  open:['pf_tasks','pf_qms_capas'],
+  overdue:['pf_tasks','pf_qms_capas'],
+  // Logs
   visitor:['pf_log_visitor'],
   sanitation:['pf_log_sanitation'],
+  clean:['pf_log_sanitation'],
   waste:['pf_log_waste'],
   pest:['pf_log_pest'],
   equipment:['pf_log_equipment'],
   temperature:['pf_log_temperature'],
   security:['pf_log_security'],
   log:['pf_log_sanitation','pf_log_visitor','pf_log_waste','pf_log_pest','pf_log_equipment','pf_log_temperature'],
+  // Risk & people
   risk:['pf_risk_register'],
   team:['pf_users_safe'],
   user:['pf_users_safe'],
   employee:['pf_users_safe'],
   staff:['pf_users_safe'],
   who:['pf_users_safe'],
+  // Chart triggers — fetch batch + testing for charting
+  chart:['pf_batch_tracker','pf_testing'],
+  graph:['pf_batch_tracker','pf_testing'],
+  trend:['pf_batch_tracker','pf_testing'],
+  summary:['pf_batch_tracker','pf_testing','pf_tasks'],
+  report:['pf_batch_tracker','pf_testing','pf_compliance_checks'],
+  overview:['pf_batch_tracker','pf_testing','pf_tasks'],
+  'how many':['pf_batch_tracker','pf_testing','pf_tasks'],
+  count:['pf_batch_tracker','pf_testing'],
 };
-const ALL_REPORTER_TABLES=['pf_batch_tracker','pf_sops','pf_qms_capas','pf_qms_corrective','pf_qms_deviations','pf_qms_audits','pf_qms_suppliers','pf_qms_complaints','pf_qms_changes','pf_compliance_checks','pf_tasks','pf_log_sanitation','pf_log_visitor','pf_log_waste','pf_log_pest','pf_log_equipment','pf_log_temperature','pf_log_security','pf_risk_register','pf_users_safe'];
+const ALL_REPORTER_TABLES=['pf_batch_tracker','pf_testing','pf_sops','pf_qms_capas','pf_qms_corrective','pf_qms_deviations','pf_qms_audits','pf_qms_suppliers','pf_qms_complaints','pf_qms_changes','pf_compliance_checks','pf_tasks','pf_log_sanitation','pf_log_visitor','pf_log_waste','pf_log_pest','pf_log_equipment','pf_log_temperature','pf_log_security','pf_risk_register','pf_users_safe'];
 
 // ── PRODUCTION PLANNER ───────────────────────────────────────────────────────
 // AI-powered ingredient calculator. User picks product type, SKU, flavors,
@@ -6841,12 +6892,40 @@ function AIReporter({cu,SUPA_URL,SUPA_KEY,H}){
     const dataStr=tables.map(t=>{
       const rows=data[t]||[];
       if(!rows.length)return `## ${t}: no records`;
-      let str=JSON.stringify(rows.slice(0,25));
-      if(str.length>3000)str=str.slice(0,3000)+'\u2026';
+      let str=JSON.stringify(rows.slice(0,30));
+      if(str.length>4000)str=str.slice(0,4000)+'\u2026';
       return `## ${t} (${rows.length} records)\n${str}`;
     }).join('\n\n');
-    const capped=dataStr.length>25000?dataStr.slice(0,25000)+'\u2026':dataStr;
-    return `AI Reporter for QMS420 (Key Stone Manufacturing, TBD-PENDING). Today: ${now}. User: ${cu.name} (${cu.role}).\n\nAnswer using ONLY the data below. Be specific with record IDs, batch numbers, dates, names. Lead with a direct answer, then details. Flag any compliance gaps.\n\n${capped}`;
+    const capped=dataStr.length>28000?dataStr.slice(0,28000)+'\u2026':dataStr;
+    return `You are the AI Reporter for QMS420, the internal compliance and production management platform for Summit Solutions (Michigan cannabis manufacturing facility). Today: ${now}. User: ${cu.name} (role: ${cu.role}).
+
+FACILITY CONTEXT:
+- Michigan licensed cannabis manufacturer operating under MRTMA/CRA (R 420.101 et seq.)
+- Products: 510 cartridges, distillate carts, infused pre-rolls, flower, edibles (gummies)
+- METRC is required for all product tracking
+- Key staff: Logan Rosenbrock (GM), Kenneth Forsyth (Production Mgr), Amber Streeter (Asst. Production Mgr), Mashon Stockmeyer (Cartridge Dept Supervisor), Hannah Rousse (Inventory & Distribution), Marissa Burt (Compliance Officer), Deanie Holland (METRC Specialist)
+- Testing: All batches require COA before distribution. Pass/fail tracked in pf_testing. Status values: not_submitted, submitted, passed, retest, failed.
+
+ANSWER RULES:
+- Answer using ONLY the data provided below. Do not fabricate records.
+- Lead with a direct, specific answer. Use batch numbers, dates, names.
+- Flag compliance gaps, missing COAs, overdue items, failed tests prominently.
+- For counts, percentages, trends across batches or tests: include a CHART block at the end if visual data would help (see format below).
+- Use plain English. Short paragraphs. Bullet points for lists.
+
+CHART FORMAT \u2014 include ONLY when data supports a meaningful chart:
+When your answer contains countable categories or time-series data, append a chart block like this at the very end:
+\`\`\`chart
+{"type":"bar","title":"Chart title","labels":["A","B","C"],"values":[10,5,3],"color":"#6ba022"}
+\`\`\`
+or for multiple series:
+\`\`\`chart
+{"type":"bar","title":"Chart title","labels":["Jan","Feb","Mar"],"series":[{"name":"Passed","values":[4,6,3],"color":"#16a34a"},{"name":"Failed","values":[1,0,2],"color":"#ef4444"}]}
+\`\`\`
+Supported types: bar, line. Only include if data has at least 2 data points. Do NOT include a chart for simple yes/no or single-fact questions.
+
+DATA:
+${capped}`;
   }
 
   async function send(){
@@ -6888,12 +6967,87 @@ function AIReporter({cu,SUPA_URL,SUPA_KEY,H}){
     setFetchStatus('');
   }
 
+  // Parse and render an inline chart from the ```chart ... ``` block
+  function InlineChart({spec}){
+    try{
+      const d=typeof spec==='string'?JSON.parse(spec):spec;
+      const labels=d.labels||[];
+      const isSeries=!!d.series;
+      const series=isSeries?d.series:[{name:'',values:d.values||[],color:d.color||'#6ba022'}];
+      const allVals=series.flatMap(s=>s.values||[]);
+      const maxVal=Math.max(...allVals,1);
+      const W=520,H=220,PAD_LEFT=48,PAD_BOTTOM=40,PAD_TOP=20,PAD_RIGHT=16;
+      const chartW=W-PAD_LEFT-PAD_RIGHT;
+      const chartH=H-PAD_BOTTOM-PAD_TOP;
+      const n=labels.length;
+      // Bar chart
+      if(d.type==='bar'||!d.type){
+        const groupW=chartW/Math.max(n,1);
+        const barW=Math.max(6,groupW/series.length-4);
+        const barEls=[];
+        series.forEach((s,si)=>{
+          (s.values||[]).forEach((v,li)=>{
+            const x=PAD_LEFT+li*groupW+si*(barW+2)+(groupW-series.length*(barW+2))/2;
+            const bh=Math.max(2,(v/maxVal)*chartH);
+            const y=PAD_TOP+chartH-bh;
+            barEls.push(React.createElement('rect',{key:si+'-'+li,x,y,width:barW,height:bh,fill:s.color||'#6ba022',rx:2,opacity:.85}));
+            barEls.push(React.createElement('text',{key:'v'+si+'-'+li,x:x+barW/2,y:y-3,textAnchor:'middle',fontSize:9,fill:'var(--text2)'},v));
+          });
+        });
+        // Y axis ticks
+        const ticks=[0,0.25,0.5,0.75,1].map(f=>Math.round(f*maxVal));
+        const tickEls=ticks.map((t,i)=>{
+          const y=PAD_TOP+chartH-(t/maxVal)*chartH;
+          return[React.createElement('line',{key:'tl'+i,x1:PAD_LEFT-4,y1:y,x2:W-PAD_RIGHT,y2:y,stroke:'var(--border)',strokeWidth:.5}),
+            React.createElement('text',{key:'tt'+i,x:PAD_LEFT-6,y:y+3,textAnchor:'end',fontSize:9,fill:'var(--text3)'},t)];
+        });
+        // X labels
+        const xLabels=labels.map((lb,i)=>React.createElement('text',{key:'xl'+i,x:PAD_LEFT+i*groupW+groupW/2,y:H-6,textAnchor:'middle',fontSize:9,fill:'var(--text3)'},lb.length>10?lb.slice(0,10)+'…':lb));
+        // Legend
+        const legendEls=isSeries?series.map((s,i)=>React.createElement('g',{key:'lg'+i,transform:`translate(${PAD_LEFT+i*100},${H+4})`},
+          React.createElement('rect',{x:0,y:0,width:10,height:10,fill:s.color,rx:2}),
+          React.createElement('text',{x:14,y:9,fontSize:9,fill:'var(--text2)'},s.name)
+        )):[];
+        const svgH=isSeries?H+18:H;
+        return React.createElement('svg',{width:'100%',viewBox:`0 0 ${W} ${svgH}`,style:{display:'block',maxWidth:W,margin:'8px 0'}},
+          React.createElement('text',{x:W/2,y:12,textAnchor:'middle',fontSize:11,fontWeight:'700',fill:'var(--text)'},d.title||''),
+          ...tickEls.flat(),...barEls,...xLabels,...legendEls
+        );
+      }
+      // Line chart
+      if(d.type==='line'){
+        const step=chartW/Math.max(n-1,1);
+        const lineEls=series.map((s,si)=>{
+          const pts=(s.values||[]).map((v,i)=>{
+            const x=PAD_LEFT+i*step;
+            const y=PAD_TOP+chartH-(v/maxVal)*chartH;
+            return`${x},${y}`;
+          }).join(' ');
+          const dots=(s.values||[]).map((v,i)=>React.createElement('circle',{key:'d'+si+'-'+i,cx:PAD_LEFT+i*step,cy:PAD_TOP+chartH-(v/maxVal)*chartH,r:3,fill:s.color||'#6ba022'}));
+          return[React.createElement('polyline',{key:'l'+si,points:pts,fill:'none',stroke:s.color||'#6ba022',strokeWidth:2,strokeLinejoin:'round'}),...dots];
+        });
+        const ticks=[0,0.5,1].map(f=>Math.round(f*maxVal));
+        const tickEls=ticks.map((t,i)=>{const y=PAD_TOP+chartH-(t/maxVal)*chartH;return[React.createElement('line',{key:'tl'+i,x1:PAD_LEFT,y1:y,x2:W-PAD_RIGHT,y2:y,stroke:'var(--border)',strokeWidth:.5,strokeDasharray:'3,3'}),React.createElement('text',{key:'tt'+i,x:PAD_LEFT-6,y:y+3,textAnchor:'end',fontSize:9,fill:'var(--text3)'},t)];});
+        const xLabels=labels.map((lb,i)=>React.createElement('text',{key:'xl'+i,x:PAD_LEFT+i*step,y:H-6,textAnchor:'middle',fontSize:9,fill:'var(--text3)'},lb.length>8?lb.slice(0,8)+'…':lb));
+        const legendEls=isSeries?series.map((s,i)=>React.createElement('g',{key:'lg'+i,transform:`translate(${PAD_LEFT+i*100},${H+4})`},React.createElement('rect',{x:0,y:0,width:10,height:10,fill:s.color,rx:2}),React.createElement('text',{x:14,y:9,fontSize:9,fill:'var(--text2)'},s.name))):[];
+        const svgH=isSeries?H+18:H;
+        return React.createElement('svg',{width:'100%',viewBox:`0 0 ${W} ${svgH}`,style:{display:'block',maxWidth:W,margin:'8px 0'}},
+          React.createElement('text',{x:W/2,y:12,textAnchor:'middle',fontSize:11,fontWeight:'700',fill:'var(--text)'},d.title||''),
+          ...tickEls.flat(),...lineEls.flat(),...xLabels,...legendEls
+        );
+      }
+    }catch(e){return null;}
+    return null;
+  }
+
   function MsgBlock({msg}){
     if(msg.role==='user') return el('div',{style:{display:'flex',justifyContent:'flex-end',marginBottom:16}},
       el('div',{style:{background:'var(--accent)',color:'#fff',borderRadius:'18px 18px 4px 18px',padding:'10px 16px',maxWidth:'75%',fontSize:13,lineHeight:1.5}},msg.content)
     );
-    // Assistant message — render markdown-ish formatting
-    const lines=msg.content.split('\n');
+    // Assistant message — parse out any ```chart blocks first
+    const chartBlocks=[];
+    const textContent=msg.content.replace(/```chart\n([\s\S]*?)```/g,(m,json)=>{chartBlocks.push(json.trim());return'[CHART_PLACEHOLDER_'+chartBlocks.length+']';});
+    const lines=textContent.split('\n');
     const formatted=lines.map((ln,i)=>{
       if(ln.startsWith('## ')) return el('div',{key:i,style:{fontWeight:700,fontSize:14,color:'var(--accent)',marginTop:i>0?12:0,marginBottom:4}},ln.slice(3));
       if(ln.startsWith('# ')) return el('div',{key:i,style:{fontWeight:800,fontSize:16,color:'var(--text)',marginTop:i>0?14:0,marginBottom:6}},ln.slice(2));
@@ -6918,10 +7072,19 @@ function AIReporter({cu,SUPA_URL,SUPA_KEY,H}){
           )
         );
       }
+      // Chart placeholder
+      if(/^\[CHART_PLACEHOLDER_(\d+)\]$/.test(ln.trim())){
+        const idx=parseInt(ln.trim().match(/\d+/)[0])-1;
+        const spec=chartBlocks[idx];
+        if(spec) return el('div',{key:i,style:{background:'var(--surface2)',border:'1px solid var(--border)',borderRadius:10,padding:'14px 16px',margin:'10px 0'}},
+          el(InlineChart,{spec})
+        );
+        return null;
+      }
       return el('div',{key:i,style:{fontSize:13,lineHeight:1.6,marginBottom:2,color:'var(--text)'}},ln||'\u00a0');
     });
     return el('div',{style:{display:'flex',justifyContent:'flex-start',marginBottom:16}},
-      el('div',{style:{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:'18px 18px 18px 4px',padding:'14px 18px',maxWidth:'85%',minWidth:200}},
+      el('div',{style:{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:'18px 18px 18px 4px',padding:'14px 18px',maxWidth:'88%',minWidth:200}},
         formatted,
         msg.tables&&el('div',{style:{marginTop:10,fontSize:10,color:'var(--text3)',display:'flex',flexWrap:'wrap',gap:4}},
           el('span',{style:{marginRight:4}},'\uD83D\uDCC1 Queried:'),
@@ -6932,12 +7095,14 @@ function AIReporter({cu,SUPA_URL,SUPA_KEY,H}){
   }
 
   const suggestions=[
-    'Show all open CAPAs and their owners',
-    'Which SOPs have the lowest acknowledgement rates?',
-    'Summarize batch tracker activity this month',
-    'Are there any compliance gaps I should know about?',
-    'Who has not acknowledged their required SOPs?',
-    'Show me all high-risk items in the risk register',
+    'Show all batches that haven’t submitted for testing yet',
+    'Chart testing pass vs fail by product type',
+    'Which batches failed COA and what were the issues?',
+    'How many cartridge batches were produced this month?',
+    'Show me all open CAPAs and compliance gaps',
+    'Summarize this week’s production across all product types',
+    'Are there any METRC tags missing from submitted batches?',
+    'Which staff have not acknowledged their required SOPs?',
   ];
 
   return el('div',{style:{display:'flex',flexDirection:'column',height:'calc(100vh - 80px)',overflow:'hidden'}},
@@ -6945,7 +7110,7 @@ function AIReporter({cu,SUPA_URL,SUPA_KEY,H}){
     el('div',{className:'ph',style:{flexShrink:0}},
       el('div',null,
         el('div',{className:'pt'},'\uD83E\uDDE0 AI Reporter'),
-        el('div',{className:'ps'},'Ask anything about your QMS — batches, compliance, SOPs, audits, tasks, logs, team'),
+        el('div',{className:'ps'},'Michigan facility intelligence — batches, COA testing, METRC, compliance, SOPs, staff — with live charts'),
       ),
     ),
 
@@ -6954,7 +7119,7 @@ function AIReporter({cu,SUPA_URL,SUPA_KEY,H}){
       messages.length===0&&el('div',{style:{flex:1,display:'flex',flexDirection:'column',justifyContent:'center',alignItems:'center',gap:16,color:'var(--text3)',paddingBottom:40}},
         el('div',{style:{fontSize:32}},'\uD83E\uDDE0'),
         el('div',{style:{fontSize:16,fontWeight:600,color:'var(--text2)'}},'Ask anything about your facility'),
-        el('div',{style:{fontSize:13,color:'var(--text3)',textAlign:'center',maxWidth:400,lineHeight:1.6}},'I\'ll pull your live QMS data and answer in plain English. Ask about compliance gaps, batch yields, SOP acknowledgements, open tasks, audit status \u2014 anything.'),
+        el('div',{style:{fontSize:13,color:'var(--text3)',textAlign:'center',maxWidth:440,lineHeight:1.6}},'Ask about production batches, COA testing results, METRC tags, compliance gaps, staff SOPs, open CAPAs \u2014 anything in the Michigan QMS. I\u2019ll pull live data and chart it when useful.'),
         el('div',{style:{display:'flex',flexWrap:'wrap',gap:8,justifyContent:'center',marginTop:8}},
           suggestions.map(s=>el('button',{key:s,onClick:()=>{setInput(s);},
             style:{padding:'8px 14px',borderRadius:20,border:'1px solid var(--border)',background:'var(--surface2)',color:'var(--text2)',fontSize:12,cursor:'pointer',fontFamily:'inherit',transition:'all .15s'}
