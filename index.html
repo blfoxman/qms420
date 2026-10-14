@@ -4439,7 +4439,6 @@ const LOG_TYPES={
     {key:'_s_primed',label:'--- PRIMED OIL / DISTILLATE ---',type:'section'},
     {key:'primed_oil_total_weight',label:'Primed Oil Total Weight',type:'text',placeholder:'e.g. 840g'},
     {key:'primed_distillate_metrc',label:'Primed Distillate METRC Tag',type:'text',placeholder:'METRC tag for the primed distillate'},
-    {key:'primed_oil_metrc',label:'Primed Oil METRC #',type:'text',placeholder:'METRC tag for the primed oil batch'},
     {key:'primed_oil_used',label:'Primed Oil Used',type:'text',placeholder:'How much primed oil was used in this fill run'},
     {key:'primed_rd1',label:'R&D Test (optional)',type:'text'},
     {key:'primed_rd2',label:'R&D Test 2 (optional)',type:'text'},
@@ -4447,9 +4446,9 @@ const LOG_TYPES={
     {key:'_s_primed_system_check',label:'--- SYSTEM CHECK ---',type:'section'},
     {key:'primed_check_result',label:'System Check',type:'display'},
     {key:'_s_filled_vapes',label:'--- FILLED VAPES BULK ---',type:'section'},
-    {key:'filled_vapes_bulk_weight',label:'Filled Vapes Bulk Weight',type:'text',placeholder:'e.g. 820g total'},
+    {key:'filled_vapes_bulk_weight',label:'Filled Vapes Bulk (Units)',type:'text',placeholder:'e.g. 2000 units'},
     {key:'filled_vapes_bulk_metrc',label:'Filled Vapes Bulk METRC Tag',type:'text',placeholder:'METRC tag for filled vapes — this is the testing tag'},
-    {key:'filled_vapes_waste',label:'Filled Vapes Waste',type:'text',placeholder:'e.g. 20g waste'},
+    {key:'filled_vapes_waste',label:'Filled Vapes Waste (Units)',type:'text',placeholder:'e.g. 10 units waste'},
     {key:'filled_rd1',label:'R&D Fill Test (optional)',type:'text'},
     {key:'filled_rd2',label:'R&D Fill Test 2 (optional)',type:'text'},
     {key:'filled_vapes_metrc_confirmed',label:'Recorded on METRC?',type:'checkbox'},
@@ -5913,6 +5912,15 @@ function CoaAnalysisPanelInner({analysis,expanded}){
       el('button',{onClick:()=>setShow(s=>!s),style:{marginLeft:'auto',background:'transparent',border:'none',color:'#6366f1',fontSize:11,fontWeight:700,cursor:'pointer',padding:'2px 6px'}},show?'▲ Collapse':'▼ Full Data'),
     ),
 
+    // METRC mismatch warning banner
+    analysis.metrc_mismatch&&el('div',{style:{background:'rgba(234,88,12,.12)',border:'1px solid rgba(234,88,12,.4)',borderRadius:8,padding:'8px 12px',marginBottom:10,display:'flex',alignItems:'flex-start',gap:8}},
+      el('span',{style:{fontSize:16,flexShrink:0}},'⚠️'),
+      el('div',null,
+        el('div',{style:{fontSize:12,fontWeight:800,color:'#ea580c',marginBottom:2}},'METRC TAG MISMATCH — Wrong COA?'),
+        el('div',{style:{fontSize:11,color:'#c2410c'}},safe(analysis.metrc_mismatch_detail)),
+        el('div',{style:{fontSize:11,color:'#c2410c',marginTop:3}},'Please verify this COA belongs to this batch before proceeding.'),
+      ),
+    ),
     // Potency summary — always visible
     (p.total_thc!=null||p.thc!=null)&&el('div',{style:{display:'flex',gap:12,marginBottom:10,flexWrap:'wrap',background:'rgba(99,102,241,.06)',borderRadius:7,padding:'8px 12px',fontSize:12}},
       (p.total_thc!=null||p.thc!=null)&&el('span',null,el('b',null,'Total THC: '),(p.total_thc??p.thc)+'%'),
@@ -6043,6 +6051,9 @@ function TestingModule({cu,isAdmin,isElevated,SUPA_URL,SUPA_KEY,H,db}){
   const[loading,setLoading]=React.useState(true);
   const[search,setSearch]=React.useState('');
   const[filterStatus,setFilterStatus]=React.useState('');
+  const[filterCategory,setFilterCategory]=React.useState('');
+  const[showCreateManual,setShowCreateManual]=React.useState(false);
+  const[manualForm,setManualForm]=React.useState({batch_number:'',batch_type:'',sku:'',flavor:'',metrc_tag:'',sample_metrc_tag:'',lab_name:'',notes:''});
   const[editItem,setEditItem]=React.useState(null);
   const[saving,setSaving]=React.useState(false);
   const[coaUploading,setCoaUploading]=React.useState(false);
@@ -6179,16 +6190,44 @@ function TestingModule({cu,isAdmin,isElevated,SUPA_URL,SUPA_KEY,H,db}){
         analysis={summary:text,sections:{},raw_response:text,parse_error:parseErr.message,analyzed_at:new Date().toISOString()};
       }
       analysis.analyzed_at=new Date().toISOString();
-      const updated={...item,coa_analysis:analysis,result_thc:analysis.thc_pct!=null?String(analysis.thc_pct):(analysis.potency?.total_thc!=null?String(analysis.potency.total_thc):item.result_thc),result_cbd:analysis.cbd_pct!=null?String(analysis.cbd_pct):(analysis.potency?.total_cbd!=null?String(analysis.potency.total_cbd):item.result_cbd),result_notes:analysis.summary||item.result_notes};
+      // --- METRC tag validation ---
+      // Check if COA sample metrc_tag matches the batch metrc_tag
+      const coaSampleTag=(analysis.sample?.metrc_tag||'').replace(/\s/g,'').toUpperCase();
+      const batchTag=(item.metrc_tag||'').replace(/\s/g,'').toUpperCase();
+      const sampleTag=(item.sample_metrc_tag||'').replace(/\s/g,'').toUpperCase();
+      let metrcMismatch=false;
+      let metrcMismatchMsg='';
+      if(coaSampleTag&&batchTag&&coaSampleTag!==batchTag){
+        // Also check against sample_metrc_tag if present
+        if(!sampleTag||coaSampleTag!==sampleTag){
+          metrcMismatch=true;
+          metrcMismatchMsg='⚠️ METRC TAG MISMATCH: COA sample tag ('+coaSampleTag+') does not match batch tag ('+batchTag+'). This may be the wrong COA!';
+          analysis.metrc_mismatch=true;
+          analysis.metrc_mismatch_detail='COA sample METRC: '+coaSampleTag+' | Batch METRC: '+batchTag+(sampleTag?' | Sample METRC: '+sampleTag:'');
+        }
+      }
+      // --- Auto-pass logic ---
+      // If COA overall=pass and no analyte failures found, auto-set status to passed
+      const coaOverallPass=analysis.overall==='pass';
+      const noSectionFails=!['pesticides','microbials','mycotoxins','heavy_metals','residual_solvents'].some(k=>analysis[k]&&analysis[k].status==='fail');
+      const autoPass=coaOverallPass&&noSectionFails&&!metrcMismatch&&!analysis.parse_error;
+      const newStatus=autoPass?'passed':item.status;
+      const updated={...item,coa_analysis:analysis,status:newStatus,result_at:autoPass&&!item.result_at?new Date().toISOString():item.result_at,result_thc:analysis.thc_pct!=null?String(analysis.thc_pct):(analysis.potency?.total_thc!=null?String(analysis.potency.total_thc):item.result_thc),result_cbd:analysis.cbd_pct!=null?String(analysis.cbd_pct):(analysis.potency?.total_cbd!=null?String(analysis.potency.total_cbd):item.result_cbd),result_notes:analysis.summary||item.result_notes};
       await saveItem(updated);
-      setEditItem(p=>p?({...p,coa_analysis:analysis,result_thc:updated.result_thc,result_cbd:updated.result_cbd,result_notes:updated.result_notes}):p);
-      alert('🧬 COA analyzed! Review results below.');
+      setEditItem(p=>p?({...p,coa_analysis:analysis,status:newStatus,result_thc:updated.result_thc,result_cbd:updated.result_cbd,result_notes:updated.result_notes}):p);
+      if(metrcMismatch){
+        alert(metrcMismatchMsg+'\n\nPlease verify you uploaded the correct COA for this batch.');
+      } else if(autoPass){
+        alert('✅ COA analyzed — ALL sections PASSED. Status automatically set to Passed!');
+      } else {
+        alert('🧬 COA analyzed! Review results below.');
+      }
     }catch(e){alert('Analysis failed: '+e.message);}
     setCoaAnalyzing(false);
   }
 
   function COA_ANALYSIS_PROMPT(item){
-    return `Extract ALL data from this Michigan cannabis COA PDF for compliance label printing. Product: ${item.sku||''} ${item.flavor||''} | Batch: ${item.batch_number||item.batch_id||''} | METRC: ${item.metrc_tag||''}
+    return `Extract ALL data from this Michigan cannabis COA PDF for compliance label printing. Product: ${item.sku||''} ${item.flavor||''} | Batch: ${item.batch_number||item.batch_id||''} | Expected METRC Tag: ${item.metrc_tag||''} | Expected Sample Tag: ${item.sample_metrc_tag||''}
 
 Return ONLY raw JSON (no markdown fences). Missing fields = null. Include EVERY analyte listed in the COA.
 
@@ -6197,8 +6236,20 @@ Return ONLY raw JSON (no markdown fences). Missing fields = null. Include EVERY 
 Fill every field from the actual COA. For analyte tables (pesticides, solvents, etc.) include ALL rows present. Each analyte: {“result”:”ND or number”,”action_level”:number,”unit”:”unit string”,”pass”:true/false}`;
   }
 
+  const CATEGORY_MAP={
+    'CONCENTRATES':['concentrate','distillate','extract','hash','rosin','wax','shatter','live_resin'],
+    'FLOWER/TRIM':['flower','trim','indoor','greenhouse','outdoor'],
+    'PRE ROLLS':['pre_roll','preroll','joint','infused_preroll','infused_joint'],
+    'EDIBLES':['edible','gummy','gummies','chocolate','beverage','tincture','capsule'],
+    'VAPE/CARTRIDGES':['cart','cartridge','vape','510','pod','distillate_cart','infused_cart'],
+  };
   const filtered=entries.filter(e=>{
     if(filterStatus&&e.status!==filterStatus) return false;
+    if(filterCategory){
+      const kws=CATEGORY_MAP[filterCategory]||[];
+      const hay=(e.batch_type||'')+(e.sku||'')+(e.flavor||'');
+      if(!kws.some(k=>hay.toLowerCase().includes(k))) return false;
+    }
     if(search&&!JSON.stringify(e).toLowerCase().includes(search.toLowerCase())) return false;
     return true;
   });
@@ -6213,6 +6264,7 @@ Fill every field from the actual COA. For analyte tables (pesticides, solvents, 
           el('div',{style:{fontSize:22,fontWeight:800,marginBottom:3}},'🧪 Testing'),
           el('div',{style:{fontSize:13,opacity:.8}},'COA tracking · Lab submissions · AI analysis · METRC tags'),
         ),
+        canEdit&&el('button',{onClick:()=>{setManualForm({batch_number:'',batch_type:'',sku:'',flavor:'',metrc_tag:'',sample_metrc_tag:'',lab_name:'',notes:''});setShowCreateManual(true);},style:{background:'rgba(255,255,255,.2)',color:'#fff',border:'1px solid rgba(255,255,255,.4)',borderRadius:8,padding:'8px 16px',fontFamily:'inherit',fontSize:13,fontWeight:700,cursor:'pointer'}},'+ Create Manual Record'),
       ),
       el('div',{style:{display:'flex',gap:20,marginTop:18,flexWrap:'wrap'}},
         TESTING_STATUSES.map(s=>el('div',{key:s.v,style:{background:'rgba(255,255,255,.12)',borderRadius:8,padding:'8px 16px',textAlign:'center'}},
@@ -6223,7 +6275,7 @@ Fill every field from the actual COA. For analyte tables (pesticides, solvents, 
     ),
 
     // Filters
-    el('div',{style:{display:'flex',gap:10,marginBottom:16,flexWrap:'wrap',alignItems:'center'}},
+    el('div',{style:{display:'flex',gap:10,marginBottom:10,flexWrap:'wrap',alignItems:'center'}},
       el('input',{type:'text',value:search,onChange:ev=>setSearch(ev.target.value),placeholder:'Search batches, SKU, METRC…',style:{flex:1,minWidth:180,background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:'8px 12px',color:'var(--text)',fontFamily:'inherit',fontSize:13}}),
       el('select',{value:filterStatus,onChange:ev=>setFilterStatus(ev.target.value),style:{background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:'8px 12px',color:'var(--text)',fontFamily:'inherit',fontSize:13}},
         el('option',{value:''},'All Statuses'),
@@ -6231,13 +6283,56 @@ Fill every field from the actual COA. For analyte tables (pesticides, solvents, 
       ),
       el('button',{onClick:load,className:'btn b-ghost btn-sm'},'↻ Refresh'),
     ),
+    // Category filter buttons
+    el('div',{style:{display:'flex',gap:6,marginBottom:16,flexWrap:'wrap'}},
+      ['ALL','CONCENTRATES','FLOWER/TRIM','PRE ROLLS','EDIBLES','VAPE/CARTRIDGES'].map(cat=>
+        el('button',{key:cat,onClick:()=>setFilterCategory(cat==='ALL'?'':cat),style:{padding:'6px 14px',borderRadius:20,border:'1px solid '+(filterCategory===(cat==='ALL'?'':cat)?'#6366f1':'var(--border)'),background:filterCategory===(cat==='ALL'?'':cat)?'rgba(99,102,241,.15)':'var(--surface)',color:filterCategory===(cat==='ALL'?'':cat)?'#6366f1':'var(--text2)',fontFamily:'inherit',fontSize:12,fontWeight:filterCategory===(cat==='ALL'?'':cat)?700:500,cursor:'pointer',transition:'all .15s'}},cat)
+      ),
+    ),
+
+    // Manual create modal
+    showCreateManual&&el('div',{style:{position:'fixed',inset:0,background:'rgba(15,23,42,.7)',backdropFilter:'blur(4px)',zIndex:1200,display:'flex',alignItems:'center',justifyContent:'center',padding:20}},
+      el('div',{style:{background:'var(--surface2)',border:'1px solid var(--border)',borderRadius:20,width:520,maxWidth:'100%',maxHeight:'90vh',overflowY:'auto',boxShadow:'0 24px 60px rgba(15,23,42,.2)'}},
+        el('div',{style:{padding:'20px 24px 14px',borderBottom:'1px solid var(--border)',display:'flex',justifyContent:'space-between',alignItems:'center'}},
+          el('div',{style:{fontSize:16,fontWeight:800}},'+ Create Testing Record'),
+          el('button',{onClick:()=>setShowCreateManual(false),style:{background:'none',border:'none',color:'var(--text3)',fontSize:22,cursor:'pointer',lineHeight:1}},'×'),
+        ),
+        el('div',{style:{padding:'20px 24px',display:'flex',flexDirection:'column',gap:12}},
+          [
+            {k:'batch_number',label:'Batch Number *',ph:'e.g. BN-2024-001'},
+            {k:'batch_type',label:'Batch Type',ph:'e.g. cartridge, flower, pre_roll, edible'},
+            {k:'sku',label:'SKU / Product',ph:'e.g. MI 1G 510 Cart'},
+            {k:'flavor',label:'Flavor / Strain',ph:'e.g. Gelato 33'},
+            {k:'metrc_tag',label:'Batch METRC Tag',ph:'1A40C0...'},
+            {k:'sample_metrc_tag',label:'Sample METRC Tag',ph:'Sample package tag (if different)'},
+            {k:'lab_name',label:'Lab Name',ph:'e.g. Infinite Chemical Analysis Labs'},
+            {k:'notes',label:'Notes',ph:'Any additional notes…'},
+          ].map(({k,label,ph})=>
+            el('div',{key:k},
+              el('label',{style:{fontSize:11,fontWeight:700,color:'var(--text2)',display:'block',marginBottom:4,textTransform:'uppercase',letterSpacing:'.8px'}},label),
+              el('input',{value:manualForm[k]||'',onChange:ev=>setManualForm(p=>({...p,[k]:ev.target.value})),placeholder:ph,style:{width:'100%',background:'var(--bg)',border:'1px solid var(--border)',borderRadius:'var(--rs)',padding:'9px 12px',color:'var(--text)',fontFamily:'inherit',fontSize:13,boxSizing:'border-box'}}),
+            )
+          ),
+        ),
+        el('div',{style:{padding:'14px 24px 20px',borderTop:'1px solid var(--border)',display:'flex',gap:8,justifyContent:'flex-end'}},
+          el('button',{onClick:()=>setShowCreateManual(false),className:'btn b-ghost'},'Cancel'),
+          el('button',{disabled:saving||!manualForm.batch_number,onClick:async()=>{
+            if(!manualForm.batch_number){alert('Batch number is required.');return;}
+            const rec={id:crypto.randomUUID(),batch_id:manualForm.batch_number,batch_number:manualForm.batch_number,batch_type:manualForm.batch_type||'manual',sku:manualForm.sku||'',flavor:manualForm.flavor||'',metrc_tag:manualForm.metrc_tag||'',sample_metrc_tag:manualForm.sample_metrc_tag||'',lab_name:manualForm.lab_name||'',notes:manualForm.notes||'',status:'not_submitted',submitted_by:cu.name,loc:'Michigan',created_at:new Date().toISOString(),updated_at:new Date().toISOString()};
+            await saveItem(rec);
+            setShowCreateManual(false);
+          },className:'btn b-blue'},saving?'Saving…':'Create Record'),
+        ),
+      ),
+    ),
 
     // List
     loading?el('div',{style:{textAlign:'center',padding:40,color:'var(--text3)'}},'Loading…')
     :filtered.length===0?el('div',{style:{textAlign:'center',padding:'48px 24px',background:'var(--surface)',borderRadius:12,border:'1px solid var(--border)'}},
         el('div',{style:{fontSize:36,marginBottom:12}},'🧪'),
         el('div',{style:{fontSize:15,fontWeight:700,color:'var(--text)',marginBottom:6}},'No testing records'),
-        el('div',{style:{fontSize:13,color:'var(--text2)'}},'Use “Submit for Testing” on a batch in the Batch Tracker to create one.'),
+        el('div',{style:{fontSize:13,color:'var(--text2)'}},'Use “Submit for Testing” on a batch in the Batch Tracker, or click “+ Create Manual Record” to add one manually.'),
+        canEdit&&el('button',{onClick:()=>{setManualForm({batch_number:'',batch_type:'',sku:'',flavor:'',metrc_tag:'',sample_metrc_tag:'',lab_name:'',notes:''});setShowCreateManual(true);},style:{marginTop:12,background:'var(--accent)',color:'#fff',border:'none',borderRadius:8,padding:'10px 24px',fontFamily:'inherit',fontSize:13,fontWeight:700,cursor:'pointer'}},'+ Create Manual Record'),
       )
     :el('div',{style:{display:'flex',flexDirection:'column',gap:10}},
         filtered.map((item,i)=>{
